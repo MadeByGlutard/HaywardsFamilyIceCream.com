@@ -47,12 +47,12 @@ module.exports = {
         pathToConfigModule: `src/utils/typography.js`
       }
     },
-    // {
-    //   resolve: `gatsby-plugin-google-analytics`,
-    //   options: {
-    //     trackingId: `UA-103197863-1`
-    //   }
-    // },
+    {
+      resolve: `gatsby-plugin-google-analytics`,
+      options: {
+        trackingId: `UA-74365494-2`
+      }
+    },
     // {
     //   resolve: `gatsby-plugin-favicon`,
     //   options: {
