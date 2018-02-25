@@ -7,6 +7,6 @@ import React from 'react'
 
 import { siteMetadata } from './gatsby-config'
 
-exports.onRenderBody = ({ setHeadComponents, setPostBodyComponents }) => {
+exports.onRenderBody = ({ setHeadComponents }) => {
   setHeadComponents([<meta key="description" name="description" content={siteMetadata.description} />])
 }
