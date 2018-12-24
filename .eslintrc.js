@@ -6,10 +6,6 @@ module.exports = {
     node: true,
     es6: true
   },
-  globals: {
-    // Gatsby exposes this as a global
-    graphql: true
-  },
   extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:prettier/recommended'],
   rules: {
     // ES6

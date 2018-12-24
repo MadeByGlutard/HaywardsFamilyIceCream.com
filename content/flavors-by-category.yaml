@@ -1,0 +1,157 @@
+- category: Ice Cream
+  flavors:
+  - name: Appalachian Trail
+    allergens: []
+    half-gallon: false
+  - name: Banana Fudge
+    allergens: []
+    half-gallon: false
+  - name: Black Raspberry
+    allergens: []
+    half-gallon: true
+  - name: Bubble Gum
+    allergens: []
+    half-gallon: false
+  - name: Butter Crunch
+    allergens: []
+    half-gallon: false
+  - name: Butter Pecan
+    allergens: [nuts]
+    half-gallon: false
+  - name: Cake Batter
+    allergens: [gluten]
+    half-gallon: false
+  - name: Caramel Tsunami
+    allergens: []
+    half-gallon: false
+  - name: Cherry Vanilla
+    allergens: []
+    half-gallon: false
+  - name: Chocolate
+    allergens: []
+    half-gallon: true
+  - name: Chocolate Chip
+    allergens: []
+    half-gallon: true
+  - name: Chocolate Peanut Butter Cup
+    allergens: [nuts]
+    half-gallon: false
+  - name: Chocolate Ripple
+    allergens: []
+    half-gallon: false
+  - name: Chocolate Tsunami
+    allergens: [gluten]
+    half-gallon: false
+  - name: Coconut Almond
+    allergens: [nuts]
+    half-gallon: true
+  - name: Coffee
+    allergens: []
+    half-gallon: true
+  - name: Coffee Oreo
+    allergens: [gluten]
+    half-gallon: true
+  - name: Cookie Dough
+    allergens: [gluten]
+    half-gallon: true
+  - name: Cookie Dough Brownie
+    allergens: [gluten]
+    half-gallon: false
+  - name: Cookie Monster
+    allergens: [gluten]
+    half-gallon: false
+  - name: Dutch Chocolate Almond
+    allergens: [nuts]
+    half-gallon: false
+  - name: Fluffernutter
+    allergens: [nuts]
+    half-gallon: false
+  - name: French Vanilla
+    allergens: []
+    half-gallon: false
+  - name: Frozen Pudding
+    allergens: []
+    half-gallon: false
+  - name: Heavenly Hash
+    allergens: [nuts]
+    half-gallon: false
+  - name: M&M
+    allergens: []
+    half-gallon: false
+  - name: Maple Walnut
+    allergens: [nuts]
+    half-gallon: true
+  - name: Milky-R-Way
+    allergens: []
+    half-gallon: false
+  - name: Mint Chocolate Chip
+    allergens: []
+    half-gallon: true
+  - name: Mint Oreo
+    allergens: [gluten]
+    half-gallon: false
+  - name: Mocha Chip
+    allergens: []
+    half-gallon: false
+  - name: Monster Trax
+    allergens: []
+    half-gallon: false
+  - name: Orange Pineapple
+    allergens: []
+    half-gallon: false
+  - name: Oreo
+    allergens: [gluten]
+    half-gallon: true
+  - name: Peppermint Stick
+    allergens: []
+    half-gallon: false
+  - name: Pistachio
+    allergens: [nuts]
+    half-gallon: false
+  - name: Raspberry Cheesecake Truffle
+    allergens: []
+    half-gallon: false
+  - name: Snickers
+    allergens: [nuts]
+    half-gallon: false
+  - name: Strawberry
+    allergens: []
+    half-gallon: false
+  - name: Strawberry Cheesecake
+    allergens: []
+    half-gallon: false
+  - name: Vanilla
+    allergens: []
+    half-gallon: true
+- category: Sherbet
+  flavors:
+  - name: Lime
+    allergens: []
+    half-gallon: false
+  - name: Orange
+    allergens: []
+    half-gallon: true
+- category: Yogurt
+  flavors:
+  - name: Coffee Heath Bar
+    allergens: []
+    half-gallon: true
+  - name: Chocolate
+    allergens: []
+    half-gallon: false
+  - name: Mint Truffle
+    allergens: []
+    half-gallon: false
+  - name: Purple Panther
+    allergens: []
+    half-gallon: false
+  - name: Vanilla
+    allergens: []
+    half-gallon: false
+- category: Sorbet
+  flavors: []
+- category: No Sugar Added
+  flavors:
+  - name: Vanilla
+    allergens: []
+    half-gallon: false

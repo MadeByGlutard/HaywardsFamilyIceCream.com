@@ -1,5 +1,7 @@
 import React from 'react'
-import styled from 'react-emotion'
+import styled from '@emotion/styled'
+
+import Layout from 'components/layout'
 
 const Placeholder = styled('h1')`
   text-align: center;
@@ -8,9 +10,11 @@ const Placeholder = styled('h1')`
   color: inherit;
 `
 
-export default () => (
-  <Placeholder>
-    Whoops, couldn't find that page
-    <div>{`¯\\_(ツ)_/¯`}</div>
-  </Placeholder>
+export default ({ location }) => (
+  <Layout location={location}>
+    <Placeholder>
+      Whoops, couldn't find that page
+      <div>{`¯\\_(ツ)_/¯`}</div>
+    </Placeholder>
+  </Layout>
 )

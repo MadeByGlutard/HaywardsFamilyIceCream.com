@@ -1,61 +1,33 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 
+import Layout from 'components/layout'
 import Header from 'components/header'
+import Flavors from 'components/flavors'
+import Gallery from 'components/gallery'
+import Contact from 'components/contact'
 import Viewport from 'components/viewport'
 
-export default ({ data }) => (
-  <Fragment>
-    <Header logo={data.logo} />
+export default ({ location }) => (
+  <Layout location={location}>
+    <Header />
 
-    <div style={{ minHeight: 0 /*8000*/, marginBottom: 128 }}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          textAlign: 'center'
-        }}
-      >
-        <h1>
-          <em>Coming Soon!</em>
-        </h1>
+    <Viewport.Width
+      style={{
+        padding: 16,
+        background: '#f5f5f5',
+        fontSize: '1.2rem',
+        fontStyle: 'italic',
+        textAlign: 'center'
+      }}
+    >
+      Closed for the season &mdash; See you in 2019!
+      {/* Open 7 Days a Week &nbsp;|&nbsp; 11am - 10pm */}
+    </Viewport.Width>
 
-        <br />
-        <br />
+    <Flavors style={{ paddingTop: 64, paddingBottom: 128 }} />
 
-        <a href="https://www.facebook.com/haywardsofmilford/">Find us on Facebook</a>
+    <Gallery style={{}} />
 
-        <br />
-        <br />
-
-        <a href="tel:16036728383">
-          Give us a Call<br />(603) 672-8383
-        </a>
-      </div>
-    </div>
-
-    {/* <Viewport.Width> */}
-    <div style={{ margin: '0 auto', maxWidth: '768px', marginBottom: 128 }}>
-      <iframe
-        frameBorder="0"
-        style={{ display: 'block', width: '100%', height: 450, margin: 0, border: 0 }}
-        src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAuu-v8xK1P-uy_NekuEs5z6NRrseapngc&q=Hayward's+Ice+Cream+of+Milford,+Elm+Street,+Milford,+NH"
-        allowFullScreen
-      />
-    </div>
-    {/* </Viewport.Width> */}
-  </Fragment>
+    <Contact style={{ paddingTop: 128, paddingBottom: 256 }} />
+  </Layout>
 )
-
-export const query = graphql`
-  query IndexPage {
-    logo: file(relativePath: { eq: "assets/logo.png" }) {
-      childImageSharp {
-        sizes {
-          ...GatsbyImageSharpSizes_noBase64
-        }
-      }
-    }
-  }
-`

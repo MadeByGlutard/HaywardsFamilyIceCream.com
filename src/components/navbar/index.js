@@ -1,6 +1,7 @@
 import React from 'react'
 import Helmet from 'react-helmet'
-import styled, { css } from 'react-emotion'
+import styled from '@emotion/styled'
+import { css } from '@emotion/core'
 
 import Sticky from 'components/sticky'
 import Container from 'components/container'
@@ -65,6 +66,7 @@ const Wrapper = styled('div')`
     props.sticky &&
     css`
       background-color: #fff;
+      background-color: rgba(255, 255, 255, 0.99);
       color: rgb(17, 107, 180);
       box-shadow: 0 2px 2px rgba(12, 13, 14, 0.05);
 

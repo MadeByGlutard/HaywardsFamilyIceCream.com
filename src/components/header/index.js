@@ -1,35 +1,27 @@
 import React from 'react'
-import Image from 'gatsby-image'
-import styled from 'react-emotion'
+import styled from '@emotion/styled'
 
+import Logo from 'components/logo'
 import Viewport from 'components/viewport'
 import Container from 'components/container'
-
-const CenteredImage = styled(Image)`
-  display: block;
-  margin: 0 auto;
-`
-
-const Logo = styled(CenteredImage)`
-  width: 80%;
-  max-width: 768px;
-`
 
 const Wrapper = styled(Viewport.Width)`
   margin-top: -64px;
   padding-top: 64px;
   background-color: rgb(17, 107, 180);
-  background-image: linear-gradient(rgb(17, 107, 180), rgb(21, 61, 117));
+  /* background-image: linear-gradient(rgb(17, 107, 180), rgb(21, 61, 117)); */
+  background-image: radial-gradient(at center calc(50% + 32px), rgba(255, 255, 255, 0.2), transparent 60%),
+    linear-gradient(rgb(17, 107, 180), rgb(21, 61, 117));
 
   ${Container} {
     padding: 48px 0;
   }
 `
 
-export default ({ logo, ...props }) => (
+export default ({ ...props }) => (
   <Wrapper {...props}>
     <Container>
-      <Logo sizes={logo.childImageSharp.sizes} alt="Hayward's Family" />
+      <Logo style={{ width: '80%', maxWidth: 768 }} />
     </Container>
   </Wrapper>
 )

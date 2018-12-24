@@ -27,6 +27,13 @@ module.exports = {
 
     // Plugins
     {
+      resolve: `gatsby-plugin-emotion`,
+      options: {
+        sourceMap: process.env.NODE_ENV !== `production`,
+        autoLabel: process.env.NODE_ENV !== `production`
+      }
+    },
+    {
       resolve: `gatsby-plugin-typography`,
       options: {
         pathToConfigModule: `src/utils/typography.js`
@@ -38,16 +45,19 @@ module.exports = {
         trackingId: `UA-74365494-2`
       }
     },
+    {
+      resolve: `gatsby-plugin-favicon`,
+      options: {
+        logo: `./src/assets/icon.png`
+      }
+    },
     `gatsby-plugin-react-helmet`,
-    `gatsby-plugin-resolve-src`,
     `gatsby-plugin-catch-links`,
-    `gatsby-plugin-react-next`,
-    `gatsby-plugin-emotion`,
     `gatsby-plugin-sitemap`,
     `gatsby-plugin-lodash`,
-    `gatsby-plugin-sharp`,
+    `gatsby-plugin-sharp`
 
-    `gatsby-plugin-netlify`,
-    `gatsby-plugin-netlify-cms`
+    // `gatsby-plugin-netlify`,
+    // `gatsby-plugin-netlify-cms`
   ]
 }
