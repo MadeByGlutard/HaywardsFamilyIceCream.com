@@ -1,0 +1,2 @@
+# Redirect default Netlify subdomain to primary domain
+https://haywards-family-ice-cream.netlify.com/* https://haywardsfamilyicecream.com/:splat 301!

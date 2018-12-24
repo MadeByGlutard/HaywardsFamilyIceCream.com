@@ -55,9 +55,10 @@ module.exports = {
     `gatsby-plugin-catch-links`,
     `gatsby-plugin-sitemap`,
     `gatsby-plugin-lodash`,
-    `gatsby-plugin-sharp`
+    `gatsby-plugin-sharp`,
 
-    // `gatsby-plugin-netlify`,
-    // `gatsby-plugin-netlify-cms`
+    `gatsby-plugin-netlify`,
+    // `gatsby-plugin-netlify-cms`,
+    `gatsby-plugin-netlify-cache`
   ]
 }
