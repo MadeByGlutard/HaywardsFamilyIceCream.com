@@ -1,37 +1,36 @@
 import React from 'react'
 import styled from '@emotion/styled'
-import { random } from 'lodash'
+import { random, sampleSize } from 'lodash'
+import { StaticQuery, graphql } from 'gatsby'
 
+import Image from './image'
 import Divider from './divider'
 import Viewport from './viewport'
 import Container from './container'
 
-const images = [
-  // require('../../content/gallery/01.jpg'),
-  // require('../../content/gallery/02.jpg'),
-  // require('../../content/gallery/03.jpg'),
-  // require('../../content/gallery/04.jpg'),
-  require('../../content/gallery/05.jpg'),
-  require('../../content/gallery/06.jpg'),
-  require('../../content/gallery/07.jpg'),
-  require('../../content/gallery/08.jpg')
-]
+const GALLERY_QUERY = graphql`
+  query {
+    gallery: allFile(filter: { absolutePath: { regex: "/content/gallery/" } }) {
+      edges {
+        node {
+          id
+          childImageSharp {
+            fluid(maxWidth: 320) {
+              ...GatsbyImageSharpFluid_withWebp
+            }
+          }
+        }
+      }
+    }
+  }
+`
 
 const Polaroid = styled('figure')`
+  width: 100%;
   padding: 8px;
   display: inline-block;
   background-color: #fff;
   box-shadow: 0 2px 2px rgba(12, 13, 14, 0.5);
-
-  img {
-    display: block;
-    margin-bottom: 0;
-  }
-
-  figcaption {
-    margin-top: 8px;
-    text-align: center;
-  }
 `
 
 const Column = styled('div')`
@@ -87,21 +86,25 @@ const Wrapper = styled(Viewport.Width)`
 `
 
 export default ({ ...props }) => (
-  <Wrapper {...props}>
-    <h1 style={{ textAlign: 'center' }}>Our Gallery</h1>
-    <Divider style={{ color: '#fff' }} />
+  <StaticQuery
+    query={GALLERY_QUERY}
+    render={({ gallery }) => (
+      <Wrapper {...props}>
+        <h1 style={{ textAlign: 'center' }}>Our Gallery</h1>
+        <Divider style={{ color: '#fff' }} />
 
-    <Container style={{ maxWidth: 1200 }}>
-      <Grid style={{ flexWrap: 'wrap' }}>
-        {images.map(image => (
-          <Column key={image.src || image} size={4}>
-            <Polaroid style={{ transform: `rotate(${random(-8, 8)}deg)` }}>
-              <img src={image.src || image} />
-              {image.caption && <figcaption>{image.caption}</figcaption>}
-            </Polaroid>
-          </Column>
-        ))}
-      </Grid>
-    </Container>
-  </Wrapper>
+        <Container style={{ maxWidth: 1200 }}>
+          <Grid style={{ flexWrap: 'wrap' }}>
+            {sampleSize(gallery.edges, 4).map(({ node }) => (
+              <Column key={node.id} size={4}>
+                <Polaroid style={{ transform: `rotate(${random(-8, 8)}deg)` }}>
+                  <Image fluid={node.childImageSharp.fluid} />
+                </Polaroid>
+              </Column>
+            ))}
+          </Grid>
+        </Container>
+      </Wrapper>
+    )}
+  />
 )

@@ -1,14 +1,15 @@
 import React from 'react'
-import Image from 'gatsby-image'
 import styled from '@emotion/styled'
 import { StaticQuery, graphql } from 'gatsby'
+
+import Image from './image'
 
 const LOGO_QUERY = graphql`
   query {
     logo: file(relativePath: { eq: "assets/logo.png" }) {
       childImageSharp {
-        sizes {
-          ...GatsbyImageSharpSizes_noBase64
+        fluid(maxWidth: 768) {
+          ...GatsbyImageSharpFluid_withWebp_noBase64
         }
       }
     }
@@ -23,6 +24,6 @@ const CenteredImage = styled(Image)`
 export default ({ ...props }) => (
   <StaticQuery
     query={LOGO_QUERY}
-    render={({ logo }) => <CenteredImage sizes={logo.childImageSharp.sizes} alt="Hayward's Family" {...props} />}
+    render={({ logo }) => <CenteredImage fluid={logo.childImageSharp.fluid} alt="Hayward's Family" {...props} />}
   />
 )

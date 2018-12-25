@@ -13,8 +13,8 @@ collections:
     editor:
       preview: false
     files:
-      - name: general
-        label: General
+      - name: settings
+        label: Settings
         file: content/settings/settings.yaml
         fields:
           - name: banner

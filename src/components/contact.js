@@ -3,6 +3,7 @@ import styled from '@emotion/styled'
 import { keyframes } from '@emotion/core'
 import { StaticQuery, graphql } from 'gatsby'
 
+import Image from './image'
 import Divider from './divider'
 import Viewport from './viewport'
 import Container from './container'
@@ -23,6 +24,15 @@ const CONTACT_QUERY = graphql`
         label
         url
         value
+      }
+    }
+
+    silhouette: file(relativePath: { eq: "assets/silhouette.png" }) {
+      childImageSharp {
+        id
+        fluid(quality: 100) {
+          ...GatsbyImageSharpFluid_withWebp
+        }
       }
     }
   }
@@ -128,17 +138,18 @@ const Grid = styled('div')`
   }
 `
 
-const Wrapper = styled(Viewport.Width)`
-  background-image: url(${require('../assets/silhouette.png')});
-  background-position: center;
-  background-size: cover;
-`
+const Wrapper = styled(Viewport.Width)``
 
 export default ({ ...props }) => (
   <StaticQuery
     query={CONTACT_QUERY}
-    render={({ settings }) => (
+    render={({ settings, silhouette }) => (
       <Wrapper {...props}>
+        <Image
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}
+          fluid={silhouette.childImageSharp.fluid}
+        />
+
         <Container>
           <h1 style={{ textAlign: 'center' }}>Contact Us</h1>
           <Divider style={{ color: '#aaa' }} />
