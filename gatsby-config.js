@@ -24,6 +24,7 @@ module.exports = {
     // Transformers
     `gatsby-transformer-sharp`,
     `gatsby-transformer-yaml`,
+    `gatsby-transformer-json`,
 
     // Plugins
     {

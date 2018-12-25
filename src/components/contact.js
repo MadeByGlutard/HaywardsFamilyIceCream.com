@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from '@emotion/styled'
 import { keyframes } from '@emotion/core'
+import { StaticQuery, graphql } from 'gatsby'
 
 import Divider from './divider'
 import Viewport from './viewport'
@@ -8,26 +9,24 @@ import Container from './container'
 
 import { MdPhone, MdEmail, MdPlace } from 'react-icons/md'
 
-const items = [
-  {
-    icon: <MdPhone />,
-    title: 'Give us a call',
-    href: 'tel:16036728383',
-    label: '(603) 672-8383'
-  },
-  {
-    icon: <MdPlace />,
-    title: 'Come visit us',
-    href: "https://www.google.com/maps?q=Hayward's+Ice+Cream+of+Milford,+Elm+Street,+Milford,+NH",
-    label: '383 Elm St, Milford, NH 03055'
-  },
-  {
-    icon: <MdEmail />,
-    title: 'Send us a message',
-    href: 'mailto:haywardsofmilford@gmail.com',
-    label: 'haywardsofmilford@gmail.com'
+const icons = {
+  phone: <MdPhone />,
+  place: <MdPlace />,
+  email: <MdEmail />
+}
+
+const CONTACT_QUERY = graphql`
+  query {
+    settings: settingsYaml {
+      contact {
+        type
+        label
+        url
+        value
+      }
+    }
   }
-]
+`
 
 const wiggle = keyframes`
   from, to {
@@ -136,22 +135,27 @@ const Wrapper = styled(Viewport.Width)`
 `
 
 export default ({ ...props }) => (
-  <Wrapper {...props}>
-    <Container>
-      <h1 style={{ textAlign: 'center' }}>Contact Us</h1>
-      <Divider style={{ color: '#aaa' }} />
+  <StaticQuery
+    query={CONTACT_QUERY}
+    render={({ settings }) => (
+      <Wrapper {...props}>
+        <Container>
+          <h1 style={{ textAlign: 'center' }}>Contact Us</h1>
+          <Divider style={{ color: '#aaa' }} />
 
-      <Grid>
-        {items.map(({ icon, title, href, label }) => (
-          <Column key={title} size={items.length}>
-            <Card>
-              <Icon>{icon}</Icon>
-              <Title>{title}</Title>
-              <Link href={href}>{label}</Link>
-            </Card>
-          </Column>
-        ))}
-      </Grid>
-    </Container>
-  </Wrapper>
+          <Grid>
+            {settings.contact.map(({ type, label, url, value }) => (
+              <Column key={value} size={settings.contact.length}>
+                <Card>
+                  <Icon>{icons[type]}</Icon>
+                  <Title>{label}</Title>
+                  <Link href={url}>{value}</Link>
+                </Card>
+              </Column>
+            ))}
+          </Grid>
+        </Container>
+      </Wrapper>
+    )}
+  />
 )

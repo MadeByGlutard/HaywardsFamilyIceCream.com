@@ -36,6 +36,7 @@
     "gatsby-plugin-sitemap": "^2.0.3",
     "gatsby-plugin-typography": "^2.2.2",
     "gatsby-source-filesystem": "^2.0.11",
+    "gatsby-transformer-json": "^2.1.6",
     "gatsby-transformer-sharp": "^2.1.9",
     "gatsby-transformer-yaml": "^2.1.6",
     "intersection-observer": "^0.5.1",

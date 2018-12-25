@@ -2,9 +2,30 @@ import React from 'react'
 import Helmet from 'react-helmet'
 import styled from '@emotion/styled'
 import { css } from '@emotion/core'
+import { find } from 'lodash'
+import { StaticQuery, graphql } from 'gatsby'
 
 import Sticky from './sticky'
 import Container from './container'
+
+const SOCIAL_QUERY = graphql`
+  query {
+    settings: settingsYaml {
+      social {
+        type
+        label
+        url
+      }
+
+      contact {
+        type
+        label
+        url
+        value
+      }
+    }
+  }
+`
 
 const Link = styled('a')`
   background-image: none;
@@ -98,30 +119,40 @@ const Wrapper = styled('div')`
 `
 
 export default props => (
-  <div style={{ height: 64, flexShrink: 0 }}>
-    <Helmet>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster+Two" />
-    </Helmet>
+  <StaticQuery
+    query={SOCIAL_QUERY}
+    render={({ settings }) => {
+      const facebook = find(settings.social, { type: 'facebook' })
+      const phone = find(settings.contact, { type: 'phone' })
 
-    <Sticky offsetY={2}>
-      {({ sticky }) => (
-        <Wrapper sticky={!props.isHomepage || sticky} {...props}>
-          <Container>
-            <BrandLink href="/">Hayward's Family Ice Cream</BrandLink>
+      return (
+        <div style={{ height: 64, flexShrink: 0 }}>
+          <Helmet>
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster+Two" />
+          </Helmet>
 
-            <Nav>
-              <NavLink href="https://www.facebook.com/haywardsofmilford/">Find us on Facebook</NavLink>
-              <Divider />
-              <NavLink href="tel:16036728383">Give us a Call</NavLink>
-            </Nav>
+          <Sticky offsetY={2}>
+            {({ sticky }) => (
+              <Wrapper sticky={!props.isHomepage || sticky} {...props}>
+                <Container>
+                  <BrandLink href="/">Hayward's Family Ice Cream</BrandLink>
 
-            {/* <NavLink href="">Ice Cream</NavLink> */}
-            {/* <NavLink href="">Food / Drink</NavLink> */}
-            {/* <NavLink href="">History</NavLink> */}
-            {/* <NavLink href="">Trees</NavLink> */}
-          </Container>
-        </Wrapper>
-      )}
-    </Sticky>
-  </div>
+                  <Nav>
+                    <NavLink href={facebook.url}>{facebook.label}</NavLink>
+                    <Divider />
+                    <NavLink href={phone.url}>{phone.label}</NavLink>
+                  </Nav>
+
+                  {/* <NavLink href="">Ice Cream</NavLink> */}
+                  {/* <NavLink href="">Food / Drink</NavLink> */}
+                  {/* <NavLink href="">History</NavLink> */}
+                  {/* <NavLink href="">Trees</NavLink> */}
+                </Container>
+              </Wrapper>
+            )}
+          </Sticky>
+        </div>
+      )
+    }}
+  />
 )
