@@ -4,9 +4,9 @@ import styled from '@emotion/styled'
 import { Global, css } from '@emotion/core'
 import { StaticQuery, graphql } from 'gatsby'
 
-import Navbar from 'components/navbar'
-import Footer from 'components/footer'
-import Container from 'components/container'
+import Navbar from './navbar'
+import Footer from './footer'
+import Container from './container'
 
 const GLOBAL_STYLES = css`
   html {

@@ -1,8 +1,8 @@
 import React from 'react'
 import { stringify } from 'querystring'
 
-import Divider from 'components/divider'
-import Viewport from 'components/viewport'
+import Divider from './divider'
+import Viewport from './viewport'
 
 const src = `https://www.google.com/maps/embed/v1/place?${stringify({
   key: 'AIzaSyAuu-v8xK1P-uy_NekuEs5z6NRrseapngc',

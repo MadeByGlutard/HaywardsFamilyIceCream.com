@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from '@emotion/styled'
 
-import Divider from 'components/divider'
-import Viewport from 'components/viewport'
-import Container from 'components/container'
+import Divider from './divider'
+import Viewport from './viewport'
+import Container from './container'
 
 const Columns = styled('div')`
   @media (min-width: 768px) {
@@ -34,7 +34,7 @@ const Wrapper = styled(Viewport.Width)``
 //     bottom: 0;
 //     left: 0;
 
-//     background-image: url(${require('../../../content/gallery/08.jpg')});
+//     background-image: url(${require('../../content/gallery/08.jpg')});
 //     background-size: cover;
 //     /* filter: brightness(240%); */
 //     /* filter: grayscale(80%) brightness(240%); */
@@ -45,7 +45,7 @@ const Wrapper = styled(Viewport.Width)``
 //   }
 // `
 
-const categories = require('../../../content/flavors.json')
+const categories = require('../../content/flavors.json')
 
 export default ({ logo, ...props }) => (
   <Wrapper {...props}>

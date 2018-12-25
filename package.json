@@ -11,16 +11,12 @@
     "build": "gatsby build",
     "serve": "gatsby serve"
   },
-  "dependencies": {
-    "gatsby-plugin-netlify-cache": "^1.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@emotion/core": "^10.0.4",
     "@emotion/styled": "^10.0.4",
     "babel-eslint": "^10.0.1",
-    "babel-plugin-module-resolver": "^3.1.1",
     "emotion": "^10.0.4",
-    "emotion-server": "^10.0.4",
     "eslint": "^5.10.0",
     "eslint-config-prettier": "^3.3.0",
     "eslint-plugin-prettier": "^3.0.0",
@@ -33,6 +29,7 @@
     "gatsby-plugin-google-analytics": "^2.0.8",
     "gatsby-plugin-lodash": "^3.0.3",
     "gatsby-plugin-netlify": "^2.0.6",
+    "gatsby-plugin-netlify-cache": "^1.0.0",
     "gatsby-plugin-netlify-cms": "^3.0.9",
     "gatsby-plugin-react-helmet": "^3.0.4",
     "gatsby-plugin-sharp": "^2.0.15",
@@ -42,8 +39,7 @@
     "gatsby-transformer-sharp": "^2.1.9",
     "gatsby-transformer-yaml": "^2.1.6",
     "intersection-observer": "^0.5.1",
-    "jasmine-reporters": "^2.3.2",
-    "object-assign": "^4.1.1",
+    "netlify-cms": "^2.3.1",
     "object-fit-images": "^3.2.4",
     "prettier": "^1.15.3",
     "prop-types": "^15.5.10",
@@ -53,8 +49,7 @@
     "react-icons": "^3.2.2",
     "react-typography": "^0.16.18",
     "typography": "^0.16.18",
-    "typography-theme-fairy-gates": "^0.16.18",
-    "whatwg-fetch": "^3.0.0"
+    "typography-theme-fairy-gates": "^0.16.18"
   },
   "prettier": {
     "semi": false,

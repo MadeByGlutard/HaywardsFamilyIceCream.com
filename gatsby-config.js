@@ -1,7 +1,6 @@
 module.exports = {
   siteMetadata: {
     title: `Hayward's Family Ice Cream`,
-    siteUrl: `https://haywardsfamilyicecream.com`,
     description: ``
   },
   plugins: [
@@ -36,7 +35,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-typography`,
       options: {
-        pathToConfigModule: `src/utils/typography.js`
+        pathToConfigModule: `./src/utils/typography.js`
       }
     },
     {
@@ -58,7 +57,7 @@ module.exports = {
     `gatsby-plugin-sharp`,
 
     `gatsby-plugin-netlify`,
-    // `gatsby-plugin-netlify-cms`,
+    `gatsby-plugin-netlify-cms`,
     `gatsby-plugin-netlify-cache`
   ]
 }

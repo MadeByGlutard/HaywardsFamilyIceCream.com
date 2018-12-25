@@ -3,8 +3,8 @@ import Helmet from 'react-helmet'
 import styled from '@emotion/styled'
 import { css } from '@emotion/core'
 
-import Sticky from 'components/sticky'
-import Container from 'components/container'
+import Sticky from './sticky'
+import Container from './container'
 
 const Link = styled('a')`
   background-image: none;

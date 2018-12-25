@@ -2,19 +2,19 @@ import React from 'react'
 import styled from '@emotion/styled'
 import { random } from 'lodash'
 
-import Divider from 'components/divider'
-import Viewport from 'components/viewport'
-import Container from 'components/container'
+import Divider from './divider'
+import Viewport from './viewport'
+import Container from './container'
 
 const images = [
-  // require('../../../content/gallery/01.jpg'),
-  // require('../../../content/gallery/02.jpg'),
-  // require('../../../content/gallery/03.jpg'),
-  // require('../../../content/gallery/04.jpg'),
-  require('../../../content/gallery/05.jpg'),
-  require('../../../content/gallery/06.jpg'),
-  require('../../../content/gallery/07.jpg'),
-  require('../../../content/gallery/08.jpg')
+  // require('../../content/gallery/01.jpg'),
+  // require('../../content/gallery/02.jpg'),
+  // require('../../content/gallery/03.jpg'),
+  // require('../../content/gallery/04.jpg'),
+  require('../../content/gallery/05.jpg'),
+  require('../../content/gallery/06.jpg'),
+  require('../../content/gallery/07.jpg'),
+  require('../../content/gallery/08.jpg')
 ]
 
 const Polaroid = styled('figure')`

@@ -2,9 +2,9 @@ import React from 'react'
 import styled from '@emotion/styled'
 import { keyframes } from '@emotion/core'
 
-import Divider from 'components/divider'
-import Viewport from 'components/viewport'
-import Container from 'components/container'
+import Divider from './divider'
+import Viewport from './viewport'
+import Container from './container'
 
 import { MdPhone, MdEmail, MdPlace } from 'react-icons/md'
 
@@ -130,7 +130,7 @@ const Grid = styled('div')`
 `
 
 const Wrapper = styled(Viewport.Width)`
-  background-image: url(${require('assets/silhouette.png')});
+  background-image: url(${require('../assets/silhouette.png')});
   background-position: center;
   background-size: cover;
 `

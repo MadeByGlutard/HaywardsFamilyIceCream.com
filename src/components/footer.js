@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from '@emotion/styled'
 
-import Logo from 'components/logo'
-import Viewport from 'components/viewport'
-import Container from 'components/container'
+import Logo from './logo'
+import Viewport from './viewport'
+import Container from './container'
 
 const Wrapper = styled(Viewport.Width)`
   background-color: rgb(17, 107, 180);
