@@ -1,6 +1,7 @@
 module.exports = {
   siteMetadata: {
     title: `Hayward's Family Ice Cream`,
+    siteUrl: `https://haywardsfamilyicecream.com`,
     description: ``
   },
   plugins: [
