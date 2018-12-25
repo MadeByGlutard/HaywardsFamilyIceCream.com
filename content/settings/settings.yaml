@@ -1,31 +1,19 @@
-# General
 banner: Closed for the season &mdash; See you in 2019!
-
-# Social
 social:
-  # - type: instagram
-  #   label: Like us on Instagram
-  #   url:
-  - type: facebook
-    label: Find us on Facebook
-    url: https://facebook.com/haywardsofmilford
-  # - type: twitter
-  #   label: Follow us on Twitter
-  #   url:
-
-# Contact
+  - label: Find us on Facebook
+    type: facebook
+    url: 'https://www.facebook.com/haywardsofmilford/'
 contact:
-  - type: phone
-    label: Give us a call
-    url: tel:16036728383
+  - label: Give us a call
+    type: phone
+    url: 'tel:16036728383'
     value: (603) 672-8383
-
-  - type: place
-    label: Come visit us
-    url: "https://www.google.com/maps?q=Hayward's+Ice+Cream+of+Milford,+Elm+Street,+Milford,+NH"
-    value: 383 Elm St, Milford, NH 03055
-
-  - type: email
-    label: Send us a message
-    url: mailto:haywardsofmilford@gmail.com
+  - label: Come visit us
+    type: place
+    url: >-
+      https://www.google.com/maps?q=Hayward's+Ice+Cream+of+Milford,+Elm+Street,+Milford,+NH
+    value: '383 Elm St, Milford, NH 03055'
+  - label: Send us a message
+    type: email
+    url: 'mailto:haywardsofmilford@gmail.com'
     value: haywardsofmilford@gmail.com
