@@ -1,0 +1,12 @@
+contact:
+  - type: phone
+    label: Give us a call
+    value: (603) 672-8383
+
+  - type: place
+    label: Come visit us
+    value: 383 Elm St, Milford, NH 03055
+
+  - type: email
+    label: Send us a message
+    value: haywardsofmilford@gmail.com

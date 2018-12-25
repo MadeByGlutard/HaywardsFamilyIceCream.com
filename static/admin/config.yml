@@ -3,66 +3,45 @@ backend:
   branch: master
 
 display_url: https://haywardsfamilyicecream.com
-
 media_folder: static/images
 public_folder: /images
 
 collections:
-  # - name: settings
-  #   label: Settings
-  #   editor:
-  #     preview: false
-  #   files:
-  #     - name: flavors
-  #       label: Flavors
-  #       file: content/flavors.json
-  #       fields:
-  #         - name: category
-  #           label: Category
-  #           widget: string
-  #         - name: flavors
-  #           label: Flavors
-  #           widget: list
-  #           fields:
-  #             - name: name
-  #               label: Name
-  #               widget: string
-  #             - name: allergens
-  #               label: Allergens
-  #               widget: list
-  #             - name: half-gallon
-  #               label: Half Gallon
-  #               widget: boolean
   - name: settings
     label: Settings
-    delete: false # Prevent users from deleting documents in this collection
+    delete: false
     editor:
       preview: false
     files:
-      - name: banner
-        label: Banner
+      - name: general
+        label: General
         file: content/settings.yaml
         fields:
           - name: banner
             label: Banner
             widget: string
-      - name: 'contact'
-        label: 'Contact'
-        file: 'content/settings.yaml'
+      - name: contact
+        label: Contact
+        file: content/contact.yaml
         fields:
           - name: contact
             label: Contact
             widget: list
             fields:
-              - name: icon
-                label: Icon
-                widget: string
-              - name: title
-                label: Title
-                widget: string
-              - name: href
-                label: Href
-                widget: string
+              - name: type
+                label: Type
+                widget: select
+                options: ['phone', 'place', 'email']
               - name: label
                 label: Label
                 widget: string
+              - name: value
+                label: Value
+                widget: string
+      - name: social
+        label: Social
+        file: content/social.yaml
+        fields:
+          - name: facebook
+            label: Facebook
+            widget: string
