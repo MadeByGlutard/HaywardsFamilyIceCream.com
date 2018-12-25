@@ -22,7 +22,7 @@ collections:
             widget: string
           - name: social
             label: Social
-            widget: object
+            widget: list
             fields:
               - name: type
                 label: Type
