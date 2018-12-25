@@ -1,0 +1,17 @@
+banner: Closed for the season &mdash; See you in 2019!
+
+contact:
+  - icon: phone
+    title: Give us a call
+    href: tel:16036728383
+    label: (603) 672-8383
+
+  - icon: place
+    title: Come visit us
+    href: "https://www.google.com/maps?q=Hayward's+Ice+Cream+of+Milford,+Elm+Street,+Milford,+NH"
+    label: 383 Elm St, Milford, NH 03055
+
+  - icon: email
+    title: Send us a message
+    href: mailto:haywardsofmilford@gmail.com
+    label: haywardsofmilford@gmail.com
