@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from '@emotion/styled'
-import { keyframes } from '@emotion/core'
-import { StaticQuery, graphql } from 'gatsby'
+import { keyframes } from '@emotion/react'
+import { useStaticQuery, graphql } from 'gatsby'
+import { StaticImage } from 'gatsby-plugin-image'
 
-import Image from './image'
 import Divider from './divider'
 import Viewport from './viewport'
 import Container from './container'
@@ -13,7 +13,7 @@ import { MdPhone, MdEmail, MdPlace } from 'react-icons/md'
 const icons = {
   phone: <MdPhone />,
   place: <MdPlace />,
-  email: <MdEmail />
+  email: <MdEmail />,
 }
 
 const CONTACT_QUERY = graphql`
@@ -24,15 +24,6 @@ const CONTACT_QUERY = graphql`
         label
         url
         value
-      }
-    }
-
-    silhouette: file(relativePath: { eq: "assets/silhouette.png" }) {
-      childImageSharp {
-        id
-        fluid(quality: 100) {
-          ...GatsbyImageSharpFluid_withWebp
-        }
       }
     }
   }
@@ -61,7 +52,7 @@ const Column = styled('div')`
   }
 
   @media (min-width: 1024px) {
-    width: calc(100% / ${props => props.size || 3});
+    width: calc(100% / ${(props) => props.size || 3});
     max-width: 360px;
     padding: 0 1rem;
 
@@ -140,33 +131,35 @@ const Grid = styled('div')`
 
 const Wrapper = styled(Viewport.Width)``
 
-export default ({ ...props }) => (
-  <StaticQuery
-    query={CONTACT_QUERY}
-    render={({ settings, silhouette }) => (
-      <Wrapper {...props}>
-        <Image
-          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}
-          fluid={silhouette.childImageSharp.fluid}
-        />
+export default ({ ...props }) => {
+  const { settings } = useStaticQuery(CONTACT_QUERY)
 
-        <Container>
-          <h1 style={{ textAlign: 'center' }}>Contact Us</h1>
-          <Divider style={{ color: '#aaa' }} />
+  return (
+    <Wrapper {...props}>
+      <StaticImage
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}
+        src="../assets/silhouette.png"
+        alt=""
+        layout="fullWidth"
+        quality={100}
+      />
 
-          <Grid>
-            {settings.contact.map(({ type, label, url, value }) => (
-              <Column key={value} size={settings.contact.length}>
-                <Card>
-                  <Icon>{icons[type]}</Icon>
-                  <Title>{label}</Title>
-                  <Link href={url}>{value}</Link>
-                </Card>
-              </Column>
-            ))}
-          </Grid>
-        </Container>
-      </Wrapper>
-    )}
-  />
-)
+      <Container>
+        <h1 style={{ textAlign: 'center' }}>Contact Us</h1>
+        <Divider style={{ color: '#aaa' }} />
+
+        <Grid>
+          {settings.contact.map(({ type, label, url, value }) => (
+            <Column key={value} size={settings.contact.length}>
+              <Card>
+                <Icon>{icons[type]}</Icon>
+                <Title>{label}</Title>
+                <Link href={url}>{value}</Link>
+              </Card>
+            </Column>
+          ))}
+        </Grid>
+      </Container>
+    </Wrapper>
+  )
+}

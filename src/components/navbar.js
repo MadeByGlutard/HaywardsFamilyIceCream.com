@@ -1,9 +1,8 @@
 import React from 'react'
-import Helmet from 'react-helmet'
 import styled from '@emotion/styled'
-import { css } from '@emotion/core'
+import { css } from '@emotion/react'
 import { find } from 'lodash'
-import { StaticQuery, graphql } from 'gatsby'
+import { useStaticQuery, graphql } from 'gatsby'
 
 import Sticky from './sticky'
 import Container from './container'
@@ -83,7 +82,7 @@ const Wrapper = styled('div')`
   background-color: rgba(0, 0, 0, 0.25);
   transition: all 100ms ease-in-out;
 
-  ${props =>
+  ${(props) =>
     props.sticky &&
     css`
       background-color: #fff;
@@ -118,41 +117,34 @@ const Wrapper = styled('div')`
   }
 `
 
-export default props => (
-  <StaticQuery
-    query={SOCIAL_QUERY}
-    render={({ settings }) => {
-      const facebook = find(settings.social, { type: 'facebook' })
-      const phone = find(settings.contact, { type: 'phone' })
+export default (props) => {
+  const { settings } = useStaticQuery(SOCIAL_QUERY)
 
-      return (
-        <div style={{ height: 64, flexShrink: 0 }}>
-          <Helmet>
-            <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster+Two" />
-          </Helmet>
+  const facebook = find(settings.social, { type: 'facebook' })
+  const phone = find(settings.contact, { type: 'phone' })
 
-          <Sticky offsetY={2}>
-            {({ sticky }) => (
-              <Wrapper sticky={!props.isHomepage || sticky} {...props}>
-                <Container>
-                  <BrandLink href="/">Hayward's Family Ice Cream</BrandLink>
+  return (
+    <div style={{ height: 64, flexShrink: 0 }}>
+      <Sticky offsetY={2}>
+        {({ sticky }) => (
+          <Wrapper sticky={!props.isHomepage || sticky} {...props}>
+            <Container>
+              <BrandLink href="/">Hayward's Family Ice Cream</BrandLink>
 
-                  <Nav>
-                    <NavLink href={facebook.url}>{facebook.label}</NavLink>
-                    <Divider />
-                    <NavLink href={phone.url}>{phone.label}</NavLink>
-                  </Nav>
+              <Nav>
+                <NavLink href={facebook.url}>{facebook.label}</NavLink>
+                <Divider />
+                <NavLink href={phone.url}>{phone.label}</NavLink>
+              </Nav>
 
-                  {/* <NavLink href="">Ice Cream</NavLink> */}
-                  {/* <NavLink href="">Food / Drink</NavLink> */}
-                  {/* <NavLink href="">History</NavLink> */}
-                  {/* <NavLink href="">Trees</NavLink> */}
-                </Container>
-              </Wrapper>
-            )}
-          </Sticky>
-        </div>
-      )
-    }}
-  />
-)
+              {/* <NavLink href="">Ice Cream</NavLink> */}
+              {/* <NavLink href="">Food / Drink</NavLink> */}
+              {/* <NavLink href="">History</NavLink> */}
+              {/* <NavLink href="">Trees</NavLink> */}
+            </Container>
+          </Wrapper>
+        )}
+      </Sticky>
+    </div>
+  )
+}

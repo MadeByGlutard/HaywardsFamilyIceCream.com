@@ -44,7 +44,7 @@ const Wrapper = styled('div')`
   }
 `
 
-export default props => (
+export default (props) => (
   <Wrapper {...props}>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480.903 480.903">
       <path

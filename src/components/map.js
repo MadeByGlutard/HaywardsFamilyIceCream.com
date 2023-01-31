@@ -6,7 +6,7 @@ import Viewport from './viewport'
 
 const src = `https://www.google.com/maps/embed/v1/place?${stringify({
   key: 'AIzaSyAuu-v8xK1P-uy_NekuEs5z6NRrseapngc',
-  q: "Hayward's+Ice+Cream+of+Milford,+Elm+Street,+Milford,+NH"
+  q: "Hayward's+Ice+Cream+of+Milford,+Elm+Street,+Milford,+NH",
 })}`
 
 export function MapA() {
@@ -63,7 +63,7 @@ export function MapE() {
         padding: 8,
         maxWidth: '768px',
         backgroundColor: '#fff',
-        border: '4px solid rgb(183, 30, 35)'
+        border: '4px solid rgb(183, 30, 35)',
       }}
     >
       <iframe style={{ display: 'block', width: '100%', height: 450, margin: 0, border: 0 }} src={src} />

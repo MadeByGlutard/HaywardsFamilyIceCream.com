@@ -1,10 +1,16 @@
 module.exports = {
-  parser: 'babel-eslint',
+  parserOptions: {
+    sourceType: 'module',
+    ecmaVersion: 'latest',
+    ecmaFeatures: {
+      jsx: true,
+    },
+  },
   plugins: ['react', 'prettier'],
   env: {
     browser: true,
     node: true,
-    es6: true
+    es6: true,
   },
   extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:prettier/recommended'],
   rules: {
@@ -24,6 +30,11 @@ module.exports = {
     // Disable
     'no-console': 'off',
     'react/display-name': 'off',
-    'react/no-unescaped-entities': 'off'
-  }
+    'react/no-unescaped-entities': 'off',
+  },
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
 }

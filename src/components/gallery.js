@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from '@emotion/styled'
 import { random, sampleSize } from 'lodash'
-import { StaticQuery, graphql } from 'gatsby'
+import { useStaticQuery, graphql } from 'gatsby'
+import { GatsbyImage } from 'gatsby-plugin-image'
 
-import Image from './image'
 import Divider from './divider'
 import Viewport from './viewport'
 import Container from './container'
@@ -15,9 +15,7 @@ const GALLERY_QUERY = graphql`
         node {
           id
           childImageSharp {
-            fluid(maxWidth: 320) {
-              ...GatsbyImageSharpFluid_withWebp
-            }
+            gatsbyImageData(width: 320)
           }
         }
       }
@@ -42,7 +40,7 @@ const Column = styled('div')`
   }
 
   @media (min-width: 768px) {
-    width: calc(100% / ${props => props.size || 3} * 2);
+    width: calc(100% / ${(props) => props.size || 3} * 2);
     padding: 0 1rem;
 
     & + & {
@@ -51,7 +49,7 @@ const Column = styled('div')`
   }
 
   @media (min-width: 1024px) {
-    width: calc(100% / ${props => props.size || 3});
+    width: calc(100% / ${(props) => props.size || 3});
     max-width: 360px;
     padding: 0 1rem;
 
@@ -85,26 +83,25 @@ const Wrapper = styled(Viewport.Width)`
   }
 `
 
-export default ({ ...props }) => (
-  <StaticQuery
-    query={GALLERY_QUERY}
-    render={({ gallery }) => (
-      <Wrapper {...props}>
-        <h1 style={{ textAlign: 'center' }}>Our Gallery</h1>
-        <Divider style={{ color: '#fff' }} />
+export default ({ ...props }) => {
+  const { gallery } = useStaticQuery(GALLERY_QUERY)
 
-        <Container style={{ maxWidth: 1200 }}>
-          <Grid style={{ flexWrap: 'wrap' }}>
-            {sampleSize(gallery.edges, 4).map(({ node }) => (
-              <Column key={node.id} size={4}>
-                <Polaroid style={{ transform: `rotate(${random(-8, 8)}deg)` }}>
-                  <Image fluid={node.childImageSharp.fluid} />
-                </Polaroid>
-              </Column>
-            ))}
-          </Grid>
-        </Container>
-      </Wrapper>
-    )}
-  />
-)
+  return (
+    <Wrapper {...props}>
+      <h1 style={{ textAlign: 'center' }}>Our Gallery</h1>
+      <Divider style={{ color: '#fff' }} />
+
+      <Container style={{ maxWidth: 1200 }}>
+        <Grid style={{ flexWrap: 'wrap' }}>
+          {sampleSize(gallery.edges, 4).map(({ node }) => (
+            <Column key={node.id} size={4}>
+              <Polaroid style={{ transform: `rotate(${random(-8, 8)}deg)` }}>
+                <GatsbyImage image={node.childImageSharp.gatsbyImageData} alt="" />
+              </Polaroid>
+            </Column>
+          ))}
+        </Grid>
+      </Container>
+    </Wrapper>
+  )
+}

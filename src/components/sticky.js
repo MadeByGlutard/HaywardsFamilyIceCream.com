@@ -12,14 +12,14 @@ class Sticky extends Component {
     offsetX: PropTypes.number,
     offsetY: PropTypes.number,
     children: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
-    render: PropTypes.func
+    render: PropTypes.func,
   }
 
   static defaultProps = {
     offsetX: null,
     offsetY: null,
     children: ({ ...props }) => <div {...props} />,
-    render: ({ children, ...props }) => (typeof children === 'function' ? children(props) : children)
+    render: ({ children, ...props }) => (typeof children === 'function' ? children(props) : children),
   }
 
   state = { sticky: isSticky(this.props) }

@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from '@emotion/styled'
+import { StaticImage } from 'gatsby-plugin-image'
 
-import Logo from './logo'
 import Viewport from './viewport'
 import Container from './container'
 
@@ -21,7 +21,20 @@ const Wrapper = styled(Viewport.Width)`
 export default ({ ...props }) => (
   <Wrapper {...props}>
     <Container>
-      <Logo style={{ width: '80%', maxWidth: 768 }} />
+      <StaticImage
+        src="../assets/logo.png"
+        alt="Hayward's Family"
+        placeholder="none"
+        loading="eager"
+        quality={100}
+        width={768}
+        style={{
+          display: 'block',
+          margin: '0 auto',
+          width: '80%',
+          maxWidth: 768,
+        }}
+      />
     </Container>
   </Wrapper>
 )
