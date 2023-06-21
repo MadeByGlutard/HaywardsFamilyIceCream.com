@@ -52,7 +52,7 @@ const Column = styled('div')`
   }
 
   @media (min-width: 1024px) {
-    width: calc(100% / ${(props) => props.size || 3});
+    width: calc(100% / ${props => props.size || 3});
     max-width: 360px;
     padding: 0 1rem;
 

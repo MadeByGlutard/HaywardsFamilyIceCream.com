@@ -2,12 +2,6 @@
 # git config --global core.excludesfile ~/.gitignore
 
 node_modules/
-
-test-reports/
-coverage/
-
 .cache/
 public/
-
-.src/
-.env
+*.log

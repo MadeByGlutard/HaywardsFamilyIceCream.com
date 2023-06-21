@@ -82,7 +82,7 @@ const Wrapper = styled('div')`
   background-color: rgba(0, 0, 0, 0.25);
   transition: all 100ms ease-in-out;
 
-  ${(props) =>
+  ${props =>
     props.sticky &&
     css`
       background-color: #fff;
@@ -117,7 +117,7 @@ const Wrapper = styled('div')`
   }
 `
 
-export default (props) => {
+export default props => {
   const { settings } = useStaticQuery(SOCIAL_QUERY)
 
   const facebook = find(settings.social, { type: 'facebook' })

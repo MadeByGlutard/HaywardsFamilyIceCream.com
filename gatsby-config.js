@@ -37,12 +37,6 @@ module.exports = {
       },
     },
     {
-      resolve: `gatsby-plugin-google-analytics`,
-      options: {
-        trackingId: `UA-74365494-2`,
-      },
-    },
-    {
       resolve: `gatsby-plugin-manifest`,
       options: {
         icon: `./src/assets/icon.png`,
@@ -53,8 +47,5 @@ module.exports = {
     `gatsby-plugin-lodash`,
     `gatsby-plugin-image`,
     `gatsby-plugin-sharp`,
-
-    `gatsby-plugin-netlify`,
-    `gatsby-plugin-netlify-cms`,
   ],
 }
