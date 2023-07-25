@@ -1,4 +1,5 @@
-import React from 'react'
+import { z } from 'zod'
+import React, { ComponentProps } from 'react'
 import styled from '@emotion/styled'
 import { keyframes } from '@emotion/react'
 import { useStaticQuery, graphql } from 'gatsby'
@@ -16,19 +17,6 @@ const icons = {
   email: <MdEmail />,
 }
 
-const CONTACT_QUERY = graphql`
-  query {
-    settings: settingsYaml {
-      contact {
-        type
-        label
-        url
-        value
-      }
-    }
-  }
-`
-
 const wiggle = keyframes`
   from, to {
     transform: rotate(0deg);
@@ -43,7 +31,7 @@ const wiggle = keyframes`
   }
 `
 
-const Column = styled('div')`
+const Column = styled('div')<{ size?: number }>`
   width: 100%;
   max-width: 320px;
 
@@ -131,8 +119,34 @@ const Grid = styled('div')`
 
 const Wrapper = styled(Viewport.Width)``
 
-export default ({ ...props }) => {
-  const { settings } = useStaticQuery(CONTACT_QUERY)
+export default (props: ComponentProps<typeof Wrapper>) => {
+  const contactQuery = useStaticQuery(graphql`
+    query Contact {
+      settings: settingsYaml {
+        contact {
+          type
+          label
+          url
+          value
+        }
+      }
+    }
+  `)
+
+  const { settings } = z
+    .object({
+      settings: z.object({
+        contact: z.array(
+          z.object({
+            type: z.enum(Object.keys(icons) as [keyof typeof icons]),
+            label: z.string(),
+            url: z.string(),
+            value: z.string(),
+          })
+        ),
+      }),
+    })
+    .parse(contactQuery)
 
   return (
     <Wrapper {...props}>

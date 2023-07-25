@@ -1,4 +1,6 @@
-module.exports = {
+import type { GatsbyConfig } from 'gatsby'
+
+const config: GatsbyConfig = {
   siteMetadata: {
     title: `Hayward's Family Ice Cream`,
     siteUrl: `https://haywardsfamilyicecream.com`,
@@ -33,7 +35,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-typography`,
       options: {
-        pathToConfigModule: `./src/utils/typography.js`,
+        pathToConfigModule: `./src/utils/typography.ts`,
       },
     },
     {
@@ -49,3 +51,5 @@ module.exports = {
     `gatsby-plugin-sharp`,
   ],
 }
+
+export default config

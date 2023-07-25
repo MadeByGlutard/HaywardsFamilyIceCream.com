@@ -1,4 +1,5 @@
-import React from 'react'
+import { z } from 'zod'
+import React, { ComponentProps } from 'react'
 import styled from '@emotion/styled'
 import { css } from '@emotion/react'
 import { find } from 'lodash'
@@ -6,25 +7,7 @@ import { useStaticQuery, graphql } from 'gatsby'
 
 import Sticky from './sticky'
 import Container from './container'
-
-const SOCIAL_QUERY = graphql`
-  query {
-    settings: settingsYaml {
-      social {
-        type
-        label
-        url
-      }
-
-      contact {
-        type
-        label
-        url
-        value
-      }
-    }
-  }
-`
+// import contact from './contact'
 
 const Link = styled('a')`
   background-image: none;
@@ -68,7 +51,7 @@ const Nav = styled('div')`
   align-items: center;
 `
 
-const Wrapper = styled('div')`
+const Wrapper = styled('div')<{ sticky?: boolean }>`
   position: fixed;
   z-index: 1000;
   height: 64px;
@@ -117,17 +100,56 @@ const Wrapper = styled('div')`
   }
 `
 
-export default props => {
-  const { settings } = useStaticQuery(SOCIAL_QUERY)
+export default ({ isHomepage, ...props }: { isHomepage?: boolean } & ComponentProps<typeof Wrapper>) => {
+  const navbarQuery = useStaticQuery(graphql`
+    query Navbar {
+      settings: settingsYaml {
+        social {
+          type
+          label
+          url
+        }
 
-  const facebook = find(settings.social, { type: 'facebook' })
-  const phone = find(settings.contact, { type: 'phone' })
+        contact {
+          type
+          label
+          url
+          value
+        }
+      }
+    }
+  `)
+
+  const { settings } = z
+    .object({
+      settings: z.object({
+        social: z.array(
+          z.object({
+            type: z.string(),
+            label: z.string(),
+            url: z.string(),
+          })
+        ),
+        contact: z.array(
+          z.object({
+            type: z.string(),
+            label: z.string(),
+            url: z.string(),
+            value: z.string(),
+          })
+        ),
+      }),
+    })
+    .parse(navbarQuery)
+
+  const facebook = find(settings.social, { type: 'facebook' })!
+  const phone = find(settings.contact, { type: 'phone' })!
 
   return (
     <div style={{ height: 64, flexShrink: 0 }}>
       <Sticky offsetY={2}>
-        {({ sticky }) => (
-          <Wrapper sticky={!props.isHomepage || sticky} {...props}>
+        {({ sticky }: { sticky: boolean }) => (
+          <Wrapper sticky={!isHomepage || sticky} {...props}>
             <Container>
               <BrandLink href="/">Hayward's Family Ice Cream</BrandLink>
 

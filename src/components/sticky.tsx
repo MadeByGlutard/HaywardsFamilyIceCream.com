@@ -1,13 +1,17 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-const isSticky = ({ offsetX, offsetY }) => {
+const isSticky = ({ offsetX, offsetY }: { offsetX: number; offsetY: number }) => {
   if (offsetX && global.scrollX && global.scrollX >= offsetX) return true
   if (offsetY && global.scrollY && global.scrollY >= offsetY) return true
   return false
 }
 
 class Sticky extends Component {
+  hasScrolled?: boolean
+
   static propTypes = {
     offsetX: PropTypes.number,
     offsetY: PropTypes.number,
@@ -19,9 +23,11 @@ class Sticky extends Component {
     offsetX: null,
     offsetY: null,
     children: ({ ...props }) => <div {...props} />,
+    // @ts-expect-error
     render: ({ children, ...props }) => (typeof children === 'function' ? children(props) : children),
   }
 
+  // @ts-expect-error
   state = { sticky: isSticky(this.props) }
 
   componentDidMount() {
@@ -40,7 +46,9 @@ class Sticky extends Component {
   }
 
   updateSticky = () => {
+    // @ts-expect-error
     if (this.state.sticky !== isSticky(this.props)) {
+      // @ts-expect-error
       this.setState(({ sticky }) => ({ sticky: !sticky }))
     }
 
@@ -48,6 +56,7 @@ class Sticky extends Component {
   }
 
   render() {
+    // @ts-expect-error
     const { render, ...props } = this.props
     const { sticky } = this.state
 

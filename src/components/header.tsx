@@ -18,23 +18,25 @@ const Wrapper = styled(Viewport.Width)`
   }
 `
 
-export default ({ ...props }) => (
-  <Wrapper {...props}>
-    <Container>
-      <StaticImage
-        src="../assets/logo.png"
-        alt="Hayward's Family"
-        placeholder="none"
-        loading="eager"
-        quality={100}
-        width={768}
-        style={{
-          display: 'block',
-          margin: '0 auto',
-          width: '80%',
-          maxWidth: 768,
-        }}
-      />
-    </Container>
-  </Wrapper>
-)
+export default ({ ...props }) => {
+  return (
+    <Wrapper {...props}>
+      <Container>
+        <StaticImage
+          src="../assets/logo.png"
+          alt="Hayward's Family"
+          placeholder="none"
+          loading="eager"
+          quality={100}
+          width={768}
+          style={{
+            display: 'block',
+            margin: '0 auto',
+            width: '80%',
+            maxWidth: 768,
+          }}
+        />
+      </Container>
+    </Wrapper>
+  )
+}

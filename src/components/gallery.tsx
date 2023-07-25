@@ -1,27 +1,13 @@
+import { z } from 'zod'
 import React from 'react'
 import styled from '@emotion/styled'
 import { random, sampleSize } from 'lodash'
 import { useStaticQuery, graphql } from 'gatsby'
-import { GatsbyImage } from 'gatsby-plugin-image'
+import { GatsbyImage, IGatsbyImageData } from 'gatsby-plugin-image'
 
 import Divider from './divider'
 import Viewport from './viewport'
 import Container from './container'
-
-const GALLERY_QUERY = graphql`
-  query {
-    gallery: allFile(filter: { absolutePath: { regex: "/content/gallery/" } }) {
-      edges {
-        node {
-          id
-          childImageSharp {
-            gatsbyImageData(width: 320)
-          }
-        }
-      }
-    }
-  }
-`
 
 const Polaroid = styled('figure')`
   width: 100%;
@@ -31,7 +17,7 @@ const Polaroid = styled('figure')`
   box-shadow: 0 2px 2px rgba(12, 13, 14, 0.5);
 `
 
-const Column = styled('div')`
+const Column = styled('div')<{ size?: number }>`
   width: 100%;
   max-width: 320px;
 
@@ -84,7 +70,33 @@ const Wrapper = styled(Viewport.Width)`
 `
 
 export default ({ ...props }) => {
-  const { gallery } = useStaticQuery(GALLERY_QUERY)
+  const galleryQuery = useStaticQuery(graphql`
+    query Gallery {
+      gallery: allFile(filter: { absolutePath: { regex: "/content/gallery/" } }) {
+        nodes {
+          id
+          childImageSharp {
+            gatsbyImageData(width: 320)
+          }
+        }
+      }
+    }
+  `)
+
+  const { gallery } = z
+    .object({
+      gallery: z.object({
+        nodes: z.array(
+          z.object({
+            id: z.string(),
+            childImageSharp: z.object({
+              gatsbyImageData: z.custom<IGatsbyImageData>(),
+            }),
+          })
+        ),
+      }),
+    })
+    .parse(galleryQuery)
 
   return (
     <Wrapper {...props}>
@@ -93,10 +105,10 @@ export default ({ ...props }) => {
 
       <Container style={{ maxWidth: 1200 }}>
         <Grid style={{ flexWrap: 'wrap' }}>
-          {sampleSize(gallery.edges, 4).map(({ node }) => (
-            <Column key={node.id} size={4}>
+          {sampleSize(gallery.nodes, 4).map(({ id, childImageSharp }) => (
+            <Column key={id} size={4}>
               <Polaroid style={{ transform: `rotate(${random(-8, 8)}deg)` }}>
-                <GatsbyImage image={node.childImageSharp.gatsbyImageData} alt="" />
+                <GatsbyImage image={childImageSharp.gatsbyImageData} alt="" />
               </Polaroid>
             </Column>
           ))}
