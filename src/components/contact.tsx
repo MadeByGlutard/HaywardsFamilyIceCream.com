@@ -142,7 +142,7 @@ export default (props: ComponentProps<typeof Wrapper>) => {
             label: z.string(),
             url: z.string(),
             value: z.string(),
-          })
+          }),
         ),
       }),
     })

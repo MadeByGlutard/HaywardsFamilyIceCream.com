@@ -70,9 +70,9 @@ export default (props: ComponentProps<typeof Wrapper>) => {
             flavors: z.array(
               z.object({
                 name: z.string(),
-              })
+              }),
             ),
-          })
+          }),
         ),
       }),
     })

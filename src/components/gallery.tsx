@@ -92,7 +92,7 @@ export default ({ ...props }) => {
             childImageSharp: z.object({
               gatsbyImageData: z.custom<IGatsbyImageData>(),
             }),
-          })
+          }),
         ),
       }),
     })

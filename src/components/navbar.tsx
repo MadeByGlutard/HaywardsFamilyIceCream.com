@@ -128,7 +128,7 @@ export default ({ isHomepage, ...props }: { isHomepage?: boolean } & ComponentPr
             type: z.string(),
             label: z.string(),
             url: z.string(),
-          })
+          }),
         ),
         contact: z.array(
           z.object({
@@ -136,7 +136,7 @@ export default ({ isHomepage, ...props }: { isHomepage?: boolean } & ComponentPr
             label: z.string(),
             url: z.string(),
             value: z.string(),
-          })
+          }),
         ),
       }),
     })
