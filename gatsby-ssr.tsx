@@ -9,7 +9,7 @@ import type { GatsbySSR } from 'gatsby'
 export const onRenderBody: GatsbySSR['onRenderBody'] = ({ setHtmlAttributes, setHeadComponents }) => {
   setHtmlAttributes({ lang: `en` })
 
-  setHeadComponents([<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster+Two" />])
+  setHeadComponents([<link key={0} rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lobster+Two" />])
 }
 
 // Move external stylesheets to the top of the head section so they're loaded first.

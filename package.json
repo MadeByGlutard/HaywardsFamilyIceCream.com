@@ -103,14 +103,6 @@
       "react/react-in-jsx-scope": "off",
       "react/no-unescaped-entities": "off"
     },
-    "overrides": [
-      {
-        "files": "gatsby-ssr.tsx",
-        "rules": {
-          "react/jsx-key": "off"
-        }
-      }
-    ],
     "settings": {
       "react": {
         "version": "detect"
