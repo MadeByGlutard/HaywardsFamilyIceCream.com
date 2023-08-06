@@ -1,11 +1,11 @@
-import React, { ReactNode } from 'react'
-import { PageProps } from 'gatsby'
+import { css, Global } from '@emotion/react'
 import styled from '@emotion/styled'
-import { Global, css } from '@emotion/react'
+import { PageProps } from 'gatsby'
+import { ReactNode } from 'react'
 
-import Navbar from './navbar'
-import Footer from './footer'
 import Container from './container'
+import Footer from './footer'
+import Navbar from './navbar'
 
 const GLOBAL_STYLES = css`
   html {

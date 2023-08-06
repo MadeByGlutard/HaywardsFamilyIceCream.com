@@ -1,15 +1,14 @@
-import { z } from 'zod'
-import React, { ComponentProps } from 'react'
-import styled from '@emotion/styled'
 import { keyframes } from '@emotion/react'
-import { useStaticQuery, graphql } from 'gatsby'
+import styled from '@emotion/styled'
+import { graphql, useStaticQuery } from 'gatsby'
 import { StaticImage } from 'gatsby-plugin-image'
+import { ComponentProps } from 'react'
+import { MdEmail, MdPhone, MdPlace } from 'react-icons/md'
+import { z } from 'zod'
 
+import Container from './container'
 import Divider from './divider'
 import Viewport from './viewport'
-import Container from './container'
-
-import { MdPhone, MdEmail, MdPlace } from 'react-icons/md'
 
 const icons = {
   phone: <MdPhone />,

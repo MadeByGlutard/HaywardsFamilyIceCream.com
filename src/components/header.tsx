@@ -1,9 +1,8 @@
-import React from 'react'
 import styled from '@emotion/styled'
 import { StaticImage } from 'gatsby-plugin-image'
 
-import Viewport from './viewport'
 import Container from './container'
+import Viewport from './viewport'
 
 const Wrapper = styled(Viewport.Width)`
   margin-top: -64px;

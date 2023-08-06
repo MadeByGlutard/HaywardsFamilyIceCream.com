@@ -1,13 +1,12 @@
+import { graphql, PageProps, useStaticQuery } from 'gatsby'
 import { z } from 'zod'
-import React from 'react'
-import { useStaticQuery, graphql, PageProps } from 'gatsby'
 
-import SEO from '../components/seo'
-import Layout from '../components/layout'
-import Header from '../components/header'
+import Contact from '../components/contact'
 import Flavors from '../components/flavors'
 import Gallery from '../components/gallery'
-import Contact from '../components/contact'
+import Header from '../components/header'
+import Layout from '../components/layout'
+import SEO from '../components/seo'
 import Viewport from '../components/viewport'
 
 export const Head = () => {

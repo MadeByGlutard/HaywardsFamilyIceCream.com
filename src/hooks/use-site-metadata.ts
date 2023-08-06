@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import { graphql, useStaticQuery } from 'gatsby'
+import { z } from 'zod'
 
 export default function useSiteMetadata() {
   const siteMetadataQuery = useStaticQuery(graphql`

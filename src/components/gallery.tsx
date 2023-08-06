@@ -1,13 +1,12 @@
-import { z } from 'zod'
-import React from 'react'
 import styled from '@emotion/styled'
-import { random, sampleSize } from 'lodash'
-import { useStaticQuery, graphql } from 'gatsby'
+import { graphql, useStaticQuery } from 'gatsby'
 import { GatsbyImage, IGatsbyImageData } from 'gatsby-plugin-image'
+import { random, sampleSize } from 'lodash'
+import { z } from 'zod'
 
+import Container from './container'
 import Divider from './divider'
 import Viewport from './viewport'
-import Container from './container'
 
 const Polaroid = styled('figure')`
   width: 100%;

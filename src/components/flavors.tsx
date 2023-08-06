@@ -1,11 +1,11 @@
-import { z } from 'zod'
-import React, { ComponentProps } from 'react'
 import styled from '@emotion/styled'
+import { graphql, useStaticQuery } from 'gatsby'
+import { ComponentProps } from 'react'
+import { z } from 'zod'
 
+import Container from './container'
 import Divider from './divider'
 import Viewport from './viewport'
-import Container from './container'
-import { graphql, useStaticQuery } from 'gatsby'
 
 const Columns = styled('div')`
   @media (min-width: 768px) {

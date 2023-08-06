@@ -6,6 +6,7 @@ const config: GatsbyConfig = {
     siteUrl: `https://haywardsfamilyicecream.com`,
     description: ``,
   },
+  jsxRuntime: 'automatic',
   plugins: [
     // Sources
     {

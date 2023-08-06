@@ -1,4 +1,3 @@
-import React from 'react'
 import useSiteMetadata from '../hooks/use-site-metadata'
 
 export default ({ title, description }: { title?: string; description?: string }) => {

@@ -1,4 +1,3 @@
-import React from 'react'
 import { stringify } from 'querystring'
 
 import Divider from './divider'

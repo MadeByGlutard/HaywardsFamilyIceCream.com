@@ -1,9 +1,9 @@
-import React, { ComponentProps } from 'react'
 import styled from '@emotion/styled'
 import { StaticImage } from 'gatsby-plugin-image'
+import { ComponentProps } from 'react'
 
-import Viewport from './viewport'
 import Container from './container'
+import Viewport from './viewport'
 
 const Wrapper = styled(Viewport.Width)`
   background-color: rgb(17, 107, 180);

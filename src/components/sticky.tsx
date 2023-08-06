@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { Component } from 'react'
 
 const isSticky = ({ offsetX, offsetY }: { offsetX: number; offsetY: number }) => {
   if (offsetX && global.scrollX && global.scrollX >= offsetX) return true
