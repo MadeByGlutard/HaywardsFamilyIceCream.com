@@ -6,6 +6,9 @@
     - name: Banana Fudge
       allergens: []
       half-gallon: false
+    - name: Black Diamond
+      allergens: [gluten]
+      half-gallon: false
     - name: Black Raspberry
       allergens: []
       half-gallon: true
@@ -36,9 +39,6 @@
     - name: Chocolate Peanut Butter Cup
       allergens: [nuts]
       half-gallon: false
-    - name: Chocolate Ripple
-      allergens: []
-      half-gallon: false
     - name: Chocolate Tsunami
       allergens: [gluten]
       half-gallon: false
@@ -60,6 +60,9 @@
     - name: Cookie Monster
       allergens: [gluten]
       half-gallon: false
+    - name: Cotton Candy
+      allergens: []
+      half-gallon: false
     - name: Dutch Chocolate Almond
       allergens: [nuts]
       half-gallon: false
@@ -68,12 +71,6 @@
       half-gallon: false
     - name: French Vanilla
       allergens: []
-      half-gallon: false
-    - name: Frozen Pudding
-      allergens: []
-      half-gallon: false
-    - name: Heavenly Hash
-      allergens: [nuts]
       half-gallon: false
     - name: M&M
       allergens: []
@@ -102,17 +99,29 @@
     - name: Oreo
       allergens: [gluten]
       half-gallon: true
+    - name: Peanut Butter Snickers
+      allergens: [nuts]
+      half-gallon: false
     - name: Peppermint Stick
       allergens: []
       half-gallon: false
     - name: Pistachio
       allergens: [nuts]
       half-gallon: false
+    - name: Razz Brownie
+      allergens: [gluten]
+      half-gallon: false
     - name: Raspberry Cheesecake Truffle
       allergens: []
       half-gallon: false
+    - name: Salty Caramel Oreo
+      allergens: [gluten]
+      half-gallon: false
     - name: Snickers
       allergens: [nuts]
+      half-gallon: false
+    - name: S'mores
+      allergens: [gluten]
       half-gallon: false
     - name: Strawberry
       allergens: []
@@ -150,8 +159,19 @@
       half-gallon: false
 - category: Sorbet
   flavors: []
+- category: Vegan
+  flavors:
+    - name: Chocolate
+      allergens: []
+      half-gallon: false
+    - name: Vanilla
+      allergens: []
+      half-gallon: false
 - category: No Sugar Added
   flavors:
+    - name: Coffee
+      allergens: []
+      half-gallon: false
     - name: Vanilla
       allergens: []
       half-gallon: false
