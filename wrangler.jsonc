@@ -4,6 +4,9 @@
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-02-24",
 	"compatibility_flags": ["nodejs_compat"],
+	// Workers cache in front of the Worker; Astro's cacheCloudflare() provider
+	// sets Cloudflare-CDN-Cache-Control/Cache-Tag and purges by tag.
+	"cache": { "enabled": true },
 	"d1_databases": [
 		{
 			"binding": "DB",

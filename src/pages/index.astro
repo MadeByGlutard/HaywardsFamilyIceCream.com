@@ -5,14 +5,16 @@ import Flavors from '../components/Flavors.astro';
 import Gallery from '../components/Gallery.astro';
 import Header from '../components/Header.astro';
 import Layout from '../layouts/Layout.astro';
-import { PUBLIC_CACHE_CONTROL } from '../lib/cache';
+import { cachePage, secondsUntilMidnight } from '../lib/cache';
 import { getFlavorCategories, getSettings } from '../lib/content';
 import { pickGallery } from '../lib/gallery';
 
-const [settings, categories] = await Promise.all([getSettings(), getFlavorCategories()]);
+const [settings, { categories, cacheHints }] = await Promise.all([getSettings(), getFlavorCategories()]);
 const photos = pickGallery();
 
-Astro.response.headers.set('Cache-Control', PUBLIC_CACHE_CONTROL);
+// Purged on publish via EmDash's cache tags; expires at New York midnight at
+// the latest, when the gallery pick changes.
+cachePage(Astro.cache, Astro.response.headers, [settings.cacheHint, ...cacheHints], secondsUntilMidnight());
 ---
 
 <Layout isHomepage={true} settings={settings}>

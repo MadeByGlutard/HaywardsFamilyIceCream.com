@@ -1,4 +1,5 @@
 import cloudflare from "@astrojs/cloudflare";
+import { cacheCloudflare } from "@astrojs/cloudflare/cache";
 import react from "@astrojs/react";
 import { d1, r2 } from "@emdash-cms/cloudflare";
 import { defineConfig } from "astro/config";
@@ -8,6 +9,9 @@ export default defineConfig({
 	site: "https://haywardsfamilyicecream.com",
 	output: "server",
 	adapter: cloudflare({ inspectorPort: false }),
+	// Route caching on the Workers cache; EmDash purges by tag on publish.
+	// A no-op in `astro dev`.
+	cache: { provider: cacheCloudflare() },
 	image: {
 		layout: "constrained",
 		responsiveStyles: true,

@@ -23,14 +23,19 @@ export interface SiteSettings {
   contact: ContactDetail[];
 }
 
+export interface CacheHint {
+  tags?: string[];
+  lastModified?: Date;
+}
+
 export interface FlavorCategory {
   category: string;
   flavors: { name: string }[];
 }
 
 /** The single entry (slug "site") of the non-routable `settings` collection. */
-export async function getSettings(): Promise<SiteSettings> {
-  const { entry, error } = await getEmDashEntry('settings', 'site');
+export async function getSettings(): Promise<SiteSettings & { cacheHint: CacheHint }> {
+  const { entry, error, cacheHint } = await getEmDashEntry('settings', 'site');
   if (error) throw error;
   if (!entry) throw new Error('Site settings are missing. Complete EmDash setup with the bundled seed.');
   const data = entry.data;
@@ -38,11 +43,13 @@ export async function getSettings(): Promise<SiteSettings> {
     banner: (data.banner ?? '').trim(),
     social: (data.social ?? []) as SocialLink[],
     contact: (data.contact ?? []) as ContactDetail[],
+    // The entry hint tags its ID; tag the collection too so a replaced entry also purges.
+    cacheHint: { ...cacheHint, tags: [...(cacheHint.tags ?? []), 'settings'] },
   };
 }
 
 /** Categories in display order, each with its flavors in display order. */
-export async function getFlavorCategories(): Promise<FlavorCategory[]> {
+export async function getFlavorCategories(): Promise<{ categories: FlavorCategory[]; cacheHints: CacheHint[] }> {
   const [categories, flavors] = await Promise.all([
     getEmDashCollection('categories', { orderBy: { sort_order: 'asc' } }),
     getEmDashCollection('flavors', { orderBy: { sort_order: 'asc' } }),
@@ -53,7 +60,7 @@ export async function getFlavorCategories(): Promise<FlavorCategory[]> {
   const byOrder = (a: { sort_order?: number | null }, b: { sort_order?: number | null }) =>
     (a.sort_order ?? 0) - (b.sort_order ?? 0);
 
-  return categories.entries
+  const grouped = categories.entries
     .map(entry => entry.data)
     .sort(byOrder)
     .map(category => ({
@@ -64,4 +71,5 @@ export async function getFlavorCategories(): Promise<FlavorCategory[]> {
         .sort(byOrder)
         .map(flavor => ({ name: flavor.name })),
     }));
+  return { categories: grouped, cacheHints: [categories.cacheHint, flavors.cacheHint] };
 }

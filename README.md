@@ -10,7 +10,7 @@ EmDash admin at `/_emdash/admin`. Edits go live without a rebuild.
 | Command             | What it does                                                         |
 | ------------------- | -------------------------------------------------------------------- |
 | `npm run dev`       | Local server with simulated D1/R2 (workerd)                          |
-| `npm test`          | Seed-vs-original data tests, gallery tests, `public/` guard          |
+| `npm test`          | Seed-vs-original data, gallery, cache policy and `public/` guard tests |
 | `npm run typecheck` | `astro check`                                                        |
 | `npm run build`     | Production Worker build into `dist/`                                 |
 | `npm run images`    | Regenerate optimized images in `public/` from `src/assets/`          |
@@ -62,18 +62,43 @@ same day gets identical HTML. The photos are static files: originals in
 
 ## Caching
 
-The homepage sends `Cache-Control: public, max-age=60, s-maxage=300`. Shared caches such as
-Cloudflare's edge may keep a page for 5 minutes, and browsers for 1 minute. Because of this:
+Pages are cached at Cloudflare's edge until their content changes:
 
-- A banner, flavor or contact edit published in the admin is visible everywhere within
-  about 5 minutes, with no rebuild or purge.
-- The daily gallery change can show up to 5 minutes after midnight.
-- Logged-in editors are not affected. EmDash marks the pages it decorates for them
-  `private, no-store`.
+- `wrangler.jsonc` turns on the Workers cache, which sits in front of the Worker:
+  `"cache": { "enabled": true }`.
+- `astro.config.mjs` sets `cache: { provider: cacheCloudflare() }` from
+  `@astrojs/cloudflare/cache`.
+- The homepage passes EmDash's `cacheHint`s for `settings`, `categories` and `flavors` to
+  `Astro.cache.set()` (`src/lib/cache.ts`). The provider turns them into `Cache-Tag`
+  (collection names and entry IDs) and `Cloudflare-CDN-Cache-Control`.
+- When an entry is saved, published, unpublished, deleted or restored in the admin, EmDash's
+  write route calls `cache.invalidate({ tags: [collection, entryId] })`. That purges every
+  cached page that read the entry or its collection. No rebuild and no fixed delay.
+- The edge TTL (`maxAge`) is the number of seconds left until the next midnight in
+  America/New_York, which is when the gallery pick changes. The calculation is DST-aware.
+- Browsers get `Cache-Control: public, max-age=0, must-revalidate`, so they always ask the
+  edge and see a purge immediately.
+- Other routes declare no cache intent, so the adapter marks them
+  `Cloudflare-CDN-Cache-Control: no-store`. This covers the 404 page, sitemaps,
+  `/_emdash/*` and the admin.
+- Editors are never served a cached page: EmDash marks responses that carry the editor
+  toolbar `private, no-store`, and they skip the route cache.
 
-If edits need to appear instantly, lower `s-maxage` in `src/lib/cache.ts`. Another option
-is to enable Astro route caching with the Cloudflare provider, so that publishing purges
-by cache tag. `/_astro/*` assets get immutable caching from the Cloudflare adapter.
+Limits:
+
+- `astro dev` uses a no-op route cache. When `Astro.cache.enabled` is false, the page falls
+  back to `Cache-Control: public, max-age=60, s-maxage=300`.
+- `wrangler dev` cannot test the edge behaviour. Local workerd does not run the Workers
+  cache layer, and its `cloudflare:workers` `cache` has no `purge()`. A publish there logs
+  `[cache] Failed to invalidate ... cache.purge is not a function`. EmDash catches this, so
+  the write still succeeds.
+- Purging has to be checked once after the first deploy:
+  1. Request `/` twice and check the second response is a cache hit.
+  2. Change the banner in the admin.
+  3. Reload: the new banner should appear immediately.
+
+  If purging ever failed, a page could stay stale until New York midnight. The cap is in
+  `src/lib/cache.ts`.
 
 ## Styling
 
