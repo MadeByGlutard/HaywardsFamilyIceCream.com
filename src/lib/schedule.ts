@@ -37,11 +37,11 @@ export interface ScheduleContext {
 
 /**
  * Design-review previews: `?period=trees` (slug or slug prefix, or `none`
- * for no period) and `?today=2026-12-01`. Honoured in `astro dev` and for
+ * for no period) and `?today=2026-12-01`. Honoured in `astro dev`, on preview builds (behind Cloudflare Access) and for
  * signed-in EmDash staff only; ignored for public visitors.
  */
 function previewParams(Astro: AstroGlobal) {
-  const allowed = import.meta.env.DEV || !!Astro.locals.user;
+  const allowed = import.meta.env.DEV || __ACCESS_SIGN_IN__ || !!Astro.locals.user;
   if (!allowed) return {};
   const period = Astro.url.searchParams.get('period')?.trim().toLowerCase() || undefined;
   const today = Astro.url.searchParams.get('today')?.trim();
