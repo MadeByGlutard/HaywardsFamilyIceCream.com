@@ -1,0 +1,50 @@
+---
+// Mirrors gatsby-plugin-image's markup and loading behaviour:
+// - a sizer reserves the box (constrained: transparent SVG of the display size;
+//   fullWidth: padding-top aspect ratio),
+// - an absolutely positioned placeholder div, coloured with the image's dominant
+//   colour (placeholder="dominantColor") or uncoloured (placeholder="none"),
+// - the main <img data-main-image> on top, faded in over .25s once decoded,
+//   while the placeholder fades out over 500ms (see ImageLoading.astro).
+// Without JavaScript the main image is simply visible (no html.js class).
+interface Props {
+  /** Path stem under /images, e.g. "gallery/05" or "logo". */
+  name: string;
+  widths: number[];
+  formats: [fallback: 'jpg' | 'png', modern: 'webp'];
+  layout: 'constrained' | 'fullWidth';
+  /** Display width/height for constrained images. */
+  width?: number;
+  height?: number;
+  aspect?: number;
+  sizes: string;
+  alt: string;
+  color?: string;
+  loading?: 'eager' | 'lazy';
+  class?: string;
+  style?: string;
+}
+const { name, widths, formats, layout, width = 0, height = 0, aspect = 1, sizes, alt, color, loading = 'lazy', class: className, style } = Astro.props;
+const [fallback, modern] = formats;
+const srcset = (format: string) => widths.map(w => `/images/${name}-${w}.${format} ${w}w`).join(',');
+const src = `/images/${name}-${layout === 'constrained' ? width : widths.at(-1)}.${fallback}`;
+const sizer = `data:image/svg+xml;charset=utf-8,%3Csvg%20height='${height}'%20width='${width}'%20xmlns='http://www.w3.org/2000/svg'%20version='1.1'%3E%3C/svg%3E`;
+const placeholderStyle = `opacity:1;transition:opacity 500ms linear${color ? `;background-color:${color};position:absolute;top:0;left:0;bottom:0;right:0` : ''}`;
+---
+
+<div data-image-wrapper class:list={['image-wrapper', { 'image-wrapper-constrained': layout === 'constrained' }, className]} style={style}>
+  {
+    layout === 'constrained' ? (
+      <div style={`max-width:${width}px;display:block`}>
+        <img alt="" role="presentation" aria-hidden="true" src={sizer} style="max-width:100%;display:block;position:static" />
+      </div>
+    ) : (
+      <div aria-hidden="true" style={`padding-top:${100 / aspect}%`} />
+    )
+  }
+  <div aria-hidden="true" data-placeholder-image style={placeholderStyle}></div>
+  <picture>
+    <source type={`image/${modern}`} srcset={srcset(modern)} sizes={sizes} />
+    <img data-main-image src={src} srcset={srcset(fallback)} sizes={sizes} decoding="async" loading={loading} alt={alt} />
+  </picture>
+</div>

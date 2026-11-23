@@ -8,23 +8,29 @@
  * same day gets identical (cacheable) HTML.
  */
 
+import meta from './image-meta.json' with { type: 'json' };
+
 export interface GalleryPhoto {
   id: string;
+  /** Display size: gatsbyImageData(width: 320) keeps the aspect ratio. */
   width: number;
   height: number;
+  /** Dominant colour placeholder, computed by scripts/optimize-images.mjs. */
+  color: string;
 }
 
+export const DISPLAY_WIDTH = 320;
+
 /** Originals live in src/assets/gallery; optimized copies in public/images/gallery. */
-export const PHOTOS: readonly GalleryPhoto[] = [
-  { id: '01', width: 320, height: 320 },
-  { id: '02', width: 320, height: 400 },
-  { id: '03', width: 320, height: 320 },
-  { id: '04', width: 320, height: 320 },
-  { id: '05', width: 320, height: 427 },
-  { id: '06', width: 320, height: 284 },
-  { id: '07', width: 320, height: 427 },
-  { id: '08', width: 320, height: 255 },
-];
+export const PHOTOS: readonly GalleryPhoto[] = Object.entries(meta)
+  .filter(([key]) => key.startsWith('gallery/'))
+  .map(([key, image]) => ({
+    id: key.slice('gallery/'.length),
+    width: DISPLAY_WIDTH,
+    height: Math.round((DISPLAY_WIDTH * image.height) / image.width),
+    color: image.color,
+  }))
+  .sort((a, b) => a.id.localeCompare(b.id));
 
 export const GALLERY_SIZE = 4;
 export const MAX_TILT = 8;

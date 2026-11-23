@@ -2,15 +2,13 @@
 // gallery.tsx: 4 polaroids, picked per day (see src/lib/gallery.ts).
 import Container from './Container.astro';
 import Divider from './Divider.astro';
+import Picture from './Picture.astro';
 import type { GalleryItem } from '../lib/gallery';
 
 interface Props {
   photos: GalleryItem[];
 }
 const { photos } = Astro.props;
-const srcset = (id: string, format: string) =>
-  [160, 320, 640].map(w => `/images/gallery/${id}-${w}.${format} ${w}w`).join(',');
-const sizes = '(min-width: 320px) 320px, 100vw';
 ---
 
 <div class="viewport-width gallery">
@@ -23,21 +21,17 @@ const sizes = '(min-width: 320px) 320px, 100vw';
         photos.map(photo => (
           <div class="gallery-column">
             <figure class="polaroid" style={`transform:rotate(${photo.tilt}deg)`}>
-              <div class="image">
-                <picture>
-                  <source type="image/webp" srcset={srcset(photo.id, 'webp')} sizes={sizes} />
-                  <img
-                    src={`/images/gallery/${photo.id}-320.jpg`}
-                    srcset={srcset(photo.id, 'jpg')}
-                    sizes={sizes}
-                    width={photo.width}
-                    height={photo.height}
-                    alt=""
-                    decoding="async"
-                    loading="lazy"
-                  />
-                </picture>
-              </div>
+              <Picture
+                name={`gallery/${photo.id}`}
+                widths={[160, 320, 640]}
+                formats={['jpg', 'webp']}
+                layout="constrained"
+                width={photo.width}
+                height={photo.height}
+                sizes={`(min-width: ${photo.width}px) ${photo.width}px, 100vw`}
+                alt=""
+                color={photo.color}
+              />
             </figure>
           </div>
         ))

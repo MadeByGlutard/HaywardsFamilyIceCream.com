@@ -26,3 +26,15 @@ test('the day rolls over at midnight America/New_York, not UTC', () => {
   assert.equal(dateKey(new Date('2026-11-23T05:00:00Z')), '2026-11-23');
   assert.equal(dateKey(new Date('2026-07-01T03:59:00Z')), '2026-06-30');
 });
+
+test('dominant-colour placeholders match what gatsby-plugin-sharp produced', async () => {
+  const { default: meta } = await import('../src/lib/image-meta.json', { with: { type: 'json' } });
+  // Colours read from the Gatsby build of main (gallery 01/03/05/07, silhouette).
+  assert.equal(meta['gallery/01'].color, '#a89888');
+  assert.equal(meta['gallery/03'].color, '#e8d8d8');
+  assert.equal(meta['gallery/05'].color, '#f8f8f8');
+  assert.equal(meta['gallery/07'].color, '#282828');
+  assert.equal(meta.silhouette.color, '#f8f8f8');
+  for (const photo of PHOTOS) assert.match(photo.color, /^#[0-9a-f]{6}$/);
+  assert.equal(PHOTOS.length, 8);
+});

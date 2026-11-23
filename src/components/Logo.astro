@@ -1,29 +1,27 @@
 ---
-// Constrained logo image (gatsby-plugin-image StaticImage equivalent).
+// Logo as gatsby-plugin-image StaticImage with placeholder="none".
+import Picture from './Picture.astro';
+import meta from '../lib/image-meta.json';
+
 interface Props {
-  class: string;
+  width: number;
   widths: number[];
-  sizes: string;
+  style: string;
   loading?: 'eager' | 'lazy';
 }
-const { class: className, widths, sizes, loading = 'lazy' } = Astro.props;
-const srcset = (format: string) => widths.map(w => `/images/logo-${w}.${format} ${w}w`).join(',');
-const largest = widths.at(-1)!;
+const { width, widths, style, loading = 'lazy' } = Astro.props;
+const height = Math.round((width * meta.logo.height) / meta.logo.width);
 ---
 
-<div class:list={['image', className]}>
-  <picture>
-    <source type="image/webp" srcset={srcset('webp')} sizes={sizes} />
-    <img
-      src={`/images/logo-${largest}.png`}
-      srcset={srcset('png')}
-      sizes={sizes}
-      width={largest}
-      height={Math.round((largest * 216) / 768)}
-      alt="Hayward's Family"
-      decoding="async"
-      loading={loading}
-      fetchpriority={loading === 'eager' ? 'high' : undefined}
-    />
-  </picture>
-</div>
+<Picture
+  name="logo"
+  widths={widths}
+  formats={['png', 'webp']}
+  layout="constrained"
+  width={width}
+  height={height}
+  sizes={`(min-width: ${width}px) ${width}px, 100vw`}
+  alt="Hayward's Family"
+  loading={loading}
+  style={style}
+/>

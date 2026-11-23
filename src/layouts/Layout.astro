@@ -4,6 +4,7 @@ import '../styles/typography.css';
 import '../styles/site.css';
 import Container from '../components/Container.astro';
 import Footer from '../components/Footer.astro';
+import ImageLoading from '../components/ImageLoading.astro';
 import Navbar from '../components/Navbar.astro';
 import Seo from '../components/Seo.astro';
 import type { SiteSettings } from '../lib/content';
@@ -24,6 +25,7 @@ const touchIcons = [48, 72, 96, 144, 192, 256, 384, 512];
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <ImageLoading />
     <Seo title={title} description={description} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
