@@ -3,7 +3,6 @@ import { ensureContentModel } from "./lib/upgrade";
 
 // Staff sign in with a password, so EmDash's passkey-first screens hand over to ours.
 // Previews are already signed in by Cloudflare Access, so the sign-in page leads to the admin.
-declare const __ACCESS_SIGN_IN__: boolean;
 const PASSWORD_PAGES: Record<string, string> = __ACCESS_SIGN_IN__
 	? { "/login": "/_emdash/admin", "/_emdash/admin/login": "/_emdash/admin" }
 	: {

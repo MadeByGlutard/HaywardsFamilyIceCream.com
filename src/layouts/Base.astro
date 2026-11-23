@@ -50,6 +50,8 @@ const themeColor = schedule.accent === 'green' ? '#2e5a3c' : '#a71d2a';
     <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content={themeColor} />
     <title>{fullTitle}</title><link rel="icon" href="/favicon.ico" sizes="48x48" /><link rel="icon" href="/brand/icons/favicon-32.png" type="image/png" sizes="32x32" /><link rel="apple-touch-icon" href="/apple-touch-icon.png" /><link rel="manifest" href="/site.webmanifest" />
     {preview && <meta name="robots" content="noindex" />}
+    {/* Previews: show EmDash's on-page Edit button without a visit to the admin. Access signs them in on the first click. */}
+    {__ACCESS_SIGN_IN__ && <script is:inline>try { localStorage.setItem('emdash-editor', '1'); } catch (e) {}</script>}
     <EmDashHead page={page} />
     <script type="application/ld+json" set:html={JSON.stringify(structured).replace(/</g, '\\u003c')} />
   </head>

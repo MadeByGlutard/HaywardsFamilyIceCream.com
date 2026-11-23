@@ -95,7 +95,8 @@ and KV namespace (sign-in sessions), named `haywardsfamilyicecream-com-<branch>`
   are behind the same Access application.
 - The admin needs no second login on previews: Access's signed token signs people in
   (`accessSignIn` in `astro.config.mjs`). New people become admins; existing accounts keep their
-  role. Production builds keep email and password.
+  role. Every page shows EmDash's Edit button, so there is no need to open the admin first.
+  Production builds keep email and password.
 - Credentials: `CLOUDFLARE_API_TOKEN` (needs D1 Edit and Workers R2 Storage Edit as well as
   the Workers permissions).
 - `.github/workflows/previews.yml` runs `preview:deploy` on every push to a branch other than
