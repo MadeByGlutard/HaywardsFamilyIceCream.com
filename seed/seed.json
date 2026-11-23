@@ -8,7 +8,8 @@
   },
   "settings": {
     "title": "Hayward's Family Ice Cream",
-    "timezone": "America/New_York"
+    "timezone": "America/New_York",
+    "tagline": "Homemade ice cream in Milford, New Hampshire."
   },
   "collections": [
     {
@@ -191,6 +192,377 @@
           "slug": "half_gallon",
           "label": "Available in half gallons (not shown on the site)",
           "type": "boolean"
+        },
+        {
+          "slug": "description",
+          "label": "Description",
+          "type": "text",
+          "required": false
+        },
+        {
+          "slug": "allergen_notes",
+          "label": "Owner-verified allergen notes",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "slug": "pages",
+      "label": "Pages",
+      "labelSingular": "Page",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
+      "routable": false,
+      "titleField": "title",
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Headline",
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        {
+          "slug": "eyebrow",
+          "label": "Section label",
+          "type": "string"
+        },
+        {
+          "slug": "excerpt",
+          "label": "Introduction",
+          "type": "text"
+        },
+        {
+          "slug": "content",
+          "label": "Page content",
+          "type": "portableText",
+          "searchable": true
+        }
+      ],
+      "urlPattern": "/{slug}"
+    },
+    {
+      "slug": "visit",
+      "label": "Visit information",
+      "labelSingular": "Location",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
+      "routable": false,
+      "titleField": "title",
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Location name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "address",
+          "label": "Street address",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "locality",
+          "label": "City and state",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "phone",
+          "label": "Telephone",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "email",
+          "label": "Email address",
+          "type": "string"
+        },
+        {
+          "slug": "hours",
+          "label": "Opening hours",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "opens_at",
+          "label": "Opens at, 24-hour (e.g. 11:00); with a closing time, the header says open or closed now",
+          "type": "string"
+        },
+        {
+          "slug": "closes_at",
+          "label": "Closes at, 24-hour (e.g. 20:00)",
+          "type": "string"
+        },
+        {
+          "slug": "hours_note",
+          "label": "Hours note",
+          "type": "text"
+        },
+        {
+          "slug": "notice",
+          "label": "Seasonal notice",
+          "type": "text"
+        },
+        {
+          "slug": "facebook",
+          "label": "Facebook page",
+          "type": "url"
+        },
+        {
+          "slug": "instagram",
+          "label": "Instagram link",
+          "type": "url"
+        },
+        {
+          "slug": "directions",
+          "label": "Directions URL",
+          "type": "url"
+        },
+        {
+          "slug": "intro",
+          "label": "Visit introduction",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "slug": "periods",
+      "label": "Schedule periods",
+      "labelSingular": "Schedule period",
+      "description": "Dated periods (closures, the tree lot, ice cream season) that change the banner, status line, home page hero, navigation and accent colour. The period whose dates include today (Milford time) is used; if two overlap, the one that started most recently wins. With no active period the site falls back to Visit information.",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
+      "routable": false,
+      "titleField": "title",
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Period name",
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        {
+          "slug": "start_date",
+          "label": "First day",
+          "type": "datetime",
+          "indexed": true
+        },
+        {
+          "slug": "end_date",
+          "label": "Last day (empty means open-ended)",
+          "type": "datetime"
+        },
+        {
+          "slug": "dates_label",
+          "label": "Dates shown in “Coming up” (replaces the first/last day)",
+          "type": "string"
+        },
+        {
+          "slug": "status_text",
+          "label": "Status line (header, footer, Visit page)",
+          "type": "string"
+        },
+        {
+          "slug": "banner_text",
+          "label": "Banner strip under the navigation",
+          "type": "text"
+        },
+        {
+          "slug": "hero_eyebrow",
+          "label": "Home page kicker above the headline (empty uses the Home page entry)",
+          "type": "string"
+        },
+        {
+          "slug": "hero_headline",
+          "label": "Home page headline (one line per row)",
+          "type": "text"
+        },
+        {
+          "slug": "hero_deck",
+          "label": "Home page introduction",
+          "type": "text"
+        },
+        {
+          "slug": "hero_image",
+          "label": "Home page photo (optional upload)",
+          "type": "image"
+        },
+        {
+          "slug": "photo_set",
+          "label": "Site photos to use",
+          "type": "select",
+          "validation": {
+            "options": [
+              "Ice cream stand",
+              "Tree lot"
+            ]
+          }
+        },
+        {
+          "slug": "accent",
+          "label": "Accent colour",
+          "type": "select",
+          "validation": {
+            "options": [
+              "red",
+              "green"
+            ]
+          }
+        },
+        {
+          "slug": "show_trees_nav",
+          "label": "Tree lot is open (shows Trees & wreaths in the menu and the list on /trees)",
+          "type": "boolean"
+        },
+        {
+          "slug": "open_state",
+          "label": "Open or closed (adds a green or grey dot to the status line; empty shows no dot)",
+          "type": "select",
+          "validation": {
+            "options": [
+              "Open",
+              "Closed"
+            ]
+          }
+        },
+        {
+          "slug": "opens_at",
+          "label": "Opens at, 24-hour (e.g. 11:00); with a closing time, the header says open or closed now",
+          "type": "string"
+        },
+        {
+          "slug": "closes_at",
+          "label": "Closes at, 24-hour (e.g. 20:00)",
+          "type": "string"
+        },
+        {
+          "slug": "band_headline",
+          "label": "Home page colour band headline (one line per row; empty keeps “Make a little time for ice cream.”)",
+          "type": "text"
+        },
+        {
+          "slug": "band_link_label",
+          "label": "Colour band button text",
+          "type": "string"
+        },
+        {
+          "slug": "band_link_url",
+          "label": "Colour band button link (e.g. /trees)",
+          "type": "string"
+        },
+        {
+          "slug": "visit_intro",
+          "label": "Visit page introduction (empty uses Visit information)",
+          "type": "text"
+        },
+        {
+          "slug": "notes",
+          "label": "Staff notes (not shown on the site)",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "slug": "products",
+      "label": "Trees & wreaths",
+      "labelSingular": "Product",
+      "description": "Christmas trees, wreaths, kissing balls and extras listed on /trees while the tree lot is open. No prices: they are marked at the lot. Square ID is reserved for a future Square catalog sync.",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
+      "routable": false,
+      "titleField": "title",
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Name",
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        {
+          "slug": "category",
+          "label": "Category",
+          "type": "select",
+          "required": true,
+          "indexed": true,
+          "validation": {
+            "options": [
+              "Tree",
+              "Wreath",
+              "Kissing ball",
+              "Extra"
+            ]
+          }
+        },
+        {
+          "slug": "options",
+          "label": "Sizes or options",
+          "type": "string"
+        },
+        {
+          "slug": "square_id",
+          "label": "Square catalog ID (optional, for a future sync)",
+          "type": "string",
+          "indexed": true
+        },
+        {
+          "slug": "sort_order",
+          "label": "Display order",
+          "type": "integer",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "slug": "servings",
+      "label": "Sizes & prices",
+      "labelSingular": "Menu item",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
+      "routable": false,
+      "titleField": "title",
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Item or size",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "price",
+          "label": "Price to display",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "description",
+          "label": "Description",
+          "type": "text"
+        },
+        {
+          "slug": "sort_order",
+          "label": "Display order",
+          "type": "integer",
+          "indexed": true
         }
       ]
     }
@@ -1003,6 +1375,496 @@
           "half_gallon": false
         }
       }
+    ],
+    "pages": [
+      {
+        "id": "home",
+        "slug": "home",
+        "status": "published",
+        "data": {
+          "title": "A Milford tradition.\nOne scoop at a time.",
+          "eyebrow": "Homemade ice cream · Family owned",
+          "excerpt": "Good ice cream. Good company. Right here on Elm Street.",
+          "content": []
+        }
+      },
+      {
+        "id": "our-story",
+        "slug": "our-story",
+        "status": "published",
+        "data": {
+          "title": "An Elm Street tradition.",
+          "eyebrow": "Our story",
+          "excerpt": "Before the cones and the cups, there were cows, milk routes, and a family with a business to build.",
+          "content": [
+            {
+              "_type": "block",
+              "_key": "b0",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s0",
+                  "text": "Hayward’s story begins with local dairy farming. Before the ice cream windows, Charles Hayward worked for Whiting Dairy and bought a farm on Elm Street. His three sons helped carry the family business forward.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "b1",
+              "style": "h2",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s1",
+                  "text": "From dairy farm to roadside favorite",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "b2",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s2",
+                  "text": "The roadside stand became part of that story. An early Hayward Farms postcard identifies the Milford building as a place where ice cream was made for its network of stands. It also advertises a snack bar, a reminder that the business has taken different forms over the years.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "b3",
+              "style": "h2",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s3",
+                  "text": "A little piece of 1948",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "b4",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s4",
+                  "text": "In Milford High School’s 1948 yearbook, a Hayward Farms advertisement offered dairy products, ice cream and frozen foods. It is a small but tangible link between the business and the people who grew up here.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "b5",
+              "style": "h2",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s5",
+                  "text": "Another stop on the trail",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "b6",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s6",
+                  "text": "In 2022, Hayward’s Family Ice Cream joined the New Hampshire Ice Cream Trail. Interviewed that summer, Frank Robinson described the Milford shop’s homemade ice cream and the individual batches behind it.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "b7",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s7",
+                  "text": "Today, the tradition continues at 383 Elm Street. Come back for your usual, bring someone along, or make a new favorite part of the story.",
+                  "marks": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "trees",
+        "slug": "trees",
+        "status": "published",
+        "data": {
+          "title": "Christmas trees & wreaths",
+          "eyebrow": "From Thanksgiving weekend",
+          "excerpt": "Balsam and Fraser firs, 24-inch wreaths and kissing balls, on the lot at the stand on Elm Street.",
+          "content": [
+            {
+              "_type": "block",
+              "_key": "t0",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "t0s",
+                  "text": "Prices are marked at the lot.",
+                  "marks": []
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "visit": [
+      {
+        "id": "milford",
+        "slug": "milford",
+        "status": "published",
+        "data": {
+          "title": "Hayward’s Family Ice Cream — Milford",
+          "address": "383 Elm Street",
+          "locality": "Milford, NH 03055",
+          "phone": "603-672-8383",
+          "email": "haywardsofmilford@gmail.com",
+          "hours": "Open daily, 11am to 8pm",
+          "hours_note": "Open until 9pm in the summer months. Hours change for the tree lot and the winter break.",
+          "notice": "",
+          "facebook": "https://www.facebook.com/Haywardsofmilford/",
+          "directions": "https://www.google.com/maps/dir/?api=1&destination=Hayward%27s+Ice+Cream+of+Milford%2C+383+Elm+Street%2C+Milford%2C+NH+03055",
+          "intro": "Look for the white stand with the curved roof and the red Hayward’s sign. Pick your scoop, find a seat, and make a little time for ice cream.",
+          "opens_at": "11:00",
+          "closes_at": "20:00",
+          "instagram": "https://www.instagram.com/haywards_icecream/"
+        }
+      }
+    ],
+    "periods": [
+      {
+        "id": "thanksgiving-2026",
+        "slug": "thanksgiving-2026",
+        "status": "published",
+        "data": {
+          "title": "Thanksgiving closure 2026",
+          "start_date": "2026-11-22T00:00:00-05:00",
+          "end_date": "2026-11-26T00:00:00-05:00",
+          "dates_label": "",
+          "status_text": "Closed through Thanksgiving. Back Friday at 11am",
+          "banner_text": "We’re closed through Thanksgiving. Back Friday, November 27 at 11am with the trees.",
+          "hero_eyebrow": "A short break",
+          "hero_headline": "Closed for Thanksgiving.\nBack Friday with the trees.",
+          "hero_deck": "Christmas trees, wreaths and kissing balls will be on the lot at the stand on Elm Street.",
+          "photo_set": "Tree lot",
+          "accent": "red",
+          "show_trees_nav": false,
+          "open_state": "Closed",
+          "band_headline": "Know your flavor\nbefore Friday.",
+          "band_link_label": "Browse the menu",
+          "band_link_url": "/menu",
+          "visit_intro": "Look for the white stand with the curved roof, the red Hayward’s sign and, from Friday, the trees on the lot.",
+          "notes": "Dates and reopening time from the design mock; confirm with the owner."
+        }
+      },
+      {
+        "id": "trees-2026",
+        "slug": "trees-2026",
+        "status": "published",
+        "data": {
+          "title": "Tree lot 2026",
+          "start_date": "2026-11-27T00:00:00-05:00",
+          "end_date": "2026-12-20T00:00:00-05:00",
+          "dates_label": "",
+          "status_text": "Open daily, 11am to 7pm",
+          "banner_text": "Christmas trees, wreaths and kissing balls are on the lot.",
+          "hero_eyebrow": "On the lot now",
+          "hero_headline": "Trees and wreaths\nare on the lot.",
+          "hero_deck": "Balsam and Fraser firs, 24-inch wreaths and kissing balls at the stand, with food and ice cream at the window. Prices are marked at the lot.",
+          "photo_set": "Tree lot",
+          "accent": "green",
+          "show_trees_nav": true,
+          "open_state": "Open",
+          "band_headline": "Bring home a tree\nfrom Elm Street.",
+          "band_link_label": "Hours & directions",
+          "band_link_url": "/visit",
+          "visit_intro": "Look for the white stand with the curved roof, the red Hayward’s sign and the trees on the lot. Pick out a tree, grab a wreath and stop at the window.",
+          "notes": "Hours: the tree lot closed at 7pm in 2024 and 2025 (opening at noon); this year's banner reopens at 11am Friday. The lot closed the Sunday before Christmas in 2024 (Dec 22) and 2025 (Dec 21), so this period ends Sunday, Dec 20. Sources: Hayward's Instagram (@haywards_icecream) posts, Nov 2024 to Dec 2025, and the live site banner.",
+          "opens_at": "11:00",
+          "closes_at": "19:00"
+        }
+      },
+      {
+        "id": "winter-2026",
+        "slug": "winter-2026",
+        "status": "published",
+        "data": {
+          "title": "Winter break 2026",
+          "start_date": "2026-12-21T00:00:00-05:00",
+          "dates_label": "",
+          "status_text": "Closed for a winter break",
+          "banner_text": "We’re closed for a short winter break. We’ll post our reopening day here, on Facebook and on Instagram.",
+          "hero_eyebrow": "Closed for now",
+          "hero_headline": "Closed for a winter break.\nSee you soon.",
+          "hero_deck": "Thank you for another year on Elm Street.",
+          "photo_set": "Ice cream stand",
+          "accent": "red",
+          "show_trees_nav": false,
+          "open_state": "Closed",
+          "band_headline": "Dreaming of\nyour first cone?",
+          "band_link_label": "Browse the menu",
+          "band_link_url": "/menu",
+          "visit_intro": "Look for the white stand with the curved roof and the red Hayward’s sign.",
+          "notes": "Open-ended: ends when the next period with a first day begins. Past reopenings: mid to late January 2025 (announced Dec 2024), February 15, 2025 (11am to 7pm), January 10, 2026. Sources: Hayward's Instagram (@haywards_icecream) posts, Nov 2024 to Dec 2025, and the live site banner."
+        }
+      },
+      {
+        "id": "ice-cream-2027",
+        "slug": "ice-cream-2027",
+        "status": "published",
+        "data": {
+          "title": "Ice cream season 2027",
+          "dates_label": "After the winter break [date to confirm]",
+          "status_text": "Open daily, 11am to 8pm",
+          "banner_text": "",
+          "hero_headline": "",
+          "hero_deck": "",
+          "photo_set": "Ice cream stand",
+          "accent": "red",
+          "show_trees_nav": false,
+          "open_state": "Open",
+          "notes": "Set the first day once the reopening date is known; this period does not start without one. Standard hours are 11am to 8pm (owner); in 2025 the stand reopened at 11am to 7pm and moved to 8pm in mid-March. For summer hours (until 9pm) use the Summer hours period. Empty headline/introduction fall back to the Home page entry.",
+          "opens_at": "11:00",
+          "closes_at": "20:00"
+        }
+      },
+      {
+        "id": "summer-2027",
+        "slug": "summer-2027",
+        "status": "published",
+        "data": {
+          "title": "Summer hours 2027",
+          "dates_label": "Summer months",
+          "status_text": "Open daily, 11am to 9pm",
+          "banner_text": "",
+          "hero_headline": "",
+          "hero_deck": "",
+          "photo_set": "Ice cream stand",
+          "accent": "red",
+          "show_trees_nav": false,
+          "open_state": "Open",
+          "notes": "Open until 9pm in the summer months, with no set dates (owner). Give it a first and last day when summer hours start; empty fields fall back to the Home page entry.",
+          "opens_at": "11:00",
+          "closes_at": "21:00"
+        }
+      }
+    ],
+    "products": [
+      {
+        "id": "tree-balsam-fir",
+        "slug": "tree-balsam-fir",
+        "status": "published",
+        "data": {
+          "title": "Balsam fir",
+          "category": "Tree",
+          "options": "4–5, 5–6, 6–7 or 7–8 ft",
+          "square_id": "",
+          "sort_order": 10
+        }
+      },
+      {
+        "id": "tree-fraser-fir",
+        "slug": "tree-fraser-fir",
+        "status": "published",
+        "data": {
+          "title": "Fraser fir",
+          "category": "Tree",
+          "options": "7–8 ft",
+          "square_id": "",
+          "sort_order": 20
+        }
+      },
+      {
+        "id": "tree-table-top-tree",
+        "slug": "tree-table-top-tree",
+        "status": "published",
+        "data": {
+          "title": "Table top tree",
+          "category": "Tree",
+          "options": "",
+          "square_id": "",
+          "sort_order": 30
+        }
+      },
+      {
+        "id": "wreath-plain",
+        "slug": "wreath-plain",
+        "status": "published",
+        "data": {
+          "title": "Plain",
+          "category": "Wreath",
+          "options": "24-inch",
+          "square_id": "",
+          "sort_order": 40
+        }
+      },
+      {
+        "id": "wreath-with-a-bow",
+        "slug": "wreath-with-a-bow",
+        "status": "published",
+        "data": {
+          "title": "With a bow",
+          "category": "Wreath",
+          "options": "24-inch",
+          "square_id": "",
+          "sort_order": 50
+        }
+      },
+      {
+        "id": "wreath-decorated",
+        "slug": "wreath-decorated",
+        "status": "published",
+        "data": {
+          "title": "Decorated",
+          "category": "Wreath",
+          "options": "24-inch",
+          "square_id": "",
+          "sort_order": 60
+        }
+      },
+      {
+        "id": "kissing-ball-classic",
+        "slug": "kissing-ball-classic",
+        "status": "published",
+        "data": {
+          "title": "Classic",
+          "category": "Kissing ball",
+          "options": "",
+          "square_id": "",
+          "sort_order": 70
+        }
+      },
+      {
+        "id": "kissing-ball-santa",
+        "slug": "kissing-ball-santa",
+        "status": "published",
+        "data": {
+          "title": "Santa",
+          "category": "Kissing ball",
+          "options": "",
+          "square_id": "",
+          "sort_order": 80
+        }
+      },
+      {
+        "id": "kissing-ball-snowman",
+        "slug": "kissing-ball-snowman",
+        "status": "published",
+        "data": {
+          "title": "Snowman",
+          "category": "Kissing ball",
+          "options": "",
+          "square_id": "",
+          "sort_order": 90
+        }
+      },
+      {
+        "id": "kissing-ball-gnome",
+        "slug": "kissing-ball-gnome",
+        "status": "published",
+        "data": {
+          "title": "Gnome",
+          "category": "Kissing ball",
+          "options": "",
+          "square_id": "",
+          "sort_order": 100
+        }
+      },
+      {
+        "id": "extra-lighted-snowman",
+        "slug": "extra-lighted-snowman",
+        "status": "published",
+        "data": {
+          "title": "Lighted snowman",
+          "category": "Extra",
+          "options": "",
+          "square_id": "",
+          "sort_order": 110
+        }
+      },
+      {
+        "id": "extra-bows",
+        "slug": "extra-bows",
+        "status": "published",
+        "data": {
+          "title": "Bows",
+          "category": "Extra",
+          "options": "",
+          "square_id": "",
+          "sort_order": 120
+        }
+      },
+      {
+        "id": "extra-tree-bags-and-preservative",
+        "slug": "extra-tree-bags-and-preservative",
+        "status": "published",
+        "data": {
+          "title": "Tree bags and preservative",
+          "category": "Extra",
+          "options": "",
+          "square_id": "",
+          "sort_order": 130
+        }
+      }
     ]
-  }
+  },
+  "menus": [
+    {
+      "name": "primary",
+      "label": "Main navigation",
+      "items": [
+        {
+          "type": "custom",
+          "label": "Home",
+          "url": "/"
+        },
+        {
+          "type": "custom",
+          "label": "Our menu",
+          "url": "/menu"
+        },
+        {
+          "type": "custom",
+          "label": "Our story",
+          "url": "/our-story"
+        },
+        {
+          "type": "custom",
+          "label": "Visit us",
+          "url": "/visit"
+        }
+      ]
+    }
+  ]
 }

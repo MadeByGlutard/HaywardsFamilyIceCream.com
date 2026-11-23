@@ -67,3 +67,17 @@ test('repeater type options cover every type the components render', () => {
 test('no collection is routable (the site is a single page)', () => {
   for (const c of seed.collections) assert.equal(c.routable, false, c.slug);
 });
+
+test('the redesign only adds to the port\'s content model', () => {
+  assert.deepEqual(seed.collections.slice(0, 3).map(c => c.slug), ['settings', 'categories', 'flavors']);
+  for (const slug of ['pages', 'visit', 'periods', 'products', 'servings']) assert.ok(collection(slug), slug);
+  for (const extra of ['description', 'allergen_notes']) assert.ok(!field('flavors', extra).required, extra);
+});
+
+test('pages and the Milford location exist, and unknown prices stay unset', () => {
+  for (const slug of ['home', 'our-story']) assert.ok(seed.content.pages.find(p => p.slug === slug && p.status === 'published'), slug);
+  const visit = seed.content.visit.find(p => p.slug === 'milford');
+  assert.equal(visit.data.address, '383 Elm Street');
+  assert.equal(visit.data.phone.replace(/\D/g, ''), originalSettings.contact.find(c => c.type === 'phone').value.replace(/\D/g, ''));
+  assert.equal(seed.content.servings, undefined);
+});

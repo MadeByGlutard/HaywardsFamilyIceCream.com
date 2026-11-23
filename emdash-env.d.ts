@@ -3,7 +3,7 @@
 
 /// <reference types="emdash/locals" />
 
-import type { BylineSummary, ContentBylineCredit, TaxonomyTerm } from "emdash";
+import type { BylineSummary, ContentBylineCredit, TaxonomyTerm, PortableTextBlock } from "emdash";
 
 export interface Category {
   id: string;
@@ -28,6 +28,90 @@ export interface Flavor {
   sort_order: number;
   allergens?: ("gluten" | "nuts")[];
   half_gallon?: boolean;
+  description?: string;
+  allergen_notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface Page {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  eyebrow?: string;
+  excerpt?: string;
+  content?: PortableTextBlock[];
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface Period {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  start_date?: string;
+  end_date?: string;
+  dates_label?: string;
+  status_text?: string;
+  banner_text?: string;
+  hero_eyebrow?: string;
+  hero_headline?: string;
+  hero_deck?: string;
+  hero_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
+  photo_set?: "Ice cream stand" | "Tree lot";
+  accent?: "red" | "green";
+  show_trees_nav?: boolean;
+  open_state?: "Open" | "Closed";
+  opens_at?: string;
+  closes_at?: string;
+  band_headline?: string;
+  band_link_label?: string;
+  band_link_url?: string;
+  visit_intro?: string;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface Product {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  category: "Tree" | "Wreath" | "Kissing ball" | "Extra";
+  options?: string;
+  square_id?: string;
+  sort_order?: number;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface Serving {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  price: string;
+  description?: string;
+  sort_order?: number;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -52,10 +136,41 @@ export interface Setting {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
+export interface Visit {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  address: string;
+  locality: string;
+  phone: string;
+  email?: string;
+  hours: string;
+  opens_at?: string;
+  closes_at?: string;
+  hours_note?: string;
+  notice?: string;
+  facebook?: string;
+  instagram?: string;
+  directions?: string;
+  intro?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
 declare module "emdash" {
   interface EmDashCollections {
     categories: Category;
     flavors: Flavor;
+    pages: Page;
+    periods: Period;
+    products: Product;
+    servings: Serving;
     settings: Setting;
+    visit: Visit;
   }
 }
