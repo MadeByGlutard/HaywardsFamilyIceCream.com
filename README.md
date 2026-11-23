@@ -16,6 +16,8 @@ EmDash admin at `/_emdash/admin`. Edits go live without a rebuild.
 | `npm run preview`   | Serve the production build locally                                   |
 | `npm run images`    | Regenerate optimized images in `public/` from `src/assets/`          |
 | `npm run deploy`    | Build and deploy production with `cf deploy` (config in `cloudflare.config.ts`) |
+| `npm run preview:deploy` | Deploy the current branch as a Worker Preview with its own D1/R2 (see Previews) |
+| `npm run preview:delete` | Delete the current branch's preview and its D1/R2                    |
 
 ### Run locally (fresh clone, macOS)
 
@@ -71,6 +73,34 @@ EmDash's passkey-first login and invite screens to it:
 Cloudflare Access (Zero Trust team `misty-night-ed60`) separately guards the `workers.dev`
 address and previews, for developers only. The real domain has no Access in front of it, so
 finish setup before attaching it: until then, whoever opens the wizard first becomes admin.
+
+## Previews
+
+Every branch other than `main` can have a Worker Preview with its own D1 database and R2
+bucket, named `haywardsfamilyicecream-com-<branch>`:
+
+- `npm run preview:deploy` creates them on the first run and copies production into them:
+  schema, rows (including users and their password hashes, so the same people can sign in) and
+  media. Later runs
+  reuse them; pass `-- --reseed` to copy production again. It then runs `cf previews deploy`,
+  which builds with `isPreview` so `cloudflare.config.ts` binds the preview's own D1/R2 and
+  leaves out the cron trigger.
+- The copy goes statement by statement because D1's export API refuses databases with FTS5
+  tables, which EmDash uses for search.
+- `npm run preview:delete` deletes the preview, its database and its bucket. Nothing deletes
+  them automatically when a branch is deleted.
+- Preview URLs (`https://<branch>-haywardsfamilyicecream-com.tuckerwhitehouse.workers.dev`)
+  are behind the same Access application.
+- Credentials: `CLOUDFLARE_API_TOKEN` (needs D1 Edit and Workers R2 Storage Edit as well as
+  the Workers permissions).
+- `.github/workflows/previews.yml` runs `preview:deploy` on every push to a branch other than
+  `main`, and `preview:delete` when a branch is deleted (GitHub only runs that from the default
+  branch, so cleanup starts once the workflow is on `main`). It needs the
+  `CLOUDFLARE_API_TOKEN` secret and the `CLOUDFLARE_ACCOUNT_ID` variable.
+- Previews don't inherit production's secrets. `EMDASH_ENCRYPTION_KEY` is set in the Worker's
+  Previews Base config (same value as production, since preview databases are copies) with
+  `npx wrangler preview base-config secret put EMDASH_ENCRYPTION_KEY --worker-name haywardsfamilyicecream-com`,
+  and every new preview starts with it.
 
 ## Content model (`seed/seed.json`)
 

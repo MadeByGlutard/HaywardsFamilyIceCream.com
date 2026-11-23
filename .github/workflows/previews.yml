@@ -1,0 +1,60 @@
+# Worker Previews for every branch except main, each with its own D1 database
+# and R2 bucket copied from production (scripts/preview.mjs).
+#
+# Needs, in the repository settings:
+#   secrets.CLOUDFLARE_API_TOKEN  user API token with Account Settings Read,
+#                                 Workers Scripts Edit, Workers KV Storage Edit,
+#                                 Workers R2 Storage Edit and D1 Edit
+#   vars.CLOUDFLARE_ACCOUNT_ID
+#
+# GitHub only runs `delete` workflows from the default branch, so cleanup on
+# branch deletion starts working once this file is on main.
+
+name: Previews
+
+on:
+  push:
+    branches-ignore: [main]
+  delete:
+
+concurrency:
+  group: preview-${{ github.event_name == 'delete' && github.event.ref || github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+
+jobs:
+  deploy:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # The branch name goes through the environment: pasted into the command, a crafted
+      # name could run code with the Cloudflare token.
+      - run: npm run preview:deploy -- --branch "$BRANCH"
+        env:
+          BRANCH: ${{ github.ref_name }}
+
+  cleanup:
+    if: github.event_name == 'delete' && github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run preview:delete -- --branch "$BRANCH"
+        env:
+          BRANCH: ${{ github.event.ref }}
