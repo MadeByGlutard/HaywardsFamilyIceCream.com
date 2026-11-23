@@ -1,0 +1,1008 @@
+{
+  "$schema": "https://emdashcms.com/seed.schema.json",
+  "version": "1",
+  "meta": {
+    "name": "Hayward's Family Ice Cream",
+    "description": "Flavors, banner and contact details for HaywardsFamilyIceCream.com",
+    "author": "Hayward's Family Ice Cream"
+  },
+  "settings": {
+    "title": "Hayward's Family Ice Cream",
+    "timezone": "America/New_York"
+  },
+  "collections": [
+    {
+      "slug": "settings",
+      "label": "Site settings",
+      "labelSingular": "Site settings",
+      "description": "One entry (\"site\") holding the homepage banner, social links and contact details.",
+      "supports": [
+        "drafts",
+        "revisions"
+      ],
+      "routable": false,
+      "titleField": "title",
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "banner",
+          "label": "Banner (plain text, leave empty to hide)",
+          "type": "string"
+        },
+        {
+          "slug": "social",
+          "label": "Social links",
+          "type": "repeater",
+          "validation": {
+            "subFields": [
+              {
+                "slug": "label",
+                "label": "Label",
+                "type": "string",
+                "required": true
+              },
+              {
+                "slug": "type",
+                "label": "Type",
+                "type": "select",
+                "required": true,
+                "options": [
+                  "facebook"
+                ]
+              },
+              {
+                "slug": "url",
+                "label": "URL",
+                "type": "url",
+                "required": true
+              }
+            ]
+          }
+        },
+        {
+          "slug": "contact",
+          "label": "Contact details",
+          "type": "repeater",
+          "validation": {
+            "subFields": [
+              {
+                "slug": "label",
+                "label": "Label",
+                "type": "string",
+                "required": true
+              },
+              {
+                "slug": "type",
+                "label": "Type",
+                "type": "select",
+                "required": true,
+                "options": [
+                  "phone",
+                  "place",
+                  "email"
+                ]
+              },
+              {
+                "slug": "url",
+                "label": "Link URL",
+                "type": "string",
+                "required": true
+              },
+              {
+                "slug": "value",
+                "label": "Displayed value",
+                "type": "string",
+                "required": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "categories",
+      "label": "Flavor categories",
+      "labelSingular": "Flavor category",
+      "description": "Headings on the flavor list, shown in display order.",
+      "supports": [
+        "drafts",
+        "revisions"
+      ],
+      "routable": false,
+      "titleField": "name",
+      "fields": [
+        {
+          "slug": "name",
+          "label": "Name",
+          "type": "string",
+          "required": true,
+          "indexed": true
+        },
+        {
+          "slug": "sort_order",
+          "label": "Display order",
+          "type": "integer",
+          "required": true,
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "slug": "flavors",
+      "label": "Flavors",
+      "labelSingular": "Flavor",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
+      "routable": false,
+      "titleField": "name",
+      "fields": [
+        {
+          "slug": "name",
+          "label": "Flavor name",
+          "type": "string",
+          "required": true,
+          "searchable": true,
+          "indexed": true
+        },
+        {
+          "slug": "category",
+          "label": "Category",
+          "type": "select",
+          "required": true,
+          "indexed": true,
+          "validation": {
+            "options": [
+              "Ice Cream",
+              "Sherbet",
+              "Yogurt",
+              "Sorbet",
+              "Vegan",
+              "No Sugar Added"
+            ]
+          }
+        },
+        {
+          "slug": "sort_order",
+          "label": "Order within category",
+          "type": "integer",
+          "required": true,
+          "indexed": true
+        },
+        {
+          "slug": "allergens",
+          "label": "Allergens (not shown on the site)",
+          "type": "multiSelect",
+          "validation": {
+            "options": [
+              "gluten",
+              "nuts"
+            ]
+          }
+        },
+        {
+          "slug": "half_gallon",
+          "label": "Available in half gallons (not shown on the site)",
+          "type": "boolean"
+        }
+      ]
+    }
+  ],
+  "content": {
+    "settings": [
+      {
+        "id": "settings-site",
+        "slug": "site",
+        "status": "published",
+        "data": {
+          "title": "Site settings",
+          "banner": "Closed until Friday, November 27th - Reopening at 11am!",
+          "social": [
+            {
+              "label": "Find us on Facebook",
+              "type": "facebook",
+              "url": "https://facebook.com/haywardsofmilford"
+            }
+          ],
+          "contact": [
+            {
+              "label": "Give us a call",
+              "type": "phone",
+              "url": "tel:16036728383",
+              "value": "(603) 672-8383"
+            },
+            {
+              "label": "Come visit us",
+              "type": "place",
+              "url": "https://www.google.com/maps?q=Hayward's+Ice+Cream+of+Milford,+Elm+Street,+Milford,+NH",
+              "value": "383 Elm St, Milford, NH 03055"
+            },
+            {
+              "label": "Send us a message",
+              "type": "email",
+              "url": "mailto:haywardsofmilford@gmail.com",
+              "value": "haywardsofmilford@gmail.com"
+            }
+          ]
+        }
+      }
+    ],
+    "categories": [
+      {
+        "id": "category-ice-cream",
+        "slug": "ice-cream",
+        "status": "published",
+        "data": {
+          "name": "Ice Cream",
+          "sort_order": 1
+        }
+      },
+      {
+        "id": "category-sherbet",
+        "slug": "sherbet",
+        "status": "published",
+        "data": {
+          "name": "Sherbet",
+          "sort_order": 2
+        }
+      },
+      {
+        "id": "category-yogurt",
+        "slug": "yogurt",
+        "status": "published",
+        "data": {
+          "name": "Yogurt",
+          "sort_order": 3
+        }
+      },
+      {
+        "id": "category-sorbet",
+        "slug": "sorbet",
+        "status": "published",
+        "data": {
+          "name": "Sorbet",
+          "sort_order": 4
+        }
+      },
+      {
+        "id": "category-vegan",
+        "slug": "vegan",
+        "status": "published",
+        "data": {
+          "name": "Vegan",
+          "sort_order": 5
+        }
+      },
+      {
+        "id": "category-no-sugar-added",
+        "slug": "no-sugar-added",
+        "status": "published",
+        "data": {
+          "name": "No Sugar Added",
+          "sort_order": 6
+        }
+      }
+    ],
+    "flavors": [
+      {
+        "id": "flavor-ice-cream-appalachian-trail",
+        "slug": "ice-cream-appalachian-trail",
+        "status": "published",
+        "data": {
+          "name": "Appalachian Trail",
+          "category": "Ice Cream",
+          "sort_order": 1,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-banana-fudge",
+        "slug": "ice-cream-banana-fudge",
+        "status": "published",
+        "data": {
+          "name": "Banana Fudge",
+          "category": "Ice Cream",
+          "sort_order": 2,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-black-diamond",
+        "slug": "ice-cream-black-diamond",
+        "status": "published",
+        "data": {
+          "name": "Black Diamond",
+          "category": "Ice Cream",
+          "sort_order": 3,
+          "allergens": [
+            "gluten"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-black-raspberry",
+        "slug": "ice-cream-black-raspberry",
+        "status": "published",
+        "data": {
+          "name": "Black Raspberry",
+          "category": "Ice Cream",
+          "sort_order": 4,
+          "allergens": [],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-ice-cream-bubble-gum",
+        "slug": "ice-cream-bubble-gum",
+        "status": "published",
+        "data": {
+          "name": "Bubble Gum",
+          "category": "Ice Cream",
+          "sort_order": 5,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-butter-crunch",
+        "slug": "ice-cream-butter-crunch",
+        "status": "published",
+        "data": {
+          "name": "Butter Crunch",
+          "category": "Ice Cream",
+          "sort_order": 6,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-butter-pecan",
+        "slug": "ice-cream-butter-pecan",
+        "status": "published",
+        "data": {
+          "name": "Butter Pecan",
+          "category": "Ice Cream",
+          "sort_order": 7,
+          "allergens": [
+            "nuts"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-cake-batter",
+        "slug": "ice-cream-cake-batter",
+        "status": "published",
+        "data": {
+          "name": "Cake Batter",
+          "category": "Ice Cream",
+          "sort_order": 8,
+          "allergens": [
+            "gluten"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-caramel-tsunami",
+        "slug": "ice-cream-caramel-tsunami",
+        "status": "published",
+        "data": {
+          "name": "Caramel Tsunami",
+          "category": "Ice Cream",
+          "sort_order": 9,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-cherry-vanilla",
+        "slug": "ice-cream-cherry-vanilla",
+        "status": "published",
+        "data": {
+          "name": "Cherry Vanilla",
+          "category": "Ice Cream",
+          "sort_order": 10,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-chocolate",
+        "slug": "ice-cream-chocolate",
+        "status": "published",
+        "data": {
+          "name": "Chocolate",
+          "category": "Ice Cream",
+          "sort_order": 11,
+          "allergens": [],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-ice-cream-chocolate-chip",
+        "slug": "ice-cream-chocolate-chip",
+        "status": "published",
+        "data": {
+          "name": "Chocolate Chip",
+          "category": "Ice Cream",
+          "sort_order": 12,
+          "allergens": [],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-ice-cream-chocolate-peanut-butter-cup",
+        "slug": "ice-cream-chocolate-peanut-butter-cup",
+        "status": "published",
+        "data": {
+          "name": "Chocolate Peanut Butter Cup",
+          "category": "Ice Cream",
+          "sort_order": 13,
+          "allergens": [
+            "nuts"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-chocolate-tsunami",
+        "slug": "ice-cream-chocolate-tsunami",
+        "status": "published",
+        "data": {
+          "name": "Chocolate Tsunami",
+          "category": "Ice Cream",
+          "sort_order": 14,
+          "allergens": [
+            "gluten"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-coconut-almond",
+        "slug": "ice-cream-coconut-almond",
+        "status": "published",
+        "data": {
+          "name": "Coconut Almond",
+          "category": "Ice Cream",
+          "sort_order": 15,
+          "allergens": [
+            "nuts"
+          ],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-ice-cream-coffee",
+        "slug": "ice-cream-coffee",
+        "status": "published",
+        "data": {
+          "name": "Coffee",
+          "category": "Ice Cream",
+          "sort_order": 16,
+          "allergens": [],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-ice-cream-coffee-oreo",
+        "slug": "ice-cream-coffee-oreo",
+        "status": "published",
+        "data": {
+          "name": "Coffee Oreo",
+          "category": "Ice Cream",
+          "sort_order": 17,
+          "allergens": [
+            "gluten"
+          ],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-ice-cream-cookie-dough",
+        "slug": "ice-cream-cookie-dough",
+        "status": "published",
+        "data": {
+          "name": "Cookie Dough",
+          "category": "Ice Cream",
+          "sort_order": 18,
+          "allergens": [
+            "gluten"
+          ],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-ice-cream-cookie-dough-brownie",
+        "slug": "ice-cream-cookie-dough-brownie",
+        "status": "published",
+        "data": {
+          "name": "Cookie Dough Brownie",
+          "category": "Ice Cream",
+          "sort_order": 19,
+          "allergens": [
+            "gluten"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-cookie-monster",
+        "slug": "ice-cream-cookie-monster",
+        "status": "published",
+        "data": {
+          "name": "Cookie Monster",
+          "category": "Ice Cream",
+          "sort_order": 20,
+          "allergens": [
+            "gluten"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-cotton-candy",
+        "slug": "ice-cream-cotton-candy",
+        "status": "published",
+        "data": {
+          "name": "Cotton Candy",
+          "category": "Ice Cream",
+          "sort_order": 21,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-dutch-chocolate-almond",
+        "slug": "ice-cream-dutch-chocolate-almond",
+        "status": "published",
+        "data": {
+          "name": "Dutch Chocolate Almond",
+          "category": "Ice Cream",
+          "sort_order": 22,
+          "allergens": [
+            "nuts"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-fluffernutter",
+        "slug": "ice-cream-fluffernutter",
+        "status": "published",
+        "data": {
+          "name": "Fluffernutter",
+          "category": "Ice Cream",
+          "sort_order": 23,
+          "allergens": [
+            "nuts"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-french-vanilla",
+        "slug": "ice-cream-french-vanilla",
+        "status": "published",
+        "data": {
+          "name": "French Vanilla",
+          "category": "Ice Cream",
+          "sort_order": 24,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-m-m",
+        "slug": "ice-cream-m-m",
+        "status": "published",
+        "data": {
+          "name": "M&M",
+          "category": "Ice Cream",
+          "sort_order": 25,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-maple-walnut",
+        "slug": "ice-cream-maple-walnut",
+        "status": "published",
+        "data": {
+          "name": "Maple Walnut",
+          "category": "Ice Cream",
+          "sort_order": 26,
+          "allergens": [
+            "nuts"
+          ],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-ice-cream-milky-r-way",
+        "slug": "ice-cream-milky-r-way",
+        "status": "published",
+        "data": {
+          "name": "Milky-R-Way",
+          "category": "Ice Cream",
+          "sort_order": 27,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-mint-chocolate-chip",
+        "slug": "ice-cream-mint-chocolate-chip",
+        "status": "published",
+        "data": {
+          "name": "Mint Chocolate Chip",
+          "category": "Ice Cream",
+          "sort_order": 28,
+          "allergens": [],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-ice-cream-mint-oreo",
+        "slug": "ice-cream-mint-oreo",
+        "status": "published",
+        "data": {
+          "name": "Mint Oreo",
+          "category": "Ice Cream",
+          "sort_order": 29,
+          "allergens": [
+            "gluten"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-mocha-chip",
+        "slug": "ice-cream-mocha-chip",
+        "status": "published",
+        "data": {
+          "name": "Mocha Chip",
+          "category": "Ice Cream",
+          "sort_order": 30,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-monster-trax",
+        "slug": "ice-cream-monster-trax",
+        "status": "published",
+        "data": {
+          "name": "Monster Trax",
+          "category": "Ice Cream",
+          "sort_order": 31,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-orange-pineapple",
+        "slug": "ice-cream-orange-pineapple",
+        "status": "published",
+        "data": {
+          "name": "Orange Pineapple",
+          "category": "Ice Cream",
+          "sort_order": 32,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-oreo",
+        "slug": "ice-cream-oreo",
+        "status": "published",
+        "data": {
+          "name": "Oreo",
+          "category": "Ice Cream",
+          "sort_order": 33,
+          "allergens": [
+            "gluten"
+          ],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-ice-cream-peanut-butter-snickers",
+        "slug": "ice-cream-peanut-butter-snickers",
+        "status": "published",
+        "data": {
+          "name": "Peanut Butter Snickers",
+          "category": "Ice Cream",
+          "sort_order": 34,
+          "allergens": [
+            "nuts"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-peppermint-stick",
+        "slug": "ice-cream-peppermint-stick",
+        "status": "published",
+        "data": {
+          "name": "Peppermint Stick",
+          "category": "Ice Cream",
+          "sort_order": 35,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-pistachio",
+        "slug": "ice-cream-pistachio",
+        "status": "published",
+        "data": {
+          "name": "Pistachio",
+          "category": "Ice Cream",
+          "sort_order": 36,
+          "allergens": [
+            "nuts"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-razz-brownie",
+        "slug": "ice-cream-razz-brownie",
+        "status": "published",
+        "data": {
+          "name": "Razz Brownie",
+          "category": "Ice Cream",
+          "sort_order": 37,
+          "allergens": [
+            "gluten"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-raspberry-cheesecake-truffle",
+        "slug": "ice-cream-raspberry-cheesecake-truffle",
+        "status": "published",
+        "data": {
+          "name": "Raspberry Cheesecake Truffle",
+          "category": "Ice Cream",
+          "sort_order": 38,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-salty-caramel-oreo",
+        "slug": "ice-cream-salty-caramel-oreo",
+        "status": "published",
+        "data": {
+          "name": "Salty Caramel Oreo",
+          "category": "Ice Cream",
+          "sort_order": 39,
+          "allergens": [
+            "gluten"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-snickers",
+        "slug": "ice-cream-snickers",
+        "status": "published",
+        "data": {
+          "name": "Snickers",
+          "category": "Ice Cream",
+          "sort_order": 40,
+          "allergens": [
+            "nuts"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-s-mores",
+        "slug": "ice-cream-s-mores",
+        "status": "published",
+        "data": {
+          "name": "S'mores",
+          "category": "Ice Cream",
+          "sort_order": 41,
+          "allergens": [
+            "gluten"
+          ],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-strawberry",
+        "slug": "ice-cream-strawberry",
+        "status": "published",
+        "data": {
+          "name": "Strawberry",
+          "category": "Ice Cream",
+          "sort_order": 42,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-strawberry-cheesecake",
+        "slug": "ice-cream-strawberry-cheesecake",
+        "status": "published",
+        "data": {
+          "name": "Strawberry Cheesecake",
+          "category": "Ice Cream",
+          "sort_order": 43,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-ice-cream-vanilla",
+        "slug": "ice-cream-vanilla",
+        "status": "published",
+        "data": {
+          "name": "Vanilla",
+          "category": "Ice Cream",
+          "sort_order": 44,
+          "allergens": [],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-sherbet-lime",
+        "slug": "sherbet-lime",
+        "status": "published",
+        "data": {
+          "name": "Lime",
+          "category": "Sherbet",
+          "sort_order": 1,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-sherbet-orange",
+        "slug": "sherbet-orange",
+        "status": "published",
+        "data": {
+          "name": "Orange",
+          "category": "Sherbet",
+          "sort_order": 2,
+          "allergens": [],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-yogurt-coffee-heath-bar",
+        "slug": "yogurt-coffee-heath-bar",
+        "status": "published",
+        "data": {
+          "name": "Coffee Heath Bar",
+          "category": "Yogurt",
+          "sort_order": 1,
+          "allergens": [],
+          "half_gallon": true
+        }
+      },
+      {
+        "id": "flavor-yogurt-chocolate",
+        "slug": "yogurt-chocolate",
+        "status": "published",
+        "data": {
+          "name": "Chocolate",
+          "category": "Yogurt",
+          "sort_order": 2,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-yogurt-mint-truffle",
+        "slug": "yogurt-mint-truffle",
+        "status": "published",
+        "data": {
+          "name": "Mint Truffle",
+          "category": "Yogurt",
+          "sort_order": 3,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-yogurt-purple-panther",
+        "slug": "yogurt-purple-panther",
+        "status": "published",
+        "data": {
+          "name": "Purple Panther",
+          "category": "Yogurt",
+          "sort_order": 4,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-yogurt-vanilla",
+        "slug": "yogurt-vanilla",
+        "status": "published",
+        "data": {
+          "name": "Vanilla",
+          "category": "Yogurt",
+          "sort_order": 5,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-sorbet-call-for-flavor",
+        "slug": "sorbet-call-for-flavor",
+        "status": "published",
+        "data": {
+          "name": "Call for flavor",
+          "category": "Sorbet",
+          "sort_order": 1
+        }
+      },
+      {
+        "id": "flavor-vegan-chocolate",
+        "slug": "vegan-chocolate",
+        "status": "published",
+        "data": {
+          "name": "Chocolate",
+          "category": "Vegan",
+          "sort_order": 1,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-vegan-vanilla",
+        "slug": "vegan-vanilla",
+        "status": "published",
+        "data": {
+          "name": "Vanilla",
+          "category": "Vegan",
+          "sort_order": 2,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-no-sugar-added-coffee",
+        "slug": "no-sugar-added-coffee",
+        "status": "published",
+        "data": {
+          "name": "Coffee",
+          "category": "No Sugar Added",
+          "sort_order": 1,
+          "allergens": [],
+          "half_gallon": false
+        }
+      },
+      {
+        "id": "flavor-no-sugar-added-vanilla",
+        "slug": "no-sugar-added-vanilla",
+        "status": "published",
+        "data": {
+          "name": "Vanilla",
+          "category": "No Sugar Added",
+          "sort_order": 2,
+          "allergens": [],
+          "half_gallon": false
+        }
+      }
+    ]
+  }
+}

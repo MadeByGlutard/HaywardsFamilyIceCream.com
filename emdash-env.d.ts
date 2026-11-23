@@ -3,16 +3,31 @@
 
 /// <reference types="emdash/locals" />
 
-import type { BylineSummary, ContentBylineCredit, TaxonomyTerm, PortableTextBlock } from "emdash";
+import type { BylineSummary, ContentBylineCredit, TaxonomyTerm } from "emdash";
+
+export interface Category {
+  id: string;
+  slug: string | null;
+  status: string;
+  name: string;
+  sort_order: number;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
 
 export interface Flavor {
   id: string;
   slug: string | null;
   status: string;
-  title: string;
-  category: "Ice Cream" | "Yogurt" | "Sherbet" | "Sorbet" | "Vegan" | "No Sugar Added";
-  description?: string;
-  allergen_notes?: string;
+  name: string;
+  category: "Ice Cream" | "Sherbet" | "Yogurt" | "Sorbet" | "Vegan" | "No Sugar Added";
+  sort_order: number;
+  allergens?: ("gluten" | "nuts")[];
+  half_gallon?: boolean;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -21,53 +36,14 @@ export interface Flavor {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
-export interface Page {
+export interface Setting {
   id: string;
   slug: string | null;
   status: string;
   title: string;
-  eyebrow?: string;
-  excerpt?: string;
-  content?: PortableTextBlock[];
-  createdAt: Date;
-  updatedAt: Date;
-  publishedAt: Date | null;
-  byline?: BylineSummary | null;
-  bylines?: ContentBylineCredit[];
-  terms?: Record<string, TaxonomyTerm[]>;
-}
-
-export interface Serving {
-  id: string;
-  slug: string | null;
-  status: string;
-  title: string;
-  price: string;
-  description?: string;
-  sort_order?: number;
-  createdAt: Date;
-  updatedAt: Date;
-  publishedAt: Date | null;
-  byline?: BylineSummary | null;
-  bylines?: ContentBylineCredit[];
-  terms?: Record<string, TaxonomyTerm[]>;
-}
-
-export interface Visit {
-  id: string;
-  slug: string | null;
-  status: string;
-  title: string;
-  address: string;
-  locality: string;
-  phone: string;
-  email?: string;
-  hours: string;
-  hours_note?: string;
-  notice?: string;
-  facebook?: string;
-  directions?: string;
-  intro?: string;
+  banner?: string;
+  social?: { "label": string; "type": "facebook"; "url": string }[];
+  contact?: { "label": string; "type": "phone" | "place" | "email"; "url": string; "value": string }[];
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -78,9 +54,8 @@ export interface Visit {
 
 declare module "emdash" {
   interface EmDashCollections {
+    categories: Category;
     flavors: Flavor;
-    pages: Page;
-    servings: Serving;
-    visit: Visit;
+    settings: Setting;
   }
 }
