@@ -5,7 +5,7 @@ const xml = (body: string) =>
     headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' },
   });
 
-const PAGES = ['/', '/menu', '/trees', '/our-story', '/visit'];
+const PAGES = ['/', '/menu', '/menu/sundaes', '/menu/food', '/trees', '/history', '/visit'];
 
 /** Same addresses the Gatsby site published: an index and one page set. */
 export const sitemapIndex = () =>

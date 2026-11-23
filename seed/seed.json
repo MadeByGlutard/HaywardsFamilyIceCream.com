@@ -208,6 +208,68 @@
       ]
     },
     {
+      "slug": "menu_items",
+      "label": "Menu items",
+      "labelSingular": "Menu item",
+      "description": "Sundaes, shakes, food and drinks on the menu pages (flavors have their own list). No prices. Square ID is reserved for a future Square catalog sync.",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
+      "routable": false,
+      "titleField": "title",
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Name",
+          "type": "string",
+          "required": true,
+          "searchable": true
+        },
+        {
+          "slug": "section",
+          "label": "Section",
+          "type": "select",
+          "required": true,
+          "indexed": true,
+          "validation": {
+            "options": [
+              "Sizes",
+              "Cones and toppings",
+              "Sundaes",
+              "Twisters and treats",
+              "Shakes and floats",
+              "Take home",
+              "Hot dogs",
+              "Melts",
+              "Rolls, wraps and subs",
+              "Mac, chili and sides",
+              "Cold drinks",
+              "Hot drinks"
+            ]
+          }
+        },
+        {
+          "slug": "options",
+          "label": "Sizes, kinds or extras",
+          "type": "string"
+        },
+        {
+          "slug": "square_id",
+          "label": "Square catalog ID (optional, for a future sync)",
+          "type": "string",
+          "indexed": true
+        },
+        {
+          "slug": "sort_order",
+          "label": "Display order",
+          "type": "integer",
+          "indexed": true
+        }
+      ]
+    },
+    {
       "slug": "pages",
       "label": "Pages",
       "labelSingular": "Page",
@@ -293,23 +355,13 @@
           "required": true
         },
         {
-          "slug": "opens_at",
-          "label": "Opens at, 24-hour (e.g. 11:00); with a closing time, the header says open or closed now",
-          "type": "string"
-        },
-        {
-          "slug": "closes_at",
-          "label": "Closes at, 24-hour (e.g. 20:00)",
-          "type": "string"
-        },
-        {
           "slug": "hours_note",
           "label": "Hours note",
           "type": "text"
         },
         {
           "slug": "notice",
-          "label": "Seasonal notice",
+          "label": "One-off notice, such as a weather closing (replaces the hours line)",
           "type": "text"
         },
         {
@@ -331,6 +383,43 @@
           "slug": "intro",
           "label": "Visit introduction",
           "type": "text"
+        }
+      ]
+    },
+    {
+      "slug": "servings",
+      "label": "Sizes & prices",
+      "labelSingular": "Menu item",
+      "supports": [
+        "drafts",
+        "revisions",
+        "search"
+      ],
+      "routable": false,
+      "titleField": "title",
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Item or size",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "price",
+          "label": "Price to display",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "description",
+          "label": "Description",
+          "type": "text"
+        },
+        {
+          "slug": "sort_order",
+          "label": "Display order",
+          "type": "integer",
+          "indexed": true
         }
       ]
     },
@@ -367,37 +456,37 @@
         },
         {
           "slug": "dates_label",
-          "label": "Dates shown in “Coming up” (replaces the first/last day)",
+          "label": "Dates shown in “Hours through the year” (replaces the first and last day)",
           "type": "string"
         },
         {
           "slug": "status_text",
-          "label": "Status line (header, footer, Visit page)",
+          "label": "Hours line (header, footer and Visit page)",
           "type": "string"
         },
         {
           "slug": "banner_text",
-          "label": "Banner strip under the navigation",
+          "label": "Banner at the top of every page",
           "type": "text"
         },
         {
           "slug": "hero_eyebrow",
-          "label": "Home page kicker above the headline (empty uses the Home page entry)",
+          "label": "Home page: small line above the headline",
           "type": "string"
         },
         {
           "slug": "hero_headline",
-          "label": "Home page headline (one line per row)",
+          "label": "Home page: headline (one line per row)",
           "type": "text"
         },
         {
           "slug": "hero_deck",
-          "label": "Home page introduction",
+          "label": "Home page: sentence under the headline",
           "type": "text"
         },
         {
           "slug": "hero_image",
-          "label": "Home page photo (optional upload)",
+          "label": "Home page: photo (optional)",
           "type": "image"
         },
         {
@@ -413,7 +502,7 @@
         },
         {
           "slug": "accent",
-          "label": "Accent colour",
+          "label": "Accent color",
           "type": "select",
           "validation": {
             "options": [
@@ -424,12 +513,12 @@
         },
         {
           "slug": "show_trees_nav",
-          "label": "Tree lot is open (shows Trees & wreaths in the menu and the list on /trees)",
+          "label": "Tree lot period (Trees & wreaths also appears two weeks before)",
           "type": "boolean"
         },
         {
           "slug": "open_state",
-          "label": "Open or closed (adds a green or grey dot to the status line; empty shows no dot)",
+          "label": "Is the stand open during this period?",
           "type": "select",
           "validation": {
             "options": [
@@ -437,31 +526,6 @@
               "Closed"
             ]
           }
-        },
-        {
-          "slug": "opens_at",
-          "label": "Opens at, 24-hour (e.g. 11:00); with a closing time, the header says open or closed now",
-          "type": "string"
-        },
-        {
-          "slug": "closes_at",
-          "label": "Closes at, 24-hour (e.g. 20:00)",
-          "type": "string"
-        },
-        {
-          "slug": "band_headline",
-          "label": "Home page colour band headline (one line per row; empty keeps “Make a little time for ice cream.”)",
-          "type": "text"
-        },
-        {
-          "slug": "band_link_label",
-          "label": "Colour band button text",
-          "type": "string"
-        },
-        {
-          "slug": "band_link_url",
-          "label": "Colour band button link (e.g. /trees)",
-          "type": "string"
         },
         {
           "slug": "visit_intro",
@@ -520,43 +584,6 @@
           "label": "Square catalog ID (optional, for a future sync)",
           "type": "string",
           "indexed": true
-        },
-        {
-          "slug": "sort_order",
-          "label": "Display order",
-          "type": "integer",
-          "indexed": true
-        }
-      ]
-    },
-    {
-      "slug": "servings",
-      "label": "Sizes & prices",
-      "labelSingular": "Menu item",
-      "supports": [
-        "drafts",
-        "revisions",
-        "search"
-      ],
-      "routable": false,
-      "titleField": "title",
-      "fields": [
-        {
-          "slug": "title",
-          "label": "Item or size",
-          "type": "string",
-          "required": true
-        },
-        {
-          "slug": "price",
-          "label": "Price to display",
-          "type": "string",
-          "required": true
-        },
-        {
-          "slug": "description",
-          "label": "Description",
-          "type": "text"
         },
         {
           "slug": "sort_order",
@@ -1393,118 +1420,186 @@
         "slug": "our-story",
         "status": "published",
         "data": {
-          "title": "An Elm Street tradition.",
-          "eyebrow": "Our story",
-          "excerpt": "Before the cones and the cups, there were cows, milk routes, and a family with a business to build.",
+          "title": "It started with a milk cart.",
+          "eyebrow": "Our history",
+          "excerpt": "A farm on Elm Street, an ice cream stand in 1939, and the one you know today.",
           "content": [
             {
               "_type": "block",
-              "_key": "b0",
+              "_key": "h0",
               "style": "normal",
               "markDefs": [],
               "children": [
                 {
                   "_type": "span",
-                  "_key": "s0",
-                  "text": "Hayward’s story begins with local dairy farming. Before the ice cream windows, Charles Hayward worked for Whiting Dairy and bought a farm on Elm Street. His three sons helped carry the family business forward.",
+                  "_key": "h0s",
+                  "text": "In the 1920s, Charles Hayward wasn’t satisfied working for the Whiting dairy. He bought a few cows of his own, pushed a milk cart around Milford, and saved enough to buy the old Smith Farm on Elm Street. His three sons helped turn one cart into milk routes across southern New Hampshire.",
                   "marks": []
                 }
               ]
             },
             {
               "_type": "block",
-              "_key": "b1",
+              "_key": "h1",
               "style": "h2",
               "markDefs": [],
               "children": [
                 {
                   "_type": "span",
-                  "_key": "s1",
-                  "text": "From dairy farm to roadside favorite",
+                  "_key": "h1s",
+                  "text": "Summer 1939",
                   "marks": []
                 }
               ]
             },
             {
               "_type": "block",
-              "_key": "b2",
+              "_key": "h2",
               "style": "normal",
               "markDefs": [],
               "children": [
                 {
                   "_type": "span",
-                  "_key": "s2",
-                  "text": "The roadside stand became part of that story. An early Hayward Farms postcard identifies the Milford building as a place where ice cream was made for its network of stands. It also advertises a snack bar, a reminder that the business has taken different forms over the years.",
+                  "_key": "h2s",
+                  "text": "His son Stanley built the family’s roadside ice cream stand in 1939. It opened that summer with 18 flavors and sold 11,000 gallons before the season was out, according to Milford History Online. The town’s 1942 tax list still has it in plain type: six acres of the Smith farm, and an ice cream stand.",
                   "marks": []
                 }
               ]
             },
             {
               "_type": "block",
-              "_key": "b3",
+              "_key": "h3",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "h3s",
+                  "text": "A second stand opened in Nashua in June 1940, the year printed on Hayward’s cups. The postcard above calls the one in Milford “the original Hayward Farms Stand,” the place where ice cream for all the others was made.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "h4",
               "style": "h2",
               "markDefs": [],
               "children": [
                 {
                   "_type": "span",
-                  "_key": "s3",
-                  "text": "A little piece of 1948",
+                  "_key": "h4s",
+                  "text": "A town’s first job",
                   "marks": []
                 }
               ]
             },
             {
               "_type": "block",
-              "_key": "b4",
+              "_key": "h5",
               "style": "normal",
               "markDefs": [],
               "children": [
                 {
                   "_type": "span",
-                  "_key": "s4",
-                  "text": "In Milford High School’s 1948 yearbook, a Hayward Farms advertisement offered dairy products, ice cream and frozen foods. It is a small but tangible link between the business and the people who grew up here.",
+                  "_key": "h5s",
+                  "text": "By 1948 the stand had added a self-service frozen food store with 192 items, and Hayward Farms was advertising in the Milford High School yearbook. A year later, the yearbook described its seniors in riddles. Two of them shared a clue: “Works at Hayward’s.” One of the two, it added, liked blond wavy hair and maroon Ford coupes.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "image",
+              "_key": "postcard-frozen",
+              "asset": {
+                "_type": "reference",
+                "_ref": "postcard-frozen",
+                "url": "/images/postcard-frozen-foods.jpg"
+              },
+              "alt": "Color postcard of the same stand with a green roof, an orange car out front and “Frozen Foods” on the Hayward Farms sign",
+              "caption": "Another undated card. The back offers steaks, vegetables and “even a frosted stuffed lobster.” Boston Public Library, Tichnor Brothers Collection.",
+              "width": 1222,
+              "height": 750
+            },
+            {
+              "_type": "block",
+              "_key": "h6",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "h6s",
+                  "text": "The town’s 1965 report thanks Hayward Farms for Christmas ice cream, enough for every elementary pupil.",
                   "marks": []
                 }
               ]
             },
             {
               "_type": "block",
-              "_key": "b5",
+              "_key": "h7",
               "style": "h2",
               "markDefs": [],
               "children": [
                 {
                   "_type": "span",
-                  "_key": "s5",
-                  "text": "Another stop on the trail",
+                  "_key": "h7s",
+                  "text": "Back on Elm Street",
                   "marks": []
                 }
               ]
             },
             {
               "_type": "block",
-              "_key": "b6",
+              "_key": "h8",
               "style": "normal",
               "markDefs": [],
               "children": [
                 {
                   "_type": "span",
-                  "_key": "s6",
-                  "text": "In 2022, Hayward’s Family Ice Cream joined the New Hampshire Ice Cream Trail. Interviewed that summer, Frank Robinson described the Milford shop’s homemade ice cream and the individual batches behind it.",
+                  "_key": "h8s",
+                  "text": "Fires and deaths in the family slowed the old company, and in time the farm closed. The stand you see today was built in 2001, on land that was once part of Hayward Farms.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "image",
+              "_key": "stand-today",
+              "asset": {
+                "_type": "reference",
+                "_ref": "stand-today",
+                "url": "/images/milford-stand.jpg"
+              },
+              "alt": "The white Hayward’s stand on Elm Street today, with its curved roof and red sign",
+              "caption": "The stand on Elm Street today.",
+              "width": 720,
+              "height": 480
+            },
+            {
+              "_type": "block",
+              "_key": "h9",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "h9s",
+                  "text": "For years the ice cream itself was made elsewhere, from Hayward’s recipes. In January 2008 the batch freezers started up again, in Milford. Hayward’s joined the New Hampshire Ice Cream Trail in 2022.",
                   "marks": []
                 }
               ]
             },
             {
               "_type": "block",
-              "_key": "b7",
+              "_key": "h10",
               "style": "normal",
               "markDefs": [],
               "children": [
                 {
                   "_type": "span",
-                  "_key": "s7",
-                  "text": "Today, the tradition continues at 383 Elm Street. Come back for your usual, bring someone along, or make a new favorite part of the story.",
+                  "_key": "h10s",
+                  "text": "Hayward’s in Nashua and Merrimack grew out of the same family. Today they are a separate business.",
                   "marks": []
                 }
               ]
@@ -1518,8 +1613,8 @@
         "status": "published",
         "data": {
           "title": "Christmas trees & wreaths",
-          "eyebrow": "From Thanksgiving weekend",
-          "excerpt": "Balsam and Fraser firs, 24-inch wreaths and kissing balls, on the lot at the stand on Elm Street.",
+          "eyebrow": "Every holiday season",
+          "excerpt": "Balsam and Fraser firs, 24‑inch wreaths and kissing balls.",
           "content": [
             {
               "_type": "block",
@@ -1550,14 +1645,12 @@
           "locality": "Milford, NH 03055",
           "phone": "603-672-8383",
           "email": "haywardsofmilford@gmail.com",
-          "hours": "Open daily, 11am to 8pm",
-          "hours_note": "Open until 9pm in the summer months. Hours change for the tree lot and the winter break.",
+          "hours": "Open daily, 11am to 8pm. Until 9pm in summer",
+          "hours_note": "",
           "notice": "",
           "facebook": "https://www.facebook.com/Haywardsofmilford/",
           "directions": "https://www.google.com/maps/dir/?api=1&destination=Hayward%27s+Ice+Cream+of+Milford%2C+383+Elm+Street%2C+Milford%2C+NH+03055",
-          "intro": "Look for the white stand with the curved roof and the red Hayward’s sign. Pick your scoop, find a seat, and make a little time for ice cream.",
-          "opens_at": "11:00",
-          "closes_at": "20:00",
+          "intro": "Look for the white stand with the curved roof and the red Hayward’s sign.",
           "instagram": "https://www.instagram.com/haywards_icecream/"
         }
       }
@@ -1568,24 +1661,21 @@
         "slug": "thanksgiving-2026",
         "status": "published",
         "data": {
-          "title": "Thanksgiving closure 2026",
+          "title": "Thanksgiving break 2026",
           "start_date": "2026-11-22T00:00:00-05:00",
           "end_date": "2026-11-26T00:00:00-05:00",
           "dates_label": "",
-          "status_text": "Closed through Thanksgiving. Back Friday at 11am",
-          "banner_text": "We’re closed through Thanksgiving. Back Friday, November 27 at 11am with the trees.",
-          "hero_eyebrow": "A short break",
-          "hero_headline": "Closed for Thanksgiving.\nBack Friday with the trees.",
-          "hero_deck": "Christmas trees, wreaths and kissing balls will be on the lot at the stand on Elm Street.",
+          "status_text": "Closed until Friday, Nov 27 at 11am",
+          "banner_text": "We’re closed through Thanksgiving. Open again Friday, Nov 27 at 11am.",
+          "hero_eyebrow": "Closed for Thanksgiving",
+          "hero_headline": "See you Friday\nwith the trees.",
+          "hero_deck": "Christmas trees, wreaths and kissing balls, plus ice cream at the window.",
           "photo_set": "Tree lot",
           "accent": "red",
           "show_trees_nav": false,
           "open_state": "Closed",
-          "band_headline": "Know your flavor\nbefore Friday.",
-          "band_link_label": "Browse the menu",
-          "band_link_url": "/menu",
           "visit_intro": "Look for the white stand with the curved roof, the red Hayward’s sign and, from Friday, the trees on the lot.",
-          "notes": "Dates and reopening time from the design mock; confirm with the owner."
+          "notes": "Reopening Friday, Nov 27 at 11am is from the live site banner. Trees on the lot that day match the design mock and 2024 and 2025; confirm for 2026."
         }
       },
       {
@@ -1593,26 +1683,20 @@
         "slug": "trees-2026",
         "status": "published",
         "data": {
-          "title": "Tree lot 2026",
+          "title": "Trees & wreaths 2026",
           "start_date": "2026-11-27T00:00:00-05:00",
-          "end_date": "2026-12-20T00:00:00-05:00",
           "dates_label": "",
-          "status_text": "Open daily, 11am to 7pm",
+          "status_text": "Open daily from 11am",
           "banner_text": "Christmas trees, wreaths and kissing balls are on the lot.",
           "hero_eyebrow": "On the lot now",
           "hero_headline": "Trees and wreaths\nare on the lot.",
-          "hero_deck": "Balsam and Fraser firs, 24-inch wreaths and kissing balls at the stand, with food and ice cream at the window. Prices are marked at the lot.",
+          "hero_deck": "Balsam and Fraser firs, wreaths and kissing balls. Food and ice cream at the window.",
           "photo_set": "Tree lot",
           "accent": "green",
           "show_trees_nav": true,
           "open_state": "Open",
-          "band_headline": "Bring home a tree\nfrom Elm Street.",
-          "band_link_label": "Hours & directions",
-          "band_link_url": "/visit",
           "visit_intro": "Look for the white stand with the curved roof, the red Hayward’s sign and the trees on the lot. Pick out a tree, grab a wreath and stop at the window.",
-          "notes": "Hours: the tree lot closed at 7pm in 2024 and 2025 (opening at noon); this year's banner reopens at 11am Friday. The lot closed the Sunday before Christmas in 2024 (Dec 22) and 2025 (Dec 21), so this period ends Sunday, Dec 20. Sources: Hayward's Instagram (@haywards_icecream) posts, Nov 2024 to Dec 2025, and the live site banner.",
-          "opens_at": "11:00",
-          "closes_at": "19:00"
+          "notes": "CONFIRM: the closing time. Posted hours were 12 to 7pm in 2024 and 2025; the 2026 banner says only that the stand reopens Friday, Nov 27 at 11am. Once confirmed, put the closing time in the status line. No last day here: the lot runs until the Winter break’s first day (set to Dec 25). Sources: Hayward’s Instagram, Nov 2024 to Dec 2025."
         }
       },
       {
@@ -1621,22 +1705,19 @@
         "status": "published",
         "data": {
           "title": "Winter break 2026",
-          "start_date": "2026-12-21T00:00:00-05:00",
+          "start_date": "2026-12-25T00:00:00-05:00",
           "dates_label": "",
           "status_text": "Closed for a winter break",
-          "banner_text": "We’re closed for a short winter break. We’ll post our reopening day here, on Facebook and on Instagram.",
-          "hero_eyebrow": "Closed for now",
-          "hero_headline": "Closed for a winter break.\nSee you soon.",
+          "banner_text": "We’re on winter break. We’ll post our reopening day on Facebook and Instagram.",
+          "hero_eyebrow": "Winter break",
+          "hero_headline": "See you soon,\nMilford.",
           "hero_deck": "Thank you for another year on Elm Street.",
           "photo_set": "Ice cream stand",
           "accent": "red",
           "show_trees_nav": false,
           "open_state": "Closed",
-          "band_headline": "Dreaming of\nyour first cone?",
-          "band_link_label": "Browse the menu",
-          "band_link_url": "/menu",
           "visit_intro": "Look for the white stand with the curved roof and the red Hayward’s sign.",
-          "notes": "Open-ended: ends when the next period with a first day begins. Past reopenings: mid to late January 2025 (announced Dec 2024), February 15, 2025 (11am to 7pm), January 10, 2026. Sources: Hayward's Instagram (@haywards_icecream) posts, Nov 2024 to Dec 2025, and the live site banner."
+          "notes": "Its first day also ends the tree lot: change this one date to move both. Open-ended: ends when the next period with a first day begins. Winter 2024-25: closed Dec 22, planned a mid to late January reopening, opened Feb 15. Winter 2025-26: closed Dec 21, announced a Jan 10 reopening. Sources: Hayward’s Instagram, Nov 2024 to Dec 2025."
         }
       },
       {
@@ -1645,8 +1726,8 @@
         "status": "published",
         "data": {
           "title": "Ice cream season 2027",
-          "dates_label": "After the winter break [date to confirm]",
-          "status_text": "Open daily, 11am to 8pm",
+          "dates_label": "After the winter break",
+          "status_text": "Open daily, 11am to 8pm. Until 9pm in summer",
           "banner_text": "",
           "hero_headline": "",
           "hero_deck": "",
@@ -1654,9 +1735,7 @@
           "accent": "red",
           "show_trees_nav": false,
           "open_state": "Open",
-          "notes": "Set the first day once the reopening date is known; this period does not start without one. Standard hours are 11am to 8pm (owner); in 2025 the stand reopened at 11am to 7pm and moved to 8pm in mid-March. For summer hours (until 9pm) use the Summer hours period. Empty headline/introduction fall back to the Home page entry.",
-          "opens_at": "11:00",
-          "closes_at": "20:00"
+          "notes": "Set the first day once the reopening date is known; this period does not start without one. Standard hours are 11am to 8pm (owner); in 2025 the stand reopened at 11am to 7pm and moved to 8pm in mid-March. For summer hours (until 9pm) use the Summer hours period. Empty headline/introduction fall back to the Home page entry."
         }
       },
       {
@@ -1674,9 +1753,7 @@
           "accent": "red",
           "show_trees_nav": false,
           "open_state": "Open",
-          "notes": "Open until 9pm in the summer months, with no set dates (owner). Give it a first and last day when summer hours start; empty fields fall back to the Home page entry.",
-          "opens_at": "11:00",
-          "closes_at": "21:00"
+          "notes": "Open until 9pm in the summer months, with no set dates (owner). Give it a first and last day when summer hours start; empty fields fall back to the Home page entry."
         }
       }
     ],
@@ -1837,6 +1914,620 @@
           "sort_order": 130
         }
       }
+    ],
+    "menu_items": [
+      {
+        "id": "sizes-kiddie",
+        "slug": "sizes-kiddie",
+        "status": "published",
+        "data": {
+          "title": "Kiddie",
+          "section": "Sizes",
+          "options": "",
+          "square_id": "XSGFH2WYBBBIOMMNPEJMXRQ3",
+          "sort_order": 10
+        }
+      },
+      {
+        "id": "sizes-junior-scoop",
+        "slug": "sizes-junior-scoop",
+        "status": "published",
+        "data": {
+          "title": "Junior scoop",
+          "section": "Sizes",
+          "options": "",
+          "square_id": "XLCTP3HV7P5WLYTDWJVZWOQW",
+          "sort_order": 20
+        }
+      },
+      {
+        "id": "sizes-small",
+        "slug": "sizes-small",
+        "status": "published",
+        "data": {
+          "title": "Small",
+          "section": "Sizes",
+          "options": "",
+          "square_id": "PMTYDD5HYQQHC7SCKJ3FKPLL",
+          "sort_order": 30
+        }
+      },
+      {
+        "id": "sizes-large",
+        "slug": "sizes-large",
+        "status": "published",
+        "data": {
+          "title": "Large",
+          "section": "Sizes",
+          "options": "",
+          "square_id": "Y4LUMQSDDDTMX72U7KS5XTEN",
+          "sort_order": 40
+        }
+      },
+      {
+        "id": "sizes-soft-serve",
+        "slug": "sizes-soft-serve",
+        "status": "published",
+        "data": {
+          "title": "Soft serve",
+          "section": "Sizes",
+          "options": "Small or large",
+          "square_id": "J3KMZXXL7QRY6PMYR6WTZAZL",
+          "sort_order": 50
+        }
+      },
+      {
+        "id": "cones-and-toppings-cones",
+        "slug": "cones-and-toppings-cones",
+        "status": "published",
+        "data": {
+          "title": "Cones",
+          "section": "Cones and toppings",
+          "options": "Sugar cone, waffle cone, dipped waffle cone or waffle bowl",
+          "square_id": "3ZBM3NZ5WM4LWR5NHXKFG4JJ",
+          "sort_order": 60
+        }
+      },
+      {
+        "id": "cones-and-toppings-toppings",
+        "slug": "cones-and-toppings-toppings",
+        "status": "published",
+        "data": {
+          "title": "Toppings",
+          "section": "Cones and toppings",
+          "options": "Sprinkles, whipped cream, banana, malt, brownie, cookie and more",
+          "square_id": "3ZBM3NZ5WM4LWR5NHXKFG4JJ",
+          "sort_order": 70
+        }
+      },
+      {
+        "id": "sundaes-sundae",
+        "slug": "sundaes-sundae",
+        "status": "published",
+        "data": {
+          "title": "Sundae",
+          "section": "Sundaes",
+          "options": "Small or large",
+          "square_id": "PQTIYDUU75MWUGHCWHBSC7ML",
+          "sort_order": 80
+        }
+      },
+      {
+        "id": "sundaes-brownie-sundae",
+        "slug": "sundaes-brownie-sundae",
+        "status": "published",
+        "data": {
+          "title": "Brownie sundae",
+          "section": "Sundaes",
+          "options": "",
+          "square_id": "DSHGEVKMJTYSMNGF34OFA2EE",
+          "sort_order": 90
+        }
+      },
+      {
+        "id": "sundaes-reeses-sundae",
+        "slug": "sundaes-reeses-sundae",
+        "status": "published",
+        "data": {
+          "title": "Reese’s sundae",
+          "section": "Sundaes",
+          "options": "",
+          "square_id": "TW3I3IWSPYIODQ3WBJHXOWWE",
+          "sort_order": 100
+        }
+      },
+      {
+        "id": "sundaes-banana-boat",
+        "slug": "sundaes-banana-boat",
+        "status": "published",
+        "data": {
+          "title": "Banana boat",
+          "section": "Sundaes",
+          "options": "Small or large",
+          "square_id": "22UQPQ6MD4DKLIFDSKKTLX2D",
+          "sort_order": 110
+        }
+      },
+      {
+        "id": "sundaes-holiday-sundaes",
+        "slug": "sundaes-holiday-sundaes",
+        "status": "published",
+        "data": {
+          "title": "Holiday sundaes",
+          "section": "Sundaes",
+          "options": "Around Valentine’s Day, St. Patrick’s Day, Easter, the Fourth and more",
+          "square_id": "U4GKU6RGZH5RC57EI2OD7DAE",
+          "sort_order": 120
+        }
+      },
+      {
+        "id": "twisters-and-treats-twister",
+        "slug": "twisters-and-treats-twister",
+        "status": "published",
+        "data": {
+          "title": "Twister",
+          "section": "Twisters and treats",
+          "options": "Oreo, peanut butter, s’mores, cheesecake, banana, Choc-Nado or dirt cup",
+          "square_id": "BAO3HKGVLB74FFSZEFBAQ3UV",
+          "sort_order": 130
+        }
+      },
+      {
+        "id": "twisters-and-treats-cookie-sandwich",
+        "slug": "twisters-and-treats-cookie-sandwich",
+        "status": "published",
+        "data": {
+          "title": "Cookie sandwich",
+          "section": "Twisters and treats",
+          "options": "Vanilla or M&M",
+          "square_id": "V7FE7DUWDN6CBWE3HFP2O46I",
+          "sort_order": 140
+        }
+      },
+      {
+        "id": "twisters-and-treats-brownie",
+        "slug": "twisters-and-treats-brownie",
+        "status": "published",
+        "data": {
+          "title": "Brownie",
+          "section": "Twisters and treats",
+          "options": "",
+          "square_id": "CCDHMPHEGV6ZVXNZWPBR3A3D",
+          "sort_order": 150
+        }
+      },
+      {
+        "id": "twisters-and-treats-whoopie-pie",
+        "slug": "twisters-and-treats-whoopie-pie",
+        "status": "published",
+        "data": {
+          "title": "Whoopie pie",
+          "section": "Twisters and treats",
+          "options": "",
+          "square_id": "RK3KGVDOQ5OKOVCPMPTRWGT7",
+          "sort_order": 160
+        }
+      },
+      {
+        "id": "shakes-and-floats-milkshake",
+        "slug": "shakes-and-floats-milkshake",
+        "status": "published",
+        "data": {
+          "title": "Milkshake",
+          "section": "Shakes and floats",
+          "options": "",
+          "square_id": "GQPTTVJCKZPIA2W566SSUDGD",
+          "sort_order": 170
+        }
+      },
+      {
+        "id": "shakes-and-floats-frappe",
+        "slug": "shakes-and-floats-frappe",
+        "status": "published",
+        "data": {
+          "title": "Frappe",
+          "section": "Shakes and floats",
+          "options": "Regular or extra thick",
+          "square_id": "M6NMMQ6FJW3BDUUBR5BAIIRD",
+          "sort_order": 180
+        }
+      },
+      {
+        "id": "shakes-and-floats-float",
+        "slug": "shakes-and-floats-float",
+        "status": "published",
+        "data": {
+          "title": "Float",
+          "section": "Shakes and floats",
+          "options": "",
+          "square_id": "GU7WR73KCWFVBX7MRVVZE7YR",
+          "sort_order": 190
+        }
+      },
+      {
+        "id": "shakes-and-floats-freeze",
+        "slug": "shakes-and-floats-freeze",
+        "status": "published",
+        "data": {
+          "title": "Freeze",
+          "section": "Shakes and floats",
+          "options": "",
+          "square_id": "6BWG4J47637SR7C4VMDPFJKR",
+          "sort_order": 200
+        }
+      },
+      {
+        "id": "shakes-and-floats-ice-cream-soda",
+        "slug": "shakes-and-floats-ice-cream-soda",
+        "status": "published",
+        "data": {
+          "title": "Ice cream soda",
+          "section": "Shakes and floats",
+          "options": "",
+          "square_id": "AWWETTHWOU2Q7G2UFZC7KSHH",
+          "sort_order": 210
+        }
+      },
+      {
+        "id": "take-home-pint",
+        "slug": "take-home-pint",
+        "status": "published",
+        "data": {
+          "title": "Pint",
+          "section": "Take home",
+          "options": "",
+          "square_id": "6EXO5DCW3HWLIW5U6TMAHRRX",
+          "sort_order": 220
+        }
+      },
+      {
+        "id": "take-home-quart",
+        "slug": "take-home-quart",
+        "status": "published",
+        "data": {
+          "title": "Quart",
+          "section": "Take home",
+          "options": "",
+          "square_id": "CWILXMSR6L5ENYSMO5IZNA5T",
+          "sort_order": 230
+        }
+      },
+      {
+        "id": "take-home-2-5-gallon-tub",
+        "slug": "take-home-2-5-gallon-tub",
+        "status": "published",
+        "data": {
+          "title": "2.5-gallon tub",
+          "section": "Take home",
+          "options": "",
+          "square_id": "KFBWWE2MC7XI5C5O5UOEI556",
+          "sort_order": 240
+        }
+      },
+      {
+        "id": "take-home-tray-of-brownies",
+        "slug": "take-home-tray-of-brownies",
+        "status": "published",
+        "data": {
+          "title": "Tray of brownies",
+          "section": "Take home",
+          "options": "",
+          "square_id": "DTHQUFHDKYWGGGI5CFXFZLM2",
+          "sort_order": 250
+        }
+      },
+      {
+        "id": "hot-dogs-hot-dog",
+        "slug": "hot-dogs-hot-dog",
+        "status": "published",
+        "data": {
+          "title": "Hot dog",
+          "section": "Hot dogs",
+          "options": "Add chili, cheese, kraut, bacon or mac and cheese",
+          "square_id": "JPNJQMVG56QZFUHXP4V3EEGS",
+          "sort_order": 260
+        }
+      },
+      {
+        "id": "hot-dogs-deluxe-dog",
+        "slug": "hot-dogs-deluxe-dog",
+        "status": "published",
+        "data": {
+          "title": "Deluxe dog",
+          "section": "Hot dogs",
+          "options": "Krazy Kraut, chili mac, BBQ bacon onion or bacon cheese",
+          "square_id": "NGGOPRIRPVPWVMOQ4GWCYGSB",
+          "sort_order": 270
+        }
+      },
+      {
+        "id": "hot-dogs-kids-meal",
+        "slug": "hot-dogs-kids-meal",
+        "status": "published",
+        "data": {
+          "title": "Kid’s meal",
+          "section": "Hot dogs",
+          "options": "Hot dog, mac and cheese or grilled cheese",
+          "square_id": "WSNWFEP5D3TUCZUZKRE6W3FJ",
+          "sort_order": 280
+        }
+      },
+      {
+        "id": "grilled-cheese-and-melts-grilled-cheese",
+        "slug": "grilled-cheese-and-melts-grilled-cheese",
+        "status": "published",
+        "data": {
+          "title": "Grilled cheese",
+          "section": "Melts",
+          "options": "Sharp cheddar, American, Swiss, pepper jack, provolone or mac and cheese",
+          "square_id": "SDQVPFK4KXMBXHRL3AEMFGHR",
+          "sort_order": 290
+        }
+      },
+      {
+        "id": "grilled-cheese-and-melts-tuna-melt",
+        "slug": "grilled-cheese-and-melts-tuna-melt",
+        "status": "published",
+        "data": {
+          "title": "Tuna melt",
+          "section": "Melts",
+          "options": "Sharp cheddar, American, Swiss or pepper jack",
+          "square_id": "DRHNGC7YWLDIOJUB5DUISOMP",
+          "sort_order": 300
+        }
+      },
+      {
+        "id": "rolls-wraps-and-subs-lobster",
+        "slug": "rolls-wraps-and-subs-lobster",
+        "status": "published",
+        "data": {
+          "title": "Lobster",
+          "section": "Rolls, wraps and subs",
+          "options": "Roll, wrap or sub",
+          "square_id": "PRWEVNFPACXEGCTON63VKN5E",
+          "sort_order": 310
+        }
+      },
+      {
+        "id": "rolls-wraps-and-subs-classic-chicken",
+        "slug": "rolls-wraps-and-subs-classic-chicken",
+        "status": "published",
+        "data": {
+          "title": "Classic chicken",
+          "section": "Rolls, wraps and subs",
+          "options": "Roll, wrap or sub",
+          "square_id": "JJVQJM623EFFQOT6ZT6IDTMJ",
+          "sort_order": 320
+        }
+      },
+      {
+        "id": "rolls-wraps-and-subs-cran-walnut-chicken",
+        "slug": "rolls-wraps-and-subs-cran-walnut-chicken",
+        "status": "published",
+        "data": {
+          "title": "Cran walnut chicken",
+          "section": "Rolls, wraps and subs",
+          "options": "Roll, wrap or sub",
+          "square_id": "LHNUYSJS6UZXVFCUBMH3XMWR",
+          "sort_order": 330
+        }
+      },
+      {
+        "id": "rolls-wraps-and-subs-tuna",
+        "slug": "rolls-wraps-and-subs-tuna",
+        "status": "published",
+        "data": {
+          "title": "Tuna",
+          "section": "Rolls, wraps and subs",
+          "options": "Roll, wrap or sub",
+          "square_id": "4TS2XGD2GZI363QZMSVEYEGB",
+          "sort_order": 340
+        }
+      },
+      {
+        "id": "rolls-wraps-and-subs-blt",
+        "slug": "rolls-wraps-and-subs-blt",
+        "status": "published",
+        "data": {
+          "title": "BLT",
+          "section": "Rolls, wraps and subs",
+          "options": "Wrap, sub or grilled",
+          "square_id": "5KYZIVTII3BD2HATYNWVPHUL",
+          "sort_order": 350
+        }
+      },
+      {
+        "id": "mac-chili-and-sides-mac-and-cheese",
+        "slug": "mac-chili-and-sides-mac-and-cheese",
+        "status": "published",
+        "data": {
+          "title": "Mac and cheese",
+          "section": "Mac, chili and sides",
+          "options": "Small or large",
+          "square_id": "SU4XL4JBRWB4YJJ6AABUNOLI",
+          "sort_order": 360
+        }
+      },
+      {
+        "id": "mac-chili-and-sides-pulled-pork-mac",
+        "slug": "mac-chili-and-sides-pulled-pork-mac",
+        "status": "published",
+        "data": {
+          "title": "Pulled pork mac",
+          "section": "Mac, chili and sides",
+          "options": "",
+          "square_id": "HWX2EE36ZLNUHEO6VZXQH4L4",
+          "sort_order": 370
+        }
+      },
+      {
+        "id": "mac-chili-and-sides-franks-homemade-chili",
+        "slug": "mac-chili-and-sides-franks-homemade-chili",
+        "status": "published",
+        "data": {
+          "title": "Frank’s homemade chili",
+          "section": "Mac, chili and sides",
+          "options": "By the pint",
+          "square_id": "CMSGKHOUNAORLSVLWVFJBVS7",
+          "sort_order": 380
+        }
+      },
+      {
+        "id": "mac-chili-and-sides-chips",
+        "slug": "mac-chili-and-sides-chips",
+        "status": "published",
+        "data": {
+          "title": "Chips",
+          "section": "Mac, chili and sides",
+          "options": "",
+          "square_id": "SLNYX3P3GAY3JF27AC5A6CLC",
+          "sort_order": 390
+        }
+      },
+      {
+        "id": "mac-chili-and-sides-applesauce",
+        "slug": "mac-chili-and-sides-applesauce",
+        "status": "published",
+        "data": {
+          "title": "Applesauce",
+          "section": "Mac, chili and sides",
+          "options": "",
+          "square_id": "IXPKWH7EFLJKIBRIELWOJ42N",
+          "sort_order": 400
+        }
+      },
+      {
+        "id": "mac-chili-and-sides-teddy-grahams",
+        "slug": "mac-chili-and-sides-teddy-grahams",
+        "status": "published",
+        "data": {
+          "title": "Teddy Grahams",
+          "section": "Mac, chili and sides",
+          "options": "",
+          "square_id": "5SD2SHAZ7RILBKZJTYS5U6HA",
+          "sort_order": 410
+        }
+      },
+      {
+        "id": "cold-drinks-fountain-drink",
+        "slug": "cold-drinks-fountain-drink",
+        "status": "published",
+        "data": {
+          "title": "Fountain drink",
+          "section": "Cold drinks",
+          "options": "Small, medium or large",
+          "square_id": "KYJY3V5BIAGX4YIDKJHJUVSA",
+          "sort_order": 420
+        }
+      },
+      {
+        "id": "cold-drinks-pink-fizz",
+        "slug": "cold-drinks-pink-fizz",
+        "status": "published",
+        "data": {
+          "title": "Pink fizz",
+          "section": "Cold drinks",
+          "options": "Small or large",
+          "square_id": "467SKA6DNXSIXRZMNS3WZHGV",
+          "sort_order": 430
+        }
+      },
+      {
+        "id": "cold-drinks-rickey",
+        "slug": "cold-drinks-rickey",
+        "status": "published",
+        "data": {
+          "title": "Rickey",
+          "section": "Cold drinks",
+          "options": "Lime or raspberry, small or large",
+          "square_id": "USOR3BDQGKVNRQDABX3UNUPY",
+          "sort_order": 440
+        }
+      },
+      {
+        "id": "cold-drinks-cold-brew-coffee",
+        "slug": "cold-drinks-cold-brew-coffee",
+        "status": "published",
+        "data": {
+          "title": "Cold brew coffee",
+          "section": "Cold drinks",
+          "options": "Small or large",
+          "square_id": "FJXFZ3IZLH6UTJICI5XWATOJ",
+          "sort_order": 450
+        }
+      },
+      {
+        "id": "cold-drinks-bottled-tea",
+        "slug": "cold-drinks-bottled-tea",
+        "status": "published",
+        "data": {
+          "title": "Bottled tea",
+          "section": "Cold drinks",
+          "options": "",
+          "square_id": "R6XUNYH2DWBR3FGFF43FEB5T",
+          "sort_order": 460
+        }
+      },
+      {
+        "id": "cold-drinks-bottled-water",
+        "slug": "cold-drinks-bottled-water",
+        "status": "published",
+        "data": {
+          "title": "Bottled water",
+          "section": "Cold drinks",
+          "options": "",
+          "square_id": "KOUCATZMIGUD3R5MDFESV2TX",
+          "sort_order": 470
+        }
+      },
+      {
+        "id": "cold-drinks-milk-or-juice-box",
+        "slug": "cold-drinks-milk-or-juice-box",
+        "status": "published",
+        "data": {
+          "title": "Milk or juice box",
+          "section": "Cold drinks",
+          "options": "For kids",
+          "square_id": "OPOLU5NYHNHFA542PDDKOIWN",
+          "sort_order": 480
+        }
+      },
+      {
+        "id": "hot-drinks-hot-chocolate",
+        "slug": "hot-drinks-hot-chocolate",
+        "status": "published",
+        "data": {
+          "title": "Hot chocolate",
+          "section": "Hot drinks",
+          "options": "",
+          "square_id": "JOKT5ZCIFBACNVH6YJ7QQOCI",
+          "sort_order": 490
+        }
+      },
+      {
+        "id": "hot-drinks-hot-coffee",
+        "slug": "hot-drinks-hot-coffee",
+        "status": "published",
+        "data": {
+          "title": "Hot coffee",
+          "section": "Hot drinks",
+          "options": "",
+          "square_id": "JKF2VNSS6ZN5KVDBVLZHNKZZ",
+          "sort_order": 500
+        }
+      },
+      {
+        "id": "hot-drinks-hot-tea",
+        "slug": "hot-drinks-hot-tea",
+        "status": "published",
+        "data": {
+          "title": "Hot tea",
+          "section": "Hot drinks",
+          "options": "",
+          "square_id": "RGYHS7P3VMZNC5UZQZIEPJDU",
+          "sort_order": 510
+        }
+      }
     ]
   },
   "menus": [
@@ -1851,18 +2542,28 @@
         },
         {
           "type": "custom",
-          "label": "Our menu",
+          "label": "Flavors",
           "url": "/menu"
         },
         {
           "type": "custom",
-          "label": "Our story",
-          "url": "/our-story"
+          "label": "Sundaes & shakes",
+          "url": "/menu/sundaes"
         },
         {
           "type": "custom",
-          "label": "Visit us",
+          "label": "Food & drinks",
+          "url": "/menu/food"
+        },
+        {
+          "type": "custom",
+          "label": "Hours & directions",
           "url": "/visit"
+        },
+        {
+          "type": "custom",
+          "label": "History",
+          "url": "/history"
         }
       ]
     }

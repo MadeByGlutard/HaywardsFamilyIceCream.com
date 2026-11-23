@@ -70,7 +70,7 @@ test('no collection is routable (the site is a single page)', () => {
 
 test('the redesign only adds to the port\'s content model', () => {
   assert.deepEqual(seed.collections.slice(0, 3).map(c => c.slug), ['settings', 'categories', 'flavors']);
-  for (const slug of ['pages', 'visit', 'periods', 'products', 'servings']) assert.ok(collection(slug), slug);
+  for (const slug of ['pages', 'visit', 'periods', 'products', 'servings', 'menu_items']) assert.ok(collection(slug), slug);
   for (const extra of ['description', 'allergen_notes']) assert.ok(!field('flavors', extra).required, extra);
 });
 

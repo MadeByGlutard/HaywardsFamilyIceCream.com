@@ -1,0 +1,7 @@
+---
+import MenuList from '../../components/MenuList.astro';
+import { photos } from '../../lib/photos';
+import { cacheContentPage } from '../../lib/cache';
+cacheContentPage(Astro);
+---
+<MenuList page="/menu/sundaes" title="Sundaes & shakes" description="Sundaes, frappes, shakes, floats, twisters and take-home ice cream at Hayward’s in Milford, New Hampshire." photo={photos.toppedCups} columns={[['Sundaes', 'Shakes and floats'], ['Twisters and treats', 'Take home']]} />

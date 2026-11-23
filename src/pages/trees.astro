@@ -3,9 +3,11 @@ import { getEmDashCollection, getEmDashEntry } from 'emdash';
 import { PortableText } from 'emdash/ui';
 import EndBand from '../components/EndBand.astro';
 import Base from '../layouts/Base.astro';
-import { getLocation } from '../lib/site';
+import { getLocation, telephone } from '../lib/site';
 import { getScheduleContext } from '../lib/schedule';
 import { photos } from '../lib/photos';
+import { sentence } from '../lib/status';
+import { sharedOptions } from '../lib/menu';
 import { withPlaceholders } from '../lib/text';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
@@ -24,43 +26,48 @@ const sections = [
   { category: 'Kissing ball', heading: 'Kissing balls', id: 'kissing-balls' },
   { category: 'Extra', heading: 'Extras', id: 'extras' },
 ].map((s) => ({ ...s, items: products.filter((p) => p.data.category?.toLowerCase() === s.category.toLowerCase()) }))
+ .map((s) => ({ ...s, shared: sharedOptions(s.items.map((item) => item.data.options)) }))
  .filter((s) => s.items.length > 0);
 
 const title = page?.data.title ?? 'Christmas trees & wreaths';
 const opens = schedule.nextTrees?.start
   ? new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(`${schedule.nextTrees.start}T12:00:00Z`))
   : undefined;
-const longDay = (day: string) => new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'long', day: 'numeric' }).format(new Date(`${day}T12:00:00Z`));
-const kicker = schedule.treesOpen ? `${schedule.status.line}${schedule.lastDay ? `, through ${longDay(schedule.lastDay)}` : ''}` : opens && schedule.treesListed ? `Opening ${opens}` : schedule.endedTrees ? 'Until next year' : undefined;
+// The heading answers "are the trees in yet?"; the page's own title is the line above it.
+const answer = schedule.treesOpen ? 'Trees are on the lot' : opens && schedule.treesNav ? `Trees arrive ${opens}` : undefined;
+// Today's hours while open, the lot's own hours before it opens.
+const lot = schedule.treesOpen ? schedule.status.line : schedule.nextTrees?.data.status_text?.trim();
+const hoursLine = lot && sentence(lot);
+const askClosing = schedule.treesOpen && !!lot && /\bfrom \d/i.test(lot);
 const gallery = [
   { ...photos.wreathWall, caption: 'Wreaths along the windows.' },
   { ...photos.kissingBalls, caption: 'Kissing balls with velvet ribbon.' },
-  { ...photos.wreathCloseup, caption: 'Bows, berries and gold pinecones.' },
+  { ...photos.wreathCloseup, caption: 'Bows, ornaments and gold pinecones.' },
 ];
 ---
 <Base title={title} description="Christmas trees, 24-inch wreaths and kissing balls at Hayward’s on Elm Street in Milford, from Thanksgiving weekend until just before Christmas." content={page ? { collection: 'pages', id: page.data.id, slug: 'trees' } : undefined} image={photos.treesStorefront.src} strip={!schedule.treesOpen}>
   <section class="page-heading wrap">
-    <p class="eyebrow" {...page?.edit.eyebrow}>{kicker ?? page?.data.eyebrow}</p>
-    <h1 {...page?.edit.title}>{title.replace(/\.$/, '')}.</h1>
+    {answer
+      ? <><p class="eyebrow" {...page?.edit.title}>{title.replace(/\.$/, '')}</p><h1>{answer}</h1></>
+      : <><p class="eyebrow" {...page?.edit.eyebrow} set:html={withPlaceholders(schedule.endedTrees ? 'Until next year' : page?.data.eyebrow)} /><h1 {...page?.edit.title}>{title.replace(/\.$/, '')}</h1></>}
     {schedule.treesListed
-      ? page?.data.excerpt && <p {...page.edit.excerpt}>{page.data.excerpt}</p>
+      ? null
       : schedule.endedTrees
-      ? <p>The lot is closed for the year. Thank you, Milford. Trees and wreaths are back next Thanksgiving weekend.</p>
-      : <p>Trees and wreaths are at the stand each year from Thanksgiving weekend until just before Christmas. {opens ? `The lot opens ${opens}.` : 'We’ll post the next opening day here and on Facebook.'}</p>}
-    {schedule.treesListed && <div class="trees-note" {...page?.edit.content}>{page?.data.content?.length ? <PortableText value={page.data.content} /> : <p>Prices are marked at the lot.</p>}</div>}
+      ? <p>The lot is closed for the year. Thank you, Milford. Trees and wreaths usually arrive Thanksgiving weekend.</p>
+      : <p>Trees and wreaths are at the stand each year from Thanksgiving weekend until just before Christmas. {!opens && 'We’ll post the next opening day here and on Facebook.'}</p>}
+    {schedule.treesListed && <div class="trees-note" {...page?.edit.content}><p>{hoursLine && <span set:html={withPlaceholders(hoursLine)} />} At the stand until just before Christmas.</p>{page?.data.content?.length ? <PortableText value={page.data.content} /> : <p>Prices are marked at the lot.</p>}</div>}
+    {askClosing && <p class="trees-call"><a class="text-link" href={telephone(location.data.phone)}>Call for closing time</a></p>}
   </section>
 
   {schedule.treesListed && sections.length > 0 && (
     <div class="trees-layout wrap">
-      <nav class="trees-jump section-tabs" aria-label="On this page" data-section-tabs>{sections.map((s) => <a href={`#${s.id}`}>{s.heading}</a>)}</nav>
-      <figure class="trees-lead"><div class="crop"><img src={photos.treesStorefront.src} alt={photos.treesStorefront.alt} width={photos.treesStorefront.width} height={photos.treesStorefront.height} fetchpriority="high" /></div><figcaption>At the stand, {location.data.address}.</figcaption></figure>
+      <figure class="trees-lead"><div class="crop"><img src={photos.treesStorefront.src} alt={photos.treesStorefront.alt} srcset={photos.treesStorefront.srcset} sizes="(max-width: 1000px) 100vw, 400px" width={photos.treesStorefront.width} height={photos.treesStorefront.height} fetchpriority="high" /></div><figcaption>At the stand, {location.data.address}.</figcaption></figure>
       <div class="trees-list">
         {sections.map((s) => (
           <section class="trees-group" id={s.id}>
-            <div class="section-rule"><h2>{s.heading}</h2></div>
-            {s.id === 'wreaths' && <img class="group-photo" src={photos.wreathWall.src} alt={photos.wreathWall.alt} width={photos.wreathWall.width} height={photos.wreathWall.height} loading="lazy" />}
-            <ul class="product-list" role="list">{s.items.map((item) => (
-              <li><span class="row-name" {...item.edit.title}>{item.data.title}</span>{item.data.options && <span class="row-detail" {...item.edit.options} set:html={withPlaceholders(item.data.options)} />}</li>
+            <div class="section-rule"><h2>{s.heading}</h2>{s.shared && <span class="flavor-count" set:html={withPlaceholders(s.shared)} />}</div>
+            <ul class="menu-list" role="list">{s.items.map((item) => (
+              <li><span class="row-name" {...item.edit.title}>{item.data.title}</span>{item.data.options && item.data.options !== s.shared && <span class="row-options" {...item.edit.options} set:html={withPlaceholders(item.data.options)} />}</li>
             ))}</ul>
           </section>
         ))}
@@ -68,8 +75,8 @@ const gallery = [
     </div>
   )}
 
-  <section class={`photo-row wrap${schedule.treesListed ? ' has-list' : ''}`} aria-label="Photos from the tree lot">
-    {gallery.map((photo) => <figure><div class="crop"><img src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} loading="lazy" /></div><figcaption>{photo.caption}</figcaption></figure>)}
+  <section class="photo-row wrap" aria-label="Photos from the tree lot">
+    {gallery.map((photo) => <figure><div class="crop"><img src={photo.src} alt={photo.alt} srcset={photo.srcset} sizes="(max-width: 740px) 50vw, 400px" width={photo.width} height={photo.height} loading="lazy" /></div><figcaption>{photo.caption}</figcaption></figure>)}
   </section>
 
   {schedule.treesOpen
@@ -78,6 +85,3 @@ const gallery = [
     ? <EndBand headline="See you at the lot." label="Hours & directions" url="/visit" />
     : <EndBand headline="Find us on Elm Street." label="Hours & directions" url="/visit" />}
 </Base>
-<script>
-  import '../scripts/section-tabs';
-</script>

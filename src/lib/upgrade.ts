@@ -16,7 +16,7 @@ import { sql } from 'kysely';
 import seed from '../../seed/seed.json';
 
 /** Raise when seed.json gains a collection or field. */
-export const CONTENT_VERSION = 2;
+export const CONTENT_VERSION = 3;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about 25 seconds, one query at a time.

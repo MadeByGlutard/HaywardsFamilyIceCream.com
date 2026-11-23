@@ -4,6 +4,7 @@
 const { collection, slug } = Astro.params;
 if (collection === 'visit' && slug === 'milford') return Astro.redirect('/visit', 302);
 if (collection === 'settings') return Astro.redirect('/', 302);
+if (collection === 'menu_items') return Astro.redirect('/menu/food', 302);
 if (collection === 'flavors' || collection === 'categories' || collection === 'servings') return Astro.redirect('/menu', 302);
 if (collection === 'products' || (collection === 'pages' && slug === 'trees')) return Astro.redirect('/trees', 302);
 // Live View of a period previews it on the home page (honoured for signed-in staff).

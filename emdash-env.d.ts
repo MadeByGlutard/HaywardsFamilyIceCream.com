@@ -38,6 +38,23 @@ export interface Flavor {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
+export interface MenuItem {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  section: "Sizes" | "Cones and toppings" | "Sundaes" | "Twisters and treats" | "Shakes and floats" | "Take home" | "Hot dogs" | "Melts" | "Rolls, wraps and subs" | "Mac, chili and sides" | "Cold drinks" | "Hot drinks";
+  options?: string;
+  square_id?: string;
+  sort_order?: number;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
 export interface Page {
   id: string;
   slug: string | null;
@@ -72,11 +89,6 @@ export interface Period {
   accent?: "red" | "green";
   show_trees_nav?: boolean;
   open_state?: "Open" | "Closed";
-  opens_at?: string;
-  closes_at?: string;
-  band_headline?: string;
-  band_link_label?: string;
-  band_link_url?: string;
   visit_intro?: string;
   notes?: string;
   createdAt: Date;
@@ -146,8 +158,6 @@ export interface Visit {
   phone: string;
   email?: string;
   hours: string;
-  opens_at?: string;
-  closes_at?: string;
   hours_note?: string;
   notice?: string;
   facebook?: string;
@@ -166,6 +176,7 @@ declare module "emdash" {
   interface EmDashCollections {
     categories: Category;
     flavors: Flavor;
+    menu_items: MenuItem;
     pages: Page;
     periods: Period;
     products: Product;

@@ -19,29 +19,29 @@ const place = location.data;
 const schedule = await getScheduleContext(Astro, place);
 const status = schedule.status;
 const preview = schedule.preview;
-// Open/closed-now attributes; left off for signed-in staff so inline editing sees the stored text.
-const next = schedule.hours?.next;
-const live = schedule.hours && !Astro.locals.user ? {
-  'data-opens': schedule.hours.opens, 'data-closes': schedule.hours.closes, 'data-late': schedule.hours.late, 'data-day': schedule.hoursDay,
-  'data-next-opens': next && 'opens' in next ? next.opens : undefined, 'data-next-closes': next && 'opens' in next ? next.closes : undefined, 'data-next-starts': next && 'starts' in next ? next.starts : undefined,
-} : schedule.openState === 'closed' && !Astro.locals.user ? { 'data-day': schedule.hoursDay } : {};
+// "We'll post our reopening day on Facebook": the notice links there.
+const linkSocial = (html: string) => [['Facebook', place.facebook], ['Instagram', place.instagram]].reduce((out, [name, url]) => (url ? out!.replace(new RegExp(`\\b${name}\\b`), `<a href="${url}">${name}</a>`) : out), html);
 const statusEdit = status.source === 'period' ? status.edit : location.edit[status.source];
 const siteTitle = settings.title || 'Hayward’s Family Ice Cream';
 const fullTitle = `${title} | ${siteTitle} · Milford, NH`;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const canonical = new URL(path, Astro.site).href;
 const page = createPublicPageContext({ Astro, kind: content ? 'content' : 'custom', pageType: 'website', title: fullTitle, description, canonical, image: new URL(image, Astro.site).href, content, siteName: siteTitle });
-const structured = { '@context':'https://schema.org', '@type':'IceCreamShop', name:siteTitle, url:Astro.site?.href, telephone:telephone(place.phone).slice(4), image:new URL('/images/milford-stand.jpg',Astro.site).href, address:{'@type':'PostalAddress',streetAddress:place.address,addressLocality:'Milford',addressRegion:'NH',postalCode:'03055',addressCountry:'US'}, sameAs:[place.facebook, place.instagram].filter(Boolean), ...(schedule.hours && schedule.status.source === 'hours' ? { openingHours: `Mo-Su ${schedule.hours.opens}-${schedule.hours.closes}` } : {}) };
+const structured = { '@context':'https://schema.org', '@type':'IceCreamShop', name:siteTitle, url:Astro.site?.href, telephone:telephone(place.phone).slice(4), image:new URL('/images/milford-stand.jpg',Astro.site).href, address:{'@type':'PostalAddress',streetAddress:place.address,addressLocality:'Milford',addressRegion:'NH',postalCode:'03055',addressCountry:'US'}, sameAs:[place.facebook, place.instagram].filter(Boolean) };
 
 // Navigation comes from the EmDash "primary" menu. While the tree lot is open, and
-// for two weeks before, a Trees & wreaths item is added before Visit (unless staff already added one).
-const TREES = { label: 'Trees & wreaths', url: '/trees', short: 'Trees' };
-const navItems: { label: string; url: string; short?: string }[] = (menu?.items ?? []).map((item) => ({ label: item.label, url: item.url }));
+// for six weeks before, a Trees & wreaths item is added before Visit (unless staff already added one).
+const TREES = { label: 'Trees & wreaths', url: '/trees' };
+const navItems: { label: string; url: string }[] = (menu?.items ?? []).map((item) => ({ label: item.label, url: item.url }));
 if (schedule.treesNav && !navItems.some((item) => item.url === TREES.url)) {
   const visitIndex = navItems.findIndex((item) => item.url === '/visit');
   navItems.splice(visitIndex === -1 ? navItems.length : visitIndex, 0, TREES);
 }
-const showStrip = showStripProp && !!status.strip;
+const isNotice = !!place.notice?.trim();
+const showStrip = (showStripProp || isNotice) && !!status.strip;
+// The bar already says it: the row doesn’t repeat it.
+const stripSays = showStrip && isNotice;
+const stripHtml = linkSocial(withSentences(status.strip));
 const themeColor = schedule.accent === 'green' ? '#2e5a3c' : '#a71d2a';
 ---
 <!doctype html>
@@ -56,31 +56,36 @@ const themeColor = schedule.accent === 'green' ? '#2e5a3c' : '#a71d2a';
   <body>
     <EmDashBodyStart page={page} /><a class="skip-link" href="#main">Skip to content</a>
     {preview && <p class="preview-flag" role="note">Preview: {schedule.active?.data.title ?? 'no period'} · {schedule.today}</p>}
-    {showStrip && <aside class="notice-strip" aria-label="Notice"><p class="wrap" {...status.stripEdit} set:html={withSentences(status.strip)} /></aside>}
+    {showStrip && <aside class="notice-strip" aria-label="Notice"><p class="wrap" {...status.stripEdit} set:html={schedule.treesOpen && !isNotice ? `<a href="/trees">${stripHtml}</a>` : stripHtml} /></aside>}
     <header class="site-header">
       <div class="masthead wrap">
         <p class="masthead-note"><span>Milford, New Hampshire</span><em>A little taste of home.</em></p>
+        <a class="menu-button" href="#pages" aria-haspopup="dialog"><i class="ph ph-list" aria-hidden="true"></i>Menu</a>
         <a class="brand" href="/" aria-label="Hayward’s Family Ice Cream, home"><img src="/brand/logo.png" alt="Hayward’s Family Ice Cream" width="768" height="216" /></a>
-        <p class="masthead-contact"><span>{place.address}</span><a href={telephone(place.phone)}>{place.phone}</a></p>
+        <p class="masthead-contact"><a href={place.directions}>{place.address}<span class="sr-only">, directions</span></a><a href={telephone(place.phone)}>{place.phone}</a></p>
+        <a class="call-link" href={telephone(place.phone)} aria-label={`Call ${place.phone}`}><i class="ph ph-phone" aria-hidden="true"></i>Call</a>
       </div>
       <div class="nav-bar"><div class="nav-wrap wrap">
-        <nav class="main-nav" aria-label="Main navigation">{navItems.map(item => <a href={item.url} aria-current={path === item.url ? 'page' : undefined}>{item.short ? <><span class="label-long">{item.label}</span><span class="label-short">{item.short}</span></> : item.label}</a>)}</nav>
-        <div class={`status-row${showStrip && schedule.openState === 'closed' ? ' says-closed' : ''}`}><a class="opening" href="/visit" data-state={schedule.openState === 'closed' ? 'closed' : undefined} {...live}><span class="status-text" {...statusEdit} set:html={withSentences(status.line)} /><span class="sr-only">, hours and directions</span></a><a class="call-link directions-link" href={place.directions}><i class="ph ph-map-pin" aria-hidden="true"></i>Directions</a><a class="call-link" href={telephone(place.phone)} aria-label={`Call ${place.phone}`}><i class="ph ph-phone" aria-hidden="true"></i>Call</a></div>
+        <nav class="main-nav" aria-label="Main navigation">{navItems.map(item => <a href={item.url} aria-current={path === item.url ? 'page' : undefined}>{item.label}</a>)}</nav>
+        <div class={`status-row${stripSays ? ' says-closed' : ''}`}><a class="opening" href={schedule.call ? telephone(place.phone) : '/visit'}><span class="status-text" {...statusEdit} set:html={withSentences(status.line)} /><span class="status-alt">Hours &amp; directions</span>{!schedule.call && <span class="sr-only">, hours and directions</span>}</a><a class="directions-link" href={place.directions}><i class="ph ph-map-pin" aria-hidden="true"></i><span>{place.address}</span><span class="sr-only">, directions</span></a></div>
       </div></div>
     </header>
+    {/* The Menu button's dialog on phones and tablets. Without script, Menu jumps to the page list in the footer. */}
+    <dialog class="menu-sheet" id="site-menu" aria-label="Menu"><div class="menu-panel">
+      <div class="menu-top"><button class="menu-button" type="button" data-close><i class="ph ph-x" aria-hidden="true"></i>Close</button></div>
+      <nav aria-label="Pages">{navItems.map(item => <a href={item.url} aria-current={path === item.url ? 'page' : undefined}>{item.label}</a>)}</nav>
+      <p class="menu-actions"><a class="button" href={place.directions}><i class="ph ph-map-pin" aria-hidden="true"></i>Directions</a><a class="button button-line" href={telephone(place.phone)}><i class="ph ph-phone" aria-hidden="true"></i>Call</a></p>
+    </div></dialog>
     <main id="main"><slot /></main>
     <footer class="footer wrap">
-      <div class="footer-brand"><a href="/"><img src="/brand/logo.png" alt="Hayward’s Family Ice Cream" width="768" height="216" loading="lazy" /></a><p>Homemade on Elm Street.</p></div>
+      <nav class="footer-col footer-menu" id="pages" aria-label="All pages"><h2>Pages</h2>{navItems.filter(item => item.url !== '/').map(item => <a href={item.url}>{item.label}</a>)}</nav>
       <div class="footer-col"><h2>Find us</h2><p>{place.address}<br />{place.locality}</p><a href={place.directions}>Get directions</a></div>
-      <div class="footer-col"><h2>Hours</h2><p set:html={withSentences(status.line)} /><a href={telephone(place.phone)}>{place.phone}</a><p class="footer-links">{place.facebook && <a href={place.facebook}>Facebook</a>}{place.instagram && <a href={place.instagram}>Instagram</a>}</p></div>
-      <div class="footer-fine"><span>© {new Date().getFullYear()} Hayward’s Family Ice Cream</span><a href="/our-story#sources">Our history &amp; sources</a><a href="/admin">Staff login</a></div>
+      <div class="footer-col"><h2>Hours &amp; contact</h2><p set:html={withSentences(status.line)} /><a href={telephone(place.phone)}>{place.phone}</a><p class="footer-links">{place.facebook && <a href={place.facebook}>Facebook</a>}{place.instagram && <a href={place.instagram}>Instagram</a>}{place.email && <a href={`mailto:${place.email}`}>Email</a>}</p></div>
+      <div class="footer-fine"><span>© {new Date().getFullYear()} Hayward’s Family Ice Cream</span><a href="/admin">Staff login</a></div>
     </footer>
     <script>
-      import '../scripts/open-now';
-      // Anchors land below the sticky section tabs, whatever height they wrap to.
-      const tabs = document.querySelector<HTMLElement>('.section-tabs');
-      if (tabs) new ResizeObserver(() => document.documentElement.style.setProperty('--tabs', getComputedStyle(tabs).position === 'sticky' && tabs.parentElement !== null ? `${tabs.offsetHeight}px` : '0px')).observe(tabs);
-      // "Our history & sources" opens the sources it links to.
+      import '../scripts/menu';
+      // A link to #sources opens the sources it links to.
       const openTarget = () => document.getElementById(location.hash.slice(1))?.querySelector('details')?.setAttribute('open', '');
       addEventListener('hashchange', openTarget);
       openTarget();

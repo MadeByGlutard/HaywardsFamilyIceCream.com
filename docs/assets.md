@@ -6,8 +6,10 @@ No generated photography is used in the implemented website.
 | --- | --- | --- |
 | `public/brand/logo.svg`, `logo.png`, `icon.png` | Existing website repository | Authentic Milford branding |
 | `public/images/sundae.jpg` | Existing repository, gallery image 02 | Home product photo |
-| `public/images/two-scoops.jpg` | Existing repository, gallery image 03 | Menu supporting photo |
-| `public/images/milford-stand.jpg` | BringFido's Milford listing, credited there to `@Haywardsofmilford` | Actual Milford building |
+| `public/images/scoops-caramel.jpg` | Existing repository, gallery image 06 | Home photo |
+| `public/images/two-cups.jpg` | Existing repository, gallery image 07 | Flavors photo |
+| `public/images/two-scoops.jpg` | Existing repository, gallery image 03 | Sundaes & shakes photo |
+| `public/images/milford-stand.jpg` | BringFido's Milford listing, credited there to `@Haywardsofmilford` | Hours and History only |
 
 Building reference: https://photos.bringfido.com/restaurants/2/7/7/93772/93772_350010.jpg?density=2x&size=tile
 
@@ -28,3 +30,5 @@ The building source is 720 × 480. It works as a concept reference but is visibl
 | `public/images/trees-wreath-closeup-crop.jpg` (1160 × 1350) | Derived crop of the above without the price sticker; `/trees` photo row. |
 
 Photo sets, alt text and captions are defined in `src/lib/photos.ts`.
+
+Flavors in the scoop photos are not identified anywhere, so captions and alt text describe what is visible. Each photo has an 800px copy (`-800.jpg`) for phones.

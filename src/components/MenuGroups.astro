@@ -1,0 +1,13 @@
+---
+/** Menu groups as ruled lists: the name, then its options on the same line when they fit. */
+import type { menuGroups } from '../lib/menu';
+interface Props { groups: Awaited<ReturnType<typeof menuGroups>> }
+const { groups } = Astro.props;
+---
+{groups.map((group) => <section class="menu-group">
+  <div class="section-rule"><h2>{group.heading}</h2>{group.shared && <span class="flavor-count">{group.shared}</span>}</div>
+  <ul class="menu-list" role="list">{group.items.map((item) => {
+    const options = item.data.options && item.data.options !== group.shared ? item.data.options : undefined;
+    return <li><span class="row-name" {...item.edit.title}>{item.data.title}</span>{options && <span class="row-options" {...item.edit.options}>{options}</span>}</li>;
+  })}</ul>
+</section>)}

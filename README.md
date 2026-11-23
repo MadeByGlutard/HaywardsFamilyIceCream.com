@@ -130,7 +130,7 @@ Changing them, or the seed, does not change an existing database.
 ## Redesign content and upgrades
 
 The port's `settings`, `categories` and `flavors` are unchanged. The redesign adds `pages`,
-`visit`, `periods` (dated schedule periods), `products` and `servings`, and two optional flavor
+`visit`, `periods` (dated schedule periods), `products`, `menu_items` (sundaes, food and drinks, with Square IDs and no prices) and `servings`, and two optional flavor
 fields. EmDash applies the seed during setup only, so `src/lib/upgrade.ts` adds what a database
 is missing once per `CONTENT_VERSION`, on the first request after a deploy. It never changes
 existing entries, labels or choices.

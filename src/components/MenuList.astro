@@ -1,0 +1,20 @@
+---
+/** A menu page made of groups (everything except the flavor list). */
+import MenuGroups from './MenuGroups.astro';
+import MenuNote from './MenuNote.astro';
+import Base from '../layouts/Base.astro';
+import { menuGroups, type MenuPage } from '../lib/menu';
+import type { Photo } from '../lib/photos';
+import { getLocation, telephone } from '../lib/site';
+interface Props { page: MenuPage; title: string; description: string; photo?: Photo; /** Group headings per column, in reading order. */ columns: string[][] }
+const { page, title, description, photo, columns } = Astro.props;
+const [groups, { data: place }] = await Promise.all([menuGroups(page), getLocation()]);
+---
+<Base title={title} description={description}>
+  <section class="page-heading wrap"><h1>{title}</h1><MenuNote lead="Not everything is on every day." /></section>
+  <div class={`menu-groups wrap${photo ? ' has-photo' : ''}`}>
+    {columns.map((headings) => <div class="menu-col"><MenuGroups groups={groups.filter((group) => headings.includes(group.heading))} /></div>)}
+    {photo && <figure class="menu-photo"><img src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} srcset={photo.srcset} sizes="(max-width: 1000px) 100vw, 400px" style={photo.position ? `object-position: ${photo.position}` : undefined} loading="lazy" /></figure>}
+    {groups.length === 0 && <p>Please <a href={telephone(place.phone)}>call the stand</a> for today’s menu.</p>}
+  </div>
+</Base>

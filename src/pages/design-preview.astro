@@ -2,8 +2,8 @@
 // Design review: one page in every schedule period, side by side at a chosen width.
 // Dev server and signed-in EmDash staff only; 404 for everyone else.
 if (!import.meta.env.DEV && !Astro.locals.user) return new Response(null, { status: 404 });
-const pages = [['/', 'Home'], ['/menu', 'Menu'], ['/trees', 'Trees'], ['/our-story', 'Our story'], ['/visit', 'Visit']] as const;
-const periods = [['thanksgiving', 'Thanksgiving closure'], ['trees', 'Tree lot'], ['winter', 'Winter break'], ['ice-cream', 'Ice cream season']] as const;
+const pages = [['/', 'Home'], ['/menu', 'Menu'], ['/trees', 'Trees'], ['/menu/food', 'Food'], ['/history', 'History'], ['/visit', 'Visit']] as const;
+const periods = [['thanksgiving', 'Thanksgiving break'], ['trees', 'Tree lot'], ['winter', 'Winter break'], ['ice-cream', 'Ice cream season']] as const;
 const widths = [['390', 'Phone'], ['820', 'iPad'], ['1440', 'Desktop']] as const;
 const q = Astro.url.searchParams;
 const page = pages.find(([p]) => p === q.get('page'))?.[0] ?? '/';

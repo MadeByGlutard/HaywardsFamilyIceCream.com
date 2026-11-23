@@ -60,7 +60,7 @@ interface CacheHint {
 }
 
 /** Every collection the public pages read. Saving any entry in one purges them. */
-export const CONTENT_TAGS = ['settings', 'categories', 'flavors', 'pages', 'visit', 'periods', 'products', 'servings', 'emdash:settings', 'emdash:menu:primary'];
+export const CONTENT_TAGS = ['settings', 'categories', 'flavors', 'pages', 'visit', 'periods', 'products', 'servings', 'menu_items', 'emdash:settings', 'emdash:menu:primary'];
 
 interface RouteCache {
   enabled: boolean;

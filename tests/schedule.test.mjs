@@ -18,8 +18,7 @@ test('active period follows the calendar', () => {
 	assert.equal(at('2026-11-22'), 'thanksgiving-2026');
 	assert.equal(at('2026-11-26'), 'thanksgiving-2026');
 	assert.equal(at('2026-11-27'), 'trees-2026');
-	assert.equal(at('2026-12-20'), 'trees-2026', 'the lot closes the Sunday before Christmas');
-	assert.equal(at('2026-12-21'), 'winter-2026');
+	assert.equal(at('2026-12-24'), 'trees-2026', 'the lot runs until the winter break starts');
 	assert.equal(at('2026-12-25'), 'winter-2026');
 	assert.equal(at('2027-06-01'), 'winter-2026', 'ice cream season has no first day yet, so the winter break continues');
 	assert.notEqual(at('2027-07-04'), 'summer-2027', 'summer hours have no set dates until staff give them');
@@ -34,8 +33,9 @@ test('a later period cuts an open-ended one short', () => {
 test('schedule labels and accents', () => {
 	const bySlug = Object.fromEntries(periods.map((s) => [s.slug, s]));
 	assert.equal(datesLabel(bySlug['thanksgiving-2026']), 'Nov 22 – 26');
-	assert.equal(datesLabel(bySlug['trees-2026']), 'Nov 27 – Dec 20');
-	assert.equal(datesLabel(bySlug['winter-2026']), 'From Dec 21');
+	assert.equal(datesLabel(bySlug['trees-2026']), 'From Nov 27');
+	assert.equal(datesLabel({ ...bySlug['trees-2026'], end: '2026-12-24', data: { title: 'x' } }), 'Nov 27 – Dec 24');
+	assert.equal(datesLabel(bySlug['winter-2026']), 'From Dec 25');
 	assert.equal(datesLabel(bySlug['summer-2027']), 'Summer months');
 	assert.equal(accentOf(bySlug['trees-2026'].data), 'green');
 	assert.equal(accentOf({ title: 'x', accent: 'purple' }), 'red', 'unknown token falls back to red');
@@ -43,14 +43,14 @@ test('schedule labels and accents', () => {
 });
 
 test('seed content invents no closing times, prices or dates', () => {
-	// Hours come from the owner and Hayward's own posts: 8pm standard, 9pm in
-	// summer, 7pm for the tree lot. Any other closing time needs a source first.
-	const text = JSON.stringify(seed.content.periods) + JSON.stringify(seed.content.products);
+	// Confirmed by the owner: 8pm standard, 9pm in summer. The tree lot's closing
+	// time is not confirmed for 2026. Staff notes may quote past hours.
+	const text = JSON.stringify(seed.content.periods.map((e) => ({ ...e.data, notes: undefined }))) + JSON.stringify(seed.content.products);
 	assert.doesNotMatch(text, /\$\s?\d/, 'no prices');
 	const closings = [...text.matchAll(/\b(1[0-2]|[1-9])(:\d\d)?\s?pm\b/gi)].map((m) => m[0].toLowerCase());
-	assert.deepEqual([...new Set(closings)].filter((t) => !['7pm', '8pm', '9pm'].includes(t)), [], 'only sourced closing times (7pm, 8pm, 9pm); use [closing time] for others');
-	assert.equal(seed.content.visit[0].data.hours, 'Open daily, 11am to 8pm');
-	assert.match(JSON.stringify(seed.content.periods), /\[date to confirm\]/);
+	assert.deepEqual([...new Set(closings)].filter((t) => !['8pm', '9pm'].includes(t)), [], 'only confirmed closing times (8pm, 9pm); leave others out');
+	assert.doesNotMatch(text, /\[[^\]"]*(confirm|time|date)[^\]"]*\]/, 'no draft placeholders in public copy');
+	assert.equal(seed.content.visit[0].data.hours, 'Open daily, 11am to 8pm. Until 9pm in summer');
 	for (const p of seed.content.products) assert.ok(!('price' in p.data), `${p.slug} has no price field`);
 });
 
@@ -75,4 +75,15 @@ test('an open-ended closure nobody follows up on is not claimed forever', () => 
 test('public names drop the admin year', () => {
 	assert.equal(publicTitle('Tree lot 2026'), 'Tree lot');
 	assert.equal(publicTitle('Ice cream season'), 'Ice cream season');
+});
+
+test('menu items match the menu pages and carry no prices', async () => {
+	const source = await readFile(new URL('../src/lib/menu.ts', import.meta.url), 'utf8');
+	const col = seed.collections.find((c) => c.slug === 'menu_items');
+	assert.ok(!col.fields.some((f) => /price/.test(f.slug)));
+	for (const section of col.fields.find((f) => f.slug === 'section').validation.options) assert.ok(source.includes(`'${section}'`), `${section} has a page`);
+	for (const item of seed.content.menu_items) {
+		assert.doesNotMatch(JSON.stringify(item), /\$\s?\d/);
+		assert.ok(item.data.square_id, `${item.slug} has a Square ID`);
+	}
 });

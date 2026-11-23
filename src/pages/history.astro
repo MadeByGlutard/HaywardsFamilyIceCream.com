@@ -1,0 +1,31 @@
+---
+import { getEmDashEntry, getSeoMeta } from 'emdash';
+import { PortableText } from 'emdash/ui';
+import Base from '../layouts/Base.astro';
+import { cacheContentPage } from '../lib/cache';
+cacheContentPage(Astro);
+const {entry:story}=await getEmDashEntry('pages','our-story');
+if(!story)return Astro.rewrite('/404');
+const seo=getSeoMeta(story,{defaultTitle:'History',defaultDescription:story.data.excerpt});
+---
+<Base title={seo.title} description={seo.description || story.data.excerpt} content={{collection:'pages',id:story.data.id,slug:'our-story'}}>
+  <section class="page-heading story-heading wrap"><p class="eyebrow" {...story.edit.eyebrow}>{story.data.eyebrow}</p><h1 {...story.edit.title}>{story.data.title.replace(/Elm Street/g, 'Elm\u00a0Street')}</h1><p {...story.edit.excerpt}>{story.data.excerpt}</p></section>
+  <figure class="story-banner wrap"><img src="/images/postcard-milford-stand.jpg" alt="Color postcard of a long white ice cream stand with a red hipped roof and a Hayward Farms sign, titled “One of our ice cream stands on Route 101, Milford, New Hampshire”" width="1222" height="750" /><figcaption>The old Milford stand on an undated postcard. Boston Public Library, Tichnor Brothers Collection.</figcaption></figure>
+  <article class="story-body wrap"><div class="story-prose" {...story.edit.content}><PortableText value={story.data.content || []} /></div></article>
+  <section class="sources wrap" id="sources"><details><summary>Sources <i class="ph ph-plus" aria-hidden="true"></i></summary><p>Sources don’t all agree. We use 1939 for the Milford stand because the 1962 obituary and the local history both give it and the town’s records fit; 1940 is when the family’s Nashua stand opened. If you have a photo or a correction, please get in touch.</p><ol>
+    <li><a href="https://milfordhistory.online/haywards-milford-nh">Matt Bowling, “Hayward’s Ice Cream,” Milford History Online: the milk cart, the Smith Farm, the 1939 opening and the fires</a></li>
+    <li><a href="https://archive.org/details/sim_guernsey-breeders-journal_1962-04-07_109_7">Guernsey Breeders’ Journal, April 7, 1962: Stanley Hayward’s obituary, which dates the stand to 1939</a></li>
+    <li><a href="https://archive.org/details/annualreportofto1943milf">Town of Milford annual report: tax inventory of April 1942</a></li>
+    <li><a href="https://ark.digitalcommonwealth.org/ark:/50959/pz50h301m">Tichnor Brothers postcard 86441, Boston Public Library: “the original Hayward Farms Stand”</a></li>
+    <li><a href="https://ark.digitalcommonwealth.org/ark:/50959/pz50h2977">Tichnor Brothers postcard 78043, Boston Public Library: the stand with the frozen foods sign</a></li>
+    <li><a href="https://haywardsicecream.com/history-of-haywards">Hayward’s Ice Cream, Nashua: its opening on June 15, 1940</a></li>
+    <li><a href="https://www.cabinet.com/opinion/cabinet-editorials/2019/06/20/thumbing-the-files-18/">The Cabinet, “Thumbing the Files,” 2019: the 1948 frozen food store</a></li>
+    <li><a href="https://milfordhistory.com/wp-content/uploads/Milford%20High%20School%20Yearbook%201948%20(searchable).pdf#page=50">Milford High School yearbook, 1948, page 50 of the PDF: Hayward Farms advertisement</a></li>
+    <li><a href="https://milfordhistory.com/wp-content/uploads/Milford%20High%20School%20Yearbook%201949%20(searchable).pdf#page=31">Milford High School yearbook, 1949, page 31 of the PDF: the seniors in riddles</a></li>
+    <li><a href="https://archive.org/details/annualreportofto1965milf">Town of Milford annual report, 1965: Christmas ice cream for the schools</a></li>
+    <li><a href="https://gis.vgsi.com/milfordnh/Parcel.aspx?pid=4979">Town of Milford assessing record for 383 Elm Street: built 2001</a></li>
+    <li><a href="https://web.archive.org/web/20090614160912/http://www.haywardsicecream.com/Milford.htm">Hayward’s website, 2009: the Milford stand on former Hayward Farms land</a></li>
+    <li><a href="https://web.archive.org/web/20080423023621/http://www.haywardsicecream-nh.com/MakingIceCream.htm">Hayward’s website, 2008: making ice cream again</a></li>
+    <li><a href="https://www.collaborativenh.org/granite-solutions-coronavirus-1/2022/6/22/these-seacoast-stops-are-on-nh-ice-cream-trail-states-greatest-summer-adventure">Granite State News Collaborative, 2022: the Ice Cream Trail</a></li>
+  </ol></details></section>
+</Base>

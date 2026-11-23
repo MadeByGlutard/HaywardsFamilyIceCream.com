@@ -24,7 +24,7 @@ Codex (gpt-6.1-sol) and Copilot (claude-opus-5.5) then scored it cold, and again
 
 The Claude reviewers' 9.0 and 9.1 are from just before those fixes: one phone utility bar, an even category grid, unrepeated closed-day calls to action, a wreath photo in the Trees list, captions and drop cap. Not taken: sideways-scrolling category tabs (they hid "No sugar added") and tree-lot photos in winter.
 
-Open nits: the 820 status line takes two lines, the second home photo is narrow on phones, Thanksgiving's phone headline repeats its banner, "Thanksgiving closure" wraps in the 820 schedule, and the Trees photo ends above its list at 1024. Not tested on a real iPhone or with VoiceOver/TalkBack.
+The nits from all four reviewers were then fixed (not re-scored), and every width from 320 to 1440 was swept on 12 pages for overflow and wrapped navigation, tabs, status, captions and buttons: none left. Not tested on a real iPhone or with VoiceOver/TalkBack.
 
 Checks: 13 tests, typecheck, production build, no axe violations on 5 pages x 4 periods, no overflow at nine widths from 320 to 1440.
 
