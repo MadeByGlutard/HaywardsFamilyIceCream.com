@@ -8,29 +8,32 @@ const PRODUCTION_D1 = {
 	id: "406e55ec-a241-4bad-a648-15dc41f01810",
 };
 const PRODUCTION_R2 = "haywardsfamilyicecream-com";
+/** haywardsfamilyicecream-com-session: who is signed in. */
+const PRODUCTION_KV = "1527cf00766d419599a8ef696b19dac9";
 
 /**
- * Each preview gets its own D1 database and R2 bucket, created and seeded from
- * production by `scripts/preview.mjs`, which passes them in through these
+ * Each preview gets its own D1 database and R2 bucket, seeded from production, and
+ * its own KV namespace for sign-in sessions. They are created by `scripts/preview.mjs`, which passes them in through these
  * environment variables before running `cf previews deploy`.
  */
 function previewResources() {
-	const { PREVIEW_D1_NAME, PREVIEW_D1_ID, PREVIEW_R2_BUCKET } = process.env;
-	if (!PREVIEW_D1_NAME || !PREVIEW_D1_ID || !PREVIEW_R2_BUCKET) {
+	const { PREVIEW_D1_NAME, PREVIEW_D1_ID, PREVIEW_R2_BUCKET, PREVIEW_KV_ID } = process.env;
+	if (!PREVIEW_D1_NAME || !PREVIEW_D1_ID || !PREVIEW_R2_BUCKET || !PREVIEW_KV_ID) {
 		throw new Error(
-			"Preview builds need their own D1 database and R2 bucket. Deploy previews with `npm run preview:deploy`, not `cf previews deploy` directly.",
+			"Preview builds need their own D1 database, R2 bucket and KV namespace. Deploy previews with `npm run preview:deploy`, not `cf previews deploy` directly.",
 		);
 	}
 	return {
 		d1: { name: PREVIEW_D1_NAME, id: PREVIEW_D1_ID },
 		r2: PREVIEW_R2_BUCKET,
+		kv: PREVIEW_KV_ID,
 	};
 }
 
 export default defineConfig(({ isPreview }) => {
 	const resources = isPreview
 		? previewResources()
-		: { d1: PRODUCTION_D1, r2: PRODUCTION_R2 };
+		: { d1: PRODUCTION_D1, r2: PRODUCTION_R2, kv: PRODUCTION_KV };
 
 	return {
 		worker: {
@@ -55,6 +58,8 @@ export default defineConfig(({ isPreview }) => {
 			env: {
 				DB: bindings.d1(resources.d1),
 				MEDIA: bindings.r2({ name: resources.r2 }),
+				// Declared so previews get one: only a full deploy creates it by itself.
+				SESSION: bindings.kv({ id: resources.kv }),
 			},
 		},
 	};

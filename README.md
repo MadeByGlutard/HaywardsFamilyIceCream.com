@@ -79,8 +79,8 @@ finish setup before attaching it: until then, whoever opens the wizard first bec
 
 ## Previews
 
-Every branch other than `main` can have a Worker Preview with its own D1 database and R2
-bucket, named `haywardsfamilyicecream-com-<branch>`:
+Every branch other than `main` can have a Worker Preview with its own D1 database, R2 bucket
+and KV namespace (sign-in sessions), named `haywardsfamilyicecream-com-<branch>`:
 
 - `npm run preview:deploy` creates them on the first run and copies production into them:
   schema, rows (including users and their password hashes, so the same people can sign in) and

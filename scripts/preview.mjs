@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Per-branch previews with their own D1 database and R2 bucket, seeded from production.
+// Per-branch previews with their own D1 database and R2 bucket, seeded from production,
+// and their own KV namespace for sign-in sessions.
 //
 //   node scripts/preview.mjs deploy [--branch <name>] [--reseed]
 //   node scripts/preview.mjs delete [--branch <name>]
@@ -226,6 +227,19 @@ async function emptyAndDeleteBucket() {
 	await api(bucketPath(name), { method: "DELETE" });
 }
 
+// ---------------------------------------------------------------- KV (sign-in sessions)
+
+const kvPath = `/accounts/${account}/storage/kv/namespaces`;
+const kvTitle = `${name}-session`;
+
+async function findNamespace() {
+	for (let page = 1; ; page++) {
+		const { result } = await api(`${kvPath}?per_page=100&page=${page}`);
+		const found = result.find((namespace) => namespace.title === kvTitle);
+		if (found || result.length < 100) return found;
+	}
+}
+
 // ---------------------------------------------------------------- commands
 
 function cf(cfArgs, { env = {}, fatal = true } = {}) {
@@ -261,8 +275,14 @@ if (command === "deploy") {
 		log(`Using existing ${name} (R2)`);
 	}
 
+	let sessions = await findNamespace();
+	if (!sessions) {
+		log(`Creating ${kvTitle} (KV)`);
+		sessions = (await api(kvPath, { method: "POST", body: { title: kvTitle } })).result;
+	}
+
 	cf(["previews", "deploy", "--preview-name", branch], {
-		env: { PREVIEW_D1_NAME: name, PREVIEW_D1_ID: database.uuid, PREVIEW_R2_BUCKET: name },
+		env: { PREVIEW_D1_NAME: name, PREVIEW_D1_ID: database.uuid, PREVIEW_R2_BUCKET: name, PREVIEW_KV_ID: sessions.id },
 	});
 } else {
 	log(`Deleting the ${branch} preview`);
@@ -276,5 +296,10 @@ if (command === "deploy") {
 	if (await bucketExists()) {
 		await emptyAndDeleteBucket();
 		log(`Deleted ${name} (R2)`);
+	}
+	const sessions = await findNamespace();
+	if (sessions) {
+		await api(`${kvPath}/${sessions.id}`, { method: "DELETE" });
+		log(`Deleted ${kvTitle} (KV)`);
 	}
 }
