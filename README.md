@@ -93,6 +93,9 @@ and KV namespace (sign-in sessions), named `haywardsfamilyicecream-com-<branch>`
   them automatically when a branch is deleted.
 - Preview URLs (`https://<branch>-haywardsfamilyicecream-com.tuckerwhitehouse.workers.dev`)
   are behind the same Access application.
+- The admin needs no second login on previews: Access's signed token signs people in
+  (`accessSignIn` in `astro.config.mjs`). New people become admins; existing accounts keep their
+  role. Production builds keep email and password.
 - Credentials: `CLOUDFLARE_API_TOKEN` (needs D1 Edit and Workers R2 Storage Edit as well as
   the Workers permissions).
 - `.github/workflows/previews.yml` runs `preview:deploy` on every push to a branch other than
