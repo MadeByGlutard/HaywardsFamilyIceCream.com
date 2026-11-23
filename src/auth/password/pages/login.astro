@@ -1,0 +1,18 @@
+---
+import Shell from "./Shell.astro";
+import { adminRedirect } from "../server";
+
+export const prerender = false;
+const next = adminRedirect(Astro.url.searchParams.get("redirect"));
+const disabled = Astro.url.searchParams.get("error") === "account_disabled";
+---
+
+<Shell title="Sign in">
+	<form data-api="/_emdash/api/auth/password/login" data-next={next} method="post">
+		<label>Email <input name="email" type="email" autocomplete="username" required autofocus /></label>
+		<label>Password <input name="password" type="password" autocomplete="current-password" required /></label>
+		<button>Sign in</button>
+		<p role="alert">{disabled ? "This account is turned off. Ask an admin." : ""}</p>
+	</form>
+	<p>Forgot your password? Ask an admin for a reset link.</p>
+</Shell>

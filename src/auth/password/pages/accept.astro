@@ -1,0 +1,28 @@
+---
+import { validateInvite } from "@emdash-cms/auth";
+import Shell from "./Shell.astro";
+import NewPassword from "./NewPassword.astro";
+import { database, users } from "../server";
+
+export const prerender = false;
+const token = Astro.url.searchParams.get("token") ?? "";
+const db = database(Astro);
+const invite = db && token ? await validateInvite(users(db), token).catch(() => null) : null;
+---
+
+<Shell title="Accept your invite">
+	{
+		invite ? (
+			<form data-api="/_emdash/api/auth/password/accept" data-next="/_emdash/admin" method="post">
+				<input type="hidden" name="token" value={token} />
+				<label>Email <input type="email" value={invite.email} autocomplete="username" readonly /></label>
+				<label>Your name <input name="name" autocomplete="name" /></label>
+				<NewPassword />
+				<button>Create account</button>
+				<p role="alert" />
+			</form>
+		) : (
+			<p>This invite link is invalid, used or expired. Ask for a new one.</p>
+		)
+	}
+</Shell>

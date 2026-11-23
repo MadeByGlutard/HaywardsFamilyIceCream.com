@@ -38,7 +38,7 @@ It runs the database migrations, applies `seed/seed.json` (flavors, categories, 
 creates a local `dev@emdash.local` admin and signs you in. The admin is at
 http://localhost:4321/_emdash/admin. Later, to sign in again without re-seeding, use
 http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin. Both URLs only
-exist in development. Production needs the real first-run admin setup.
+exist in development. Deployed sites use email and password (see Sign-in).
 
 Everything runs locally:
 
@@ -51,6 +51,26 @@ Everything runs locally:
 
 To try the production build locally: `npm run build`, then `npm run preview`.
 The setup URL is disabled in that mode, so seed with `npm run dev` first.
+
+## Sign-in
+
+Staff sign in with an email and password. EmDash has no password login of its own, so
+`src/auth/password/` adds one as an EmDash auth provider, and `src/middleware.ts` sends
+EmDash's passkey-first login and invite screens to it:
+
+- **First admin:** in the setup wizard, choose "Email and password" on the last step.
+- **Invites only:** an admin invites people from the Users screen. With no email provider set
+  up, EmDash shows the invite link to share. There is no sign-up page.
+- **Forgotten password:** an admin makes a one-time link, good for 24 hours, at
+  `/_emdash/password/users`. Anyone signed in can change their own at `/_emdash/password/account`.
+- **Storage:** scrypt hashes (OWASP's 16 MiB setting) in EmDash's `_plugin_storage` table.
+  Reset tokens are stored hashed.
+- **Limits:** per 15 minutes, 10 sign-in attempts per email and 30 per IP address.
+- Changing or resetting a password does not sign out other devices that are already signed in.
+
+Cloudflare Access (Zero Trust team `misty-night-ed60`) separately guards the `workers.dev`
+address and previews, for developers only. The real domain has no Access in front of it, so
+finish setup before attaching it: until then, whoever opens the wizard first becomes admin.
 
 ## Content model (`seed/seed.json`)
 

@@ -4,6 +4,7 @@ import react from "@astrojs/react";
 import { d1, r2 } from "@emdash-cms/cloudflare";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
+import { password } from "./src/auth/password/index.mjs";
 
 export default defineConfig({
 	site: "https://haywardsfamilyicecream.com",
@@ -22,6 +23,7 @@ export default defineConfig({
 		emdash({
 			database: d1({ binding: "DB", session: "auto", coalesce: true }),
 			storage: r2({ binding: "MEDIA" }),
+			authProviders: [password()],
 		}),
 	],
 	devToolbar: { enabled: false },

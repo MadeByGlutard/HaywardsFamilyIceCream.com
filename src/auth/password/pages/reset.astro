@@ -1,0 +1,16 @@
+---
+import Shell from "./Shell.astro";
+import NewPassword from "./NewPassword.astro";
+
+export const prerender = false;
+const token = Astro.url.searchParams.get("token") ?? "";
+---
+
+<Shell title="Choose a new password">
+	<form data-api="/_emdash/api/auth/password/reset" data-next="/_emdash/admin" method="post">
+		<input type="hidden" name="token" value={token} />
+		<NewPassword />
+		<button>Save password</button>
+		<p role="alert"></p>
+	</form>
+</Shell>

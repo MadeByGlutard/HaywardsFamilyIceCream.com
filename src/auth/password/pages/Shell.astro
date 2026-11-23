@@ -1,0 +1,66 @@
+---
+const { title } = Astro.props;
+Astro.response.headers.set("Cache-Control", "private, no-store");
+Astro.response.headers.set("Referrer-Policy", "no-referrer");
+Astro.response.headers.set("X-Frame-Options", "DENY");
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="robots" content="noindex" />
+		<title>{title} | Hayward's Family Ice Cream</title>
+		<style is:global>
+			body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #1b1b1b; background: #f4f4f5; }
+			main { max-width: 24rem; margin: 10vh auto; padding: 2rem; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
+			h1 { margin: 0 0 1rem; font-size: 1.4rem; }
+			label { display: block; margin: 0 0 1rem; font-weight: 600; }
+			input { display: block; width: 100%; box-sizing: border-box; margin-top: 0.25rem; padding: 0.6rem; font: inherit; border: 1px solid #8a8a8a; border-radius: 4px; }
+			button { padding: 0.6rem 1rem; font: inherit; font-weight: 600; color: #fff; background: #1f4b8f; border: 0; border-radius: 4px; cursor: pointer; }
+			form > button { width: 100%; }
+			button:disabled { opacity: 0.6; }
+			[role="alert"] { margin: 1rem 0 0; color: #a11212; }
+			[role="alert"]:empty { display: none; }
+			li { margin: 0 0 1rem; overflow-wrap: anywhere; }
+			@media (max-width: 30rem) { main { margin: 0; min-height: 100vh; box-sizing: border-box; border: 0; } }
+		</style>
+	</head>
+	<body>
+		<main>
+			<h1>{title}</h1>
+			<slot />
+		</main>
+		<script>
+			for (const form of document.querySelectorAll<HTMLFormElement>("form[data-api]")) {
+				form.addEventListener("submit", async (event) => {
+					event.preventDefault();
+					const alert = form.querySelector<HTMLElement>('[role="alert"]')!;
+					const button = form.querySelector("button")!;
+					const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+					alert.textContent = "";
+					if ("confirm" in data && data.confirm !== data.password) {
+						alert.textContent = "The passwords don't match.";
+						return;
+					}
+					delete data.confirm;
+					button.disabled = true;
+					try {
+						const response = await fetch(form.dataset.api!, {
+							method: "POST",
+							headers: { "Content-Type": "application/json", "X-EmDash-Request": "1" },
+							body: JSON.stringify(data),
+						});
+						const result = (await response.json().catch(() => null)) as any;
+						if (response.ok) location.assign(form.dataset.next!);
+						else alert.textContent = result?.error?.message ?? "Something went wrong. Try again.";
+					} catch {
+						alert.textContent = "Could not reach the site. Try again.";
+					}
+					button.disabled = false;
+				});
+			}
+		</script>
+	</body>
+</html>

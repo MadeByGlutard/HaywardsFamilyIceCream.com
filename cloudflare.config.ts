@@ -6,10 +6,11 @@ import { bindings, defineConfig, triggers } from "cf/config";
 export default defineConfig({
 	worker: {
 		name: "haywardsfamilyicecream-com",
-		// No public URL yet: EmDash's first-run setup lets whoever opens
-		// /_emdash/admin first become the owner.
-		workersDev: false,
-		previewUrls: false,
+		// workers.dev and preview URLs sit behind Cloudflare Access (invited emails
+		// only), configured in Zero Trust. Access covers the workers.dev hostname and
+		// this Worker's previews, so the custom domain stays public after cutover.
+		workersDev: true,
+		previewUrls: true,
 		compatibilityDate: "2026-11-22",
 		compatibilityFlags: ["nodejs_compat"],
 		entrypoint: "./src/worker.ts",

@@ -1,0 +1,41 @@
+---
+import { Role } from "@emdash-cms/auth";
+import Shell from "./Shell.astro";
+import { currentUser, database } from "../server";
+
+export const prerender = false;
+const user = currentUser(Astro);
+if (!user) return Astro.redirect("/_emdash/password/login");
+if (user.role < Role.ADMIN) return new Response("Only admins can see this page.", { status: 403 });
+const people = await database(Astro).selectFrom("users").select(["id", "email", "name"]).orderBy("email").execute();
+---
+
+<Shell title="Reset a password">
+	<p>Makes a link that works once, for 24 hours. Send it to the person yourself.</p>
+	<ul>
+		{
+			people.map((person: { id: string; email: string; name: string | null }) => (
+				<li>
+					{person.name ? `${person.name} (${person.email})` : person.email}
+					<br />
+					<button data-user={person.id}>Make reset link</button>
+					<output />
+				</li>
+			))
+		}
+	</ul>
+</Shell>
+<script>
+	for (const button of document.querySelectorAll<HTMLButtonElement>("button[data-user]")) {
+		button.addEventListener("click", async () => {
+			const response = await fetch("/_emdash/api/auth/password/reset-link", {
+				method: "POST",
+				headers: { "Content-Type": "application/json", "X-EmDash-Request": "1" },
+				body: JSON.stringify({ userId: button.dataset.user }),
+			});
+			const result = (await response.json().catch(() => null)) as any;
+			const output = button.nextElementSibling as HTMLElement;
+			output.textContent = result?.data?.url ?? result?.error?.message ?? "Something went wrong.";
+		});
+	}
+</script>

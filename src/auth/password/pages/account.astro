@@ -1,0 +1,19 @@
+---
+import Shell from "./Shell.astro";
+import NewPassword from "./NewPassword.astro";
+import { currentUser, database, storage } from "../server";
+
+export const prerender = false;
+const user = currentUser(Astro);
+if (!user) return Astro.redirect("/_emdash/password/login");
+const hasPassword = Boolean(await storage(database(Astro)).credentials.get(user.id));
+---
+
+<Shell title={hasPassword ? "Change your password" : "Set a password"}>
+	<form data-api="/_emdash/api/auth/password/change" data-next="/_emdash/admin" method="post">
+		{hasPassword && <label>Current password <input name="current" type="password" autocomplete="current-password" required /></label>}
+		<NewPassword />
+		<button>Save password</button>
+		<p role="alert"></p>
+	</form>
+</Shell>
