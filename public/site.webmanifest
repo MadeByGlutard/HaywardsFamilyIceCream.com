@@ -1,0 +1,13 @@
+{
+	"name": "Hayward’s Family Ice Cream — Milford",
+	"short_name": "Hayward’s",
+	"start_url": "/",
+	"display": "browser",
+	"background_color": "#fffdf8",
+	"theme_color": "#a71d2a",
+	"icons": [
+		{ "src": "/brand/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+		{ "src": "/brand/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+		{ "src": "/brand/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+	]
+}

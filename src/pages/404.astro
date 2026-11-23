@@ -1,14 +1,4 @@
 ---
-// pages/404.tsx
-import Layout from '../layouts/Layout.astro';
-import { getSettings } from '../lib/content';
-
-const settings = await getSettings();
+import Base from '../layouts/Base.astro';
 ---
-
-<Layout isHomepage={false} settings={settings} title="Not Found">
-  <h1 class="not-found">
-    Whoops, couldn't find that page
-    <div>¯\_(ツ)_/¯</div>
-  </h1>
-</Layout>
+<Base title="Page not found"><section class="page-heading wrap error-page"><p class="eyebrow">404 · A wrong turn</p><h1>This scoop got away.</h1><p>The page you’re looking for isn’t here.</p><a class="button" href="/">Back to Hayward’s <i class="ph ph-arrow-right" aria-hidden="true"></i></a></section></Base>

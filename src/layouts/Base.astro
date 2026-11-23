@@ -1,0 +1,102 @@
+---
+import { getMenu, getSiteSettings } from 'emdash';
+import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from 'emdash/ui';
+import { createPublicPageContext } from 'emdash/page';
+import { getLocation, telephone } from '../lib/site';
+import { getScheduleContext } from '../lib/schedule';
+import { withPlaceholders, withSentences } from '../lib/text';
+// opsz: Fraunces with its optical-size axis (the default file has weight only).
+import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource-variable/dm-sans';
+// Newsreader italic sets the site's italic lines (tagline, kickers, footer labels).
+import '@fontsource-variable/newsreader/opsz-italic.css';
+import '@phosphor-icons/web/regular';
+import '../styles/theme.css';
+interface Props { title: string; strip?: boolean; description?: string; content?: { collection: string; id: string; slug?: string | null }; image?: string; }
+const { strip: showStripProp = true, title, description = 'Homemade ice cream at 383 Elm Street in Milford, New Hampshire. Explore the flavors, read our story, and plan your visit.', content, image = '/images/milford-stand.jpg' } = Astro.props;
+const [settings, menu, location] = await Promise.all([getSiteSettings(), getMenu('primary'), getLocation()]);
+const place = location.data;
+const schedule = await getScheduleContext(Astro, place);
+const status = schedule.status;
+const preview = schedule.preview;
+// Open/closed-now attributes; left off for signed-in staff so inline editing sees the stored text.
+const next = schedule.hours?.next;
+const live = schedule.hours && !Astro.locals.user ? {
+  'data-opens': schedule.hours.opens, 'data-closes': schedule.hours.closes, 'data-late': schedule.hours.late, 'data-day': schedule.hoursDay,
+  'data-next-opens': next && 'opens' in next ? next.opens : undefined, 'data-next-closes': next && 'opens' in next ? next.closes : undefined, 'data-next-starts': next && 'starts' in next ? next.starts : undefined,
+} : schedule.openState === 'closed' && !Astro.locals.user ? { 'data-day': schedule.hoursDay } : {};
+const statusEdit = status.source === 'period' ? status.edit : location.edit[status.source];
+const siteTitle = settings.title || 'Hayward’s Family Ice Cream';
+const fullTitle = `${title} | ${siteTitle} · Milford, NH`;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const page = createPublicPageContext({ Astro, kind: content ? 'content' : 'custom', pageType: 'website', title: fullTitle, description, canonical, image: new URL(image, Astro.site).href, content, siteName: siteTitle });
+const structured = { '@context':'https://schema.org', '@type':'IceCreamShop', name:siteTitle, url:Astro.site?.href, telephone:telephone(place.phone).slice(4), image:new URL('/images/milford-stand.jpg',Astro.site).href, address:{'@type':'PostalAddress',streetAddress:place.address,addressLocality:'Milford',addressRegion:'NH',postalCode:'03055',addressCountry:'US'}, sameAs:[place.facebook, place.instagram].filter(Boolean), ...(schedule.hours && schedule.status.source === 'hours' ? { openingHours: `Mo-Su ${schedule.hours.opens}-${schedule.hours.closes}` } : {}) };
+
+// Navigation comes from the EmDash "primary" menu. While the tree lot is open, and
+// for two weeks before, a Trees & wreaths item is added before Visit (unless staff already added one).
+const TREES = { label: 'Trees & wreaths', url: '/trees', short: 'Trees' };
+const navItems: { label: string; url: string; short?: string }[] = (menu?.items ?? []).map((item) => ({ label: item.label, url: item.url }));
+if (schedule.treesNav && !navItems.some((item) => item.url === TREES.url)) {
+  const visitIndex = navItems.findIndex((item) => item.url === '/visit');
+  navItems.splice(visitIndex === -1 ? navItems.length : visitIndex, 0, TREES);
+}
+const showStrip = showStripProp && !!status.strip;
+const themeColor = schedule.accent === 'green' ? '#2e5a3c' : '#a71d2a';
+---
+<!doctype html>
+<html lang="en" data-accent={schedule.accent}>
+  <head>
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="theme-color" content={themeColor} />
+    <title>{fullTitle}</title><link rel="icon" href="/favicon.ico" sizes="48x48" /><link rel="icon" href="/brand/icons/favicon-32.png" type="image/png" sizes="32x32" /><link rel="apple-touch-icon" href="/apple-touch-icon.png" /><link rel="manifest" href="/site.webmanifest" />
+    {preview && <meta name="robots" content="noindex" />}
+    <EmDashHead page={page} />
+    <script type="application/ld+json" set:html={JSON.stringify(structured).replace(/</g, '\\u003c')} />
+  </head>
+  <body>
+    <EmDashBodyStart page={page} /><a class="skip-link" href="#main">Skip to content</a>
+    {preview && <p class="preview-flag" role="note">Preview: {schedule.active?.data.title ?? 'no period'} · {schedule.today}</p>}
+    {showStrip && <aside class="notice-strip" aria-label="Notice"><p class="wrap" {...status.stripEdit} set:html={withSentences(status.strip)} /></aside>}
+    <header class="site-header">
+      <div class="masthead wrap">
+        <p class="masthead-note"><span>Milford, New Hampshire</span><em>A little taste of home.</em></p>
+        <a class="brand" href="/" aria-label="Hayward’s Family Ice Cream, home"><img src="/brand/logo.png" alt="Hayward’s Family Ice Cream" width="768" height="216" /></a>
+        <p class="masthead-contact"><span>{place.address}</span><a href={telephone(place.phone)}>{place.phone}</a></p>
+      </div>
+      <div class="nav-bar"><div class="nav-wrap wrap">
+        <nav class="main-nav" aria-label="Main navigation">{navItems.map(item => <a href={item.url} aria-current={path === item.url ? 'page' : undefined}>{item.short ? <><span class="label-long">{item.label}</span><span class="label-short">{item.short}</span></> : item.label}</a>)}</nav>
+        <div class={`status-row${showStrip && schedule.openState === 'closed' ? ' says-closed' : ''}`}><a class="opening" href="/visit" data-state={schedule.openState === 'closed' ? 'closed' : undefined} {...live}><span class="status-text" {...statusEdit} set:html={withSentences(status.line)} /><span class="sr-only">, hours and directions</span></a><a class="call-link directions-link" href={place.directions}><i class="ph ph-map-pin" aria-hidden="true"></i>Directions</a><a class="call-link" href={telephone(place.phone)} aria-label={`Call ${place.phone}`}><i class="ph ph-phone" aria-hidden="true"></i>Call</a></div>
+      </div></div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="footer wrap">
+      <div class="footer-brand"><a href="/"><img src="/brand/logo.png" alt="Hayward’s Family Ice Cream" width="768" height="216" loading="lazy" /></a><p>Homemade on Elm Street.</p></div>
+      <div class="footer-col"><h2>Find us</h2><p>{place.address}<br />{place.locality}</p><a href={place.directions}>Get directions</a></div>
+      <div class="footer-col"><h2>Hours</h2><p set:html={withSentences(status.line)} /><a href={telephone(place.phone)}>{place.phone}</a><p class="footer-links">{place.facebook && <a href={place.facebook}>Facebook</a>}{place.instagram && <a href={place.instagram}>Instagram</a>}</p></div>
+      <div class="footer-fine"><span>© {new Date().getFullYear()} Hayward’s Family Ice Cream</span><a href="/our-story#sources">Our history &amp; sources</a><a href="/admin">Staff login</a></div>
+    </footer>
+    <script>
+      import '../scripts/open-now';
+      // Anchors land below the sticky section tabs, whatever height they wrap to.
+      const tabs = document.querySelector<HTMLElement>('.section-tabs');
+      if (tabs) new ResizeObserver(() => document.documentElement.style.setProperty('--tabs', getComputedStyle(tabs).position === 'sticky' && tabs.parentElement !== null ? `${tabs.offsetHeight}px` : '0px')).observe(tabs);
+      // "Our history & sources" opens the sources it links to.
+      const openTarget = () => document.getElementById(location.hash.slice(1))?.querySelector('details')?.setAttribute('open', '');
+      addEventListener('hashchange', openTarget);
+      openTarget();
+    </script>
+    {preview && <script is:inline>
+      // Design review: keep ?period= / ?today= when following internal links.
+      (function () {
+        var keep = new URLSearchParams();
+        new URLSearchParams(location.search).forEach(function (v, k) { if (k === 'period' || k === 'today') keep.set(k, v); });
+        document.querySelectorAll('a[href^="/"]:not([href^="/_emdash"])').forEach(function (a) {
+          var url = new URL(a.getAttribute('href'), location.origin);
+          keep.forEach(function (v, k) { if (!url.searchParams.has(k)) url.searchParams.set(k, v); });
+          a.setAttribute('href', url.pathname + url.search + url.hash);
+        });
+      })();
+    </script>}
+    <EmDashBodyEnd page={page} />
+  </body>
+</html>

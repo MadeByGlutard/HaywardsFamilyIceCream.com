@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { BROWSER_CACHE_CONTROL, FALLBACK_CACHE_CONTROL, cachePage, secondsUntilMidnight } from '../src/lib/cache.ts';
+import { BROWSER_CACHE_CONTROL, CONTENT_TAGS, FALLBACK_CACHE_CONTROL, cacheContentPage, cachePage, secondsUntilMidnight } from '../src/lib/cache.ts';
 
 test('TTL runs to the next midnight in America/New_York', () => {
   // 19:00 EST -> 5 hours
@@ -41,16 +41,21 @@ test('without a cache provider (astro dev), falls back to a short Cache-Control'
   assert.equal(headers.get('Cache-Control'), FALLBACK_CACHE_CONTROL);
 });
 
-test('the homepage registers every collection EmDash purges on publish', async () => {
-  const content = await readFile(new URL('../src/lib/content.ts', import.meta.url), 'utf8');
-  const page = await readFile(new URL('../src/pages/index.astro', import.meta.url), 'utf8');
-  // EmDash's write routes invalidate [collection, entryId]; collection queries
-  // tag the collection name, entry queries the entry ID.
-  for (const collection of ['settings', 'categories', 'flavors']) assert.match(content, new RegExp(`'${collection}'`));
-  assert.match(content, /categories\.cacheHint, flavors\.cacheHint/);
-  assert.match(page, /cachePage\(Astro\.cache, Astro\.response\.headers, \[settings\.cacheHint, \.\.\.cacheHints\], secondsUntilMidnight\(\)\)/);
-  const config = await readFile(new URL('../astro.config.mjs', import.meta.url), 'utf8');
-  assert.match(config, /cache: \{ provider: cacheCloudflare\(\) \}/);
-  const worker = await readFile(new URL('../cloudflare.config.ts', import.meta.url), 'utf8');
-  assert.match(worker, /cache: \{\s*enabled: true,?\s*\}/);
+test('every content page is cached and purged by every collection it can show', async () => {
+  const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
+  const seed = JSON.parse(await read('seed/seed.json'));
+  for (const { slug } of seed.collections) assert.ok(CONTENT_TAGS.includes(slug), `${slug} is missing from CONTENT_TAGS`);
+  for (const page of ['index', 'menu', 'our-story', 'trees', 'visit']) assert.match(await read(`src/pages/${page}.astro`), /cacheContentPage\(Astro\);/, page);
+  assert.match(await read('astro.config.mjs'), /cache: \{ provider: cacheCloudflare\(\) \}/);
+  assert.match(await read('cloudflare.config.ts'), /cache: \{\s*enabled: true,?\s*\}/);
+});
+
+test('staff previews of another period or date are never cached', () => {
+  for (const query of ['?period=trees', '?today=2026-12-01']) {
+    const cache = fakeCache(true);
+    const headers = new Headers();
+    cacheContentPage({ cache, response: { headers }, url: new URL(`https://example.test/${query}`) });
+    assert.deepEqual(cache.calls, []);
+    assert.equal(headers.get('Cache-Control'), 'private, no-store');
+  }
 });

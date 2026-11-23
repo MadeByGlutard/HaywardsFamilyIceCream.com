@@ -1,0 +1,8 @@
+---
+/** The colour band every page ends on: one headline, one action. */
+import { withPlaceholders } from '../lib/text';
+interface Props { headline: string; label: string; url: string; edit?: Record<string, string> }
+const { headline, label, url, edit } = Astro.props;
+const external = /^https?:/.test(url);
+---
+<section class="end-band"><div class="wrap"><h2 {...edit} set:html={withPlaceholders(headline)} /><a class="button button-light" href={url}>{label} <i class={`ph ${external ? 'ph-arrow-up-right' : 'ph-arrow-right'}`} aria-hidden="true"></i></a></div></section>

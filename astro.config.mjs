@@ -29,8 +29,8 @@ export default defineConfig({
 			toolbar: "client",
 			admin: {
 				siteName: "Hayward's",
-				logo: "/icons/icon-192x192.png",
-				favicon: "/favicon-32x32.png",
+				logo: "/brand/icons/icon-192.png",
+				favicon: "/brand/icons/favicon-32.png",
 				// Features this site doesn't use. Their pages stay reachable by URL.
 				hiddenNavItems: ["calendar", "comments", "menus", "redirects", "widgets", "sections", "bylines", "import"],
 			},

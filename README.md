@@ -1,20 +1,19 @@
 # Hayward's Family Ice Cream
 
 HaywardsFamilyIceCream.com on Astro + [EmDash](https://docs.emdashcms.com/), running on
-Cloudflare Workers with D1 (content) and R2 (media). It is a port of the Gatsby 5 site on
-`main` with no visual changes. Staff edit the banner, flavors and contact details in the
-EmDash admin at `/_emdash/admin`. Edits go live without a rebuild.
+Cloudflare Workers with D1 (content) and R2 (media). This branch is the newspaper redesign on
+top of the port of the Gatsby 5 site. Staff edit everything in the EmDash admin at `/admin`.
+Edits go live without a rebuild.
 
 ## Commands
 
 | Command             | What it does                                                         |
 | ------------------- | -------------------------------------------------------------------- |
 | `npm run dev`       | Local server with simulated D1/R2 (workerd)                          |
-| `npm test`          | Seed-vs-original data, gallery, cache policy and `public/` guard tests |
+| `npm test`          | Seed-vs-original data, schedule, cache, password and `public/` guard tests |
 | `npm run typecheck` | `astro check`                                                        |
 | `npm run build`     | Production Worker build into `.cloudflare/output/`                   |
 | `npm run preview`   | Serve the production build locally                                   |
-| `npm run images`    | Regenerate optimized images in `public/` from `src/assets/`          |
 | `npm run deploy`    | Build and deploy production with `cf deploy` (config in `cloudflare.config.ts`) |
 | `npm run preview:deploy` | Deploy the current branch as a Worker Preview with its own D1/R2 (see Previews) |
 | `npm run preview:delete` | Delete the current branch's preview and its D1/R2                    |
@@ -128,13 +127,19 @@ went through `dangerouslySetInnerHTML`.
 `main`. They are kept only so `tests/migration.test.mjs` can prove the seed matches them.
 Changing them, or the seed, does not change an existing database.
 
-## Gallery
+## Redesign content and upgrades
 
-The Gatsby site picked 4 of the 8 photos and a tilt of -8 to 8 degrees for each, once per
-build. Here `src/lib/gallery.ts` seeds a small PRNG with the calendar date in
-America/New_York. The selection changes once a day at midnight, and every request on the
-same day gets identical HTML. The photos are static files: originals in
-`src/assets/gallery`, optimized copies in `public/images/gallery`.
+The port's `settings`, `categories` and `flavors` are unchanged. The redesign adds `pages`,
+`visit`, `periods` (dated schedule periods), `products` and `servings`, and two optional flavor
+fields. EmDash applies the seed during setup only, so `src/lib/upgrade.ts` adds what a database
+is missing once per `CONTENT_VERSION`, on the first request after a deploy. It never changes
+existing entries, labels or choices.
+
+- The Site settings banner, when filled in, is the strip across the top. Empty it to use the
+  current schedule period's own notice.
+- Address, phone, email and social links come from the Visit entry. The same details in Site
+  settings are only used by the port's design.
+- Staff can preview another date with `?today=2026-12-01` or a period with `?period=trees`.
 
 ## Caching
 
@@ -144,14 +149,13 @@ Pages are cached at Cloudflare's edge until their content changes:
   `cache: { enabled: true }`.
 - `astro.config.mjs` sets `cache: { provider: cacheCloudflare() }` from
   `@astrojs/cloudflare/cache`.
-- The homepage passes EmDash's `cacheHint`s for `settings`, `categories` and `flavors` to
-  `Astro.cache.set()` (`src/lib/cache.ts`). The provider turns them into `Cache-Tag`
-  (collection names and entry IDs) and `Cloudflare-CDN-Cache-Control`.
+- Every content page is tagged with all the collections it can show (`CONTENT_TAGS` in
+  `src/lib/cache.ts`). The provider turns those into `Cache-Tag` and `Cloudflare-CDN-Cache-Control`.
 - When an entry is saved, published, unpublished, deleted or restored in the admin, EmDash's
   write route calls `cache.invalidate({ tags: [collection, entryId] })`. That purges every
   cached page that read the entry or its collection. No rebuild and no fixed delay.
 - The edge TTL (`maxAge`) is the number of seconds left until the next midnight in
-  America/New_York, which is when the gallery pick changes. The calculation is DST-aware.
+  America/New_York, when hours and schedule periods can change. The calculation is DST-aware.
 - Browsers get `Cache-Control: public, max-age=0, must-revalidate`, so they always ask the
   edge and see a purge immediately.
 - Other routes declare no cache intent, so the adapter marks them
@@ -175,26 +179,6 @@ Limits:
 - A version address (`<version>-haywardsfamilyicecream-com...workers.dev`) has its own cache,
   which publishing in production does not purge, and its requests don't show in the logs.
 - The adapter ignores the result of a purge, so a refused one (over the rate limit) is silent.
-
-## Styling
-
-- `src/styles/typography.css` is the output of `new Typography(fairyGatesTheme).toString()`
-  (typography 0.16.24, typography-theme-fairy-gates 0.16.19). It is byte-identical to the
-  CSS that gatsby-plugin-typography inlined. Fonts: Work Sans 600 and Quattrocento Sans
-  400/400i/700 from Google Fonts. To regenerate it, install those two packages in a scratch
-  directory and print `toString()`. Do not add them to this project.
-- `src/styles/site.css` ports the Emotion styles from the Gatsby components one to one.
-- The navbar's sticky behaviour is a small inline script in `src/components/Navbar.astro`.
-  The navbar turns white after 2px of scroll on the homepage and is always white on other
-  pages.
-
-## Not ported
-
-- `src/components/map.tsx` was unused, and it contains a committed Google Maps API key.
-  That key should be rotated or restricted.
-- The unused Lobster Two font link from `gatsby-ssr.tsx`.
-- `static/_redirects`, the Netlify subdomain redirect, which has no meaning on Workers.
-- `logo.svg` / `icon.svg`, which the site did not use.
 
 ## Guardrails
 

@@ -1,30 +1,62 @@
 ---
-// pages/index.tsx
-import Contact from '../components/Contact.astro';
-import Flavors from '../components/Flavors.astro';
-import Gallery from '../components/Gallery.astro';
-import Header from '../components/Header.astro';
-import Layout from '../layouts/Layout.astro';
-import { cachePage, secondsUntilMidnight } from '../lib/cache';
-import { getFlavorCategories, getSettings } from '../lib/content';
-import { pickGallery } from '../lib/gallery';
-
-const [settings, { categories, cacheHints }] = await Promise.all([getSettings(), getFlavorCategories()]);
-const photos = pickGallery();
-
-// Purged on publish via EmDash's cache tags; expires at New York midnight at
-// the latest, when the gallery pick changes.
-cachePage(Astro.cache, Astro.response.headers, [settings.cacheHint, ...cacheHints], secondsUntilMidnight());
+import { getEmDashEntry, getEmDashCollection } from 'emdash';
+import { Image } from 'emdash/ui';
+import EndBand from '../components/EndBand.astro';
+import Base from '../layouts/Base.astro';
+import { getLocation, isNamedFlavor, sameCategory } from '../lib/site';
+import { getScheduleContext } from '../lib/schedule';
+import { sentence } from '../lib/status';
+import { photoSets } from '../lib/photos';
+import { withPlaceholders } from '../lib/text';
+import { cacheContentPage } from '../lib/cache';
+cacheContentPage(Astro);
+const [{entry:home}, {entries:flavors}, location] = await Promise.all([getEmDashEntry('pages','home'), getEmDashCollection('flavors',{limit:200}),getLocation()]);
+if (!home) throw new Error('Home content is missing from EmDash.');
+const iceCreamCount = flavors.filter((f) => sameCategory(f.data.category, 'Ice Cream') && isNamedFlavor(f.data.name)).length;
+const place = location.data;
+const schedule = await getScheduleContext(Astro, place);
+const status = schedule.status;
+const active = schedule.active;
+// Period fields win when filled in; empty fields fall back to the Home page entry.
+const headline = active?.data.hero_headline?.trim() ? { text: active.data.hero_headline, edit: active.edit.hero_headline } : { text: home.data.title, edit: home.edit.title };
+const deck = active?.data.hero_deck?.trim() ? { text: active.data.hero_deck, edit: active.edit.hero_deck } : { text: home.data.excerpt ?? '', edit: home.edit.excerpt };
+const photos = photoSets[schedule.photoSet];
+const upload = active?.data.hero_image?.id ? active.data.hero_image : undefined;
+// Colour band: a period can swap the ice-cream line for its own (e.g. the tree lot).
+const bandHeadline = active?.data.band_headline?.trim();
+const band = bandHeadline
+  ? { headline: bandHeadline, edit: active!.edit.band_headline, label: active!.data.band_link_label?.trim() || 'Visit us in Milford', url: active!.data.band_link_url?.trim() || '/visit' }
+  : { headline: 'Make a little time\nfor ice cream.', edit: undefined, label: 'Visit us in Milford', url: '/visit' };
+const closed = schedule.openState === 'closed';
+// Closed with the tree lot coming next (e.g. Thanksgiving): point the hero at /trees, not the ice cream menu.
+const treesNext = closed && !!schedule.nextTrees;
+// The hero's main action follows the period: trees while the lot is open or coming,
+// the period's own link while closed (e.g. reopening news on Facebook), else the menu.
+const primary = schedule.treesOpen ? { label: 'See trees & wreaths', url: '/trees' }
+  : treesNext ? { label: 'See what’s coming to the lot', url: '/trees' }
+  : closed && place.facebook ? { label: 'Follow along on Facebook', url: place.facebook }
+  : { label: 'Browse the menu', url: '/menu' };
+// The everyday note ("until 9pm in summer") only when the everyday hours apply.
+const showNote = !!place.hours_note && status.source !== 'notice' && !schedule.treesOpen && (!schedule.hours || schedule.hours.closes === place.closes_at);
+const primaryExternal = /^https?:/.test(primary.url);
+const secondary = closed && !treesNext ? { label: 'Hours through the year', url: '/visit' } : { label: 'Plan your visit', url: '/visit' };
+const kicker = active?.data.hero_eyebrow?.trim() ? { text: active.data.hero_eyebrow, edit: active.edit.hero_eyebrow } : { text: home.data.eyebrow, edit: home.edit.eyebrow };
 ---
-
-<Layout isHomepage={true} settings={settings}>
-  <Header />
-
-  {settings.banner && <div class="viewport-width banner">{settings.banner}</div>}
-
-  <Flavors categories={categories} />
-
-  <Gallery photos={photos} />
-
-  <Contact contact={settings.contact} />
-</Layout>
+<Base title="Homemade ice cream" content={{collection:'pages',id:home.data.id,slug:'home'}} image={photos.lead.src}>
+  <section class="home-intro wrap"><p class="eyebrow" {...kicker.edit}>{kicker.text}</p><h1 {...headline.edit}>{headline.text.split('\n').map((line) => <><span class="line" set:html={withPlaceholders(line)} />{' '}</>)}</h1><p class="intro-deck" {...deck.edit} set:html={withPlaceholders(deck.text)} />
+    <div class="actions"><a class="button" href={primary.url}>{primary.label} <i class={`ph ${primaryExternal ? 'ph-arrow-up-right' : 'ph-arrow-right'}`} aria-hidden="true"></i></a><a class="text-link" href={secondary.url}>{secondary.label}</a></div></section>
+  <div class={`photo-spread wrap photo-set-${schedule.photoSet}`}>
+    <figure class="stand-photo"><div class="crop">{upload
+      ? <div {...active!.edit.hero_image}><Image image={upload} /></div>
+      : <img src={photos.lead.src} alt={photos.lead.alt} width={photos.lead.width} height={photos.lead.height} fetchpriority="high" />}</div><figcaption><strong>{photos.leadCaption[0]}</strong> {photos.leadCaption[1]}</figcaption></figure>
+    <figure class="second-photo"><div class="crop"><img src={photos.second.src} alt={photos.second.alt} width={photos.second.width} height={photos.second.height} loading="lazy" /></div><figcaption>{photos.secondCaption}</figcaption></figure>
+  </div>
+  <section class="news-columns wrap" aria-label="Explore Hayward’s">
+    <article><p class="eyebrow">At the counter</p><h2><span class="line">Your usual.</span>{' '}<span class="line">Or something new.</span></h2><p>{iceCreamCount} ice cream flavors, plus yogurt, sherbet and more. The hardest part is choosing.</p><p class="column-links"><a class="text-link" href="/menu">Find your flavor</a></p></article>
+    <article><p class="eyebrow">From the archives</p><h2><span class="line">A story with</span>{' '}<span class="line">local roots.</span></h2><p>Milk routes. A family farm. A stand on Elm Street. There’s a little Milford history behind every visit.</p><p class="column-links"><a class="text-link" href="/our-story">Read our story</a></p></article>
+    {closed
+      ? <article><p class="eyebrow">Until we reopen</p><h2><span class="line">Follow along</span>{' '}<span class="line">for the news.</span></h2><p>We post opening days and weather closings on Facebook and Instagram.</p><p class="column-links">{place.facebook && <a class="text-link" href={place.facebook}>Facebook</a>}{place.instagram && <a class="text-link" href={place.instagram}>Instagram</a>}</p></article>
+      : <article><p class="eyebrow">Come on over</p><h2><span class="line">We’ll see you</span>{' '}<span class="line">at the window.</span></h2><p>{sentence(status.line)}{showNote && ` ${place.hours_note}`}</p><p class="column-links"><a class="text-link" href={place.directions}>Get directions</a></p></article>}
+  </section>
+  <EndBand headline={band.headline} label={band.label} url={band.url} edit={band.edit} />
+</Base>

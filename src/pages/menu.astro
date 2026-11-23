@@ -1,0 +1,40 @@
+---
+import { getEmDashCollection } from 'emdash';
+import EndBand from '../components/EndBand.astro';
+import Base from '../layouts/Base.astro';
+import { categoryId, categoryLabel, getCategories, getLocation, isNamedFlavor, sameCategory, plural, telephone } from '../lib/site';
+import { cacheContentPage } from '../lib/cache';
+cacheContentPage(Astro);
+const [categories,{entries:allFlavors},{entries:servings}] = await Promise.all([getCategories(),getEmDashCollection('flavors',{orderBy:{name:'asc'},limit:200}),getEmDashCollection('servings',{orderBy:{sort_order:'asc'},limit:100})]);
+const flavors = allFlavors.filter((flavor) => isNamedFlavor(flavor.data.name));
+const { data: place } = await getLocation();
+// Words people search for that aren't in a flavor's name (no allergy or diet claims here).
+const aliases: Record<string, string> = { Yogurt: 'froyo', 'No Sugar Added': 'sugar free sugarfree nsa' };
+const groups=categories.map(category=>({category,flavors:flavors.filter(f=>sameCategory(f.data.category,category))}));
+---
+<Base title="Our menu" description="Explore Hayward’s Milford ice cream flavors, frozen yogurt, sherbet, sorbet, vegan and no-sugar-added options.">
+  <section class="page-heading menu-heading wrap"><p class="eyebrow">The menu</p><h1>Find your flavor.</h1><p>A favorite for every kind of ice cream day.</p></section>
+  <div class="menu-layout wrap">
+    <aside class="menu-sidebar">
+      <div class="menu-tools"><label class="sr-only" for="flavor-search">Search flavors</label><div class="search-field"><i class="ph ph-magnifying-glass" aria-hidden="true"></i><input id="flavor-search" type="search" placeholder="Search flavors" autocomplete="off" enterkeyhint="search" /></div>
+      <p id="search-status" class="search-status" role="status"></p></div>
+      <nav aria-label="Menu categories" class="category-nav section-tabs" data-section-tabs>{categories.map(category=><a href={`#${categoryId(category)}`}>{categoryLabel(category)}</a>)}</nav>
+      <p class="allergy-note"><strong>Food allergies?</strong> Please talk with our team about ingredients and preparation before ordering.</p>
+      <figure class="menu-photo"><img src="/images/two-scoops.jpg" width="1080" height="1080" alt="Two cups of ice cream on an outdoor table at Hayward’s" loading="lazy" /><figcaption>Better with company.</figcaption></figure>
+    </aside>
+    <div class="flavor-sections">
+      <p class="no-results" hidden>We couldn’t find that. Check the spelling, see <a href="#vegan">Vegan</a> or <a href="#no-sugar-added">No sugar added</a>, or <a href={telephone(place.phone)}>call the stand</a>.</p>
+      {groups.map(group=><section id={categoryId(group.category)} class="flavor-group" data-category={group.category}>
+        <div class="section-rule"><h2>{categoryLabel(group.category)}</h2><span class="flavor-count">{group.flavors.length > 0 ? plural(group.flavors.length,'flavor') : 'Changes often'}</span></div>
+        {group.flavors.length > 0 ? <ul class="flavor-list" role="list">{group.flavors.map(flavor=><li data-name={flavor.data.name} data-flavor={`${flavor.data.name} ${flavor.data.description || ''} ${/peanut butter|reese/i.test(flavor.data.name) ? 'pb' : ''} ${categoryLabel(group.category)} ${aliases[group.category] ?? ''}`}><span class="row-name" {...flavor.edit.name}>{flavor.data.name.replace(/'/g, '’')}</span>{flavor.data.description && <p {...flavor.edit.description}>{flavor.data.description}</p>}{flavor.data.allergen_notes && <small>{flavor.data.allergen_notes}</small>}</li>)}</ul> : <p class="sorbet-note" data-flavor={`${categoryLabel(group.category)} ${group.category}`} data-uncounted>Ask us what we’re scooping. <a href={telephone(place.phone)}>Call the stand</a>.</p>}
+      </section>)}
+      {servings.length>0 && <section class="flavor-group"><div class="section-rule"><h2>Sizes</h2></div><dl class="price-list">{servings.map(item=><div><dt>{item.data.title}{item.data.description&&<small>{item.data.description}</small>}</dt></div>)}</dl></section>}
+      <p class="menu-note"><strong>Have a flavor in mind?</strong> Flavors come and go. <a href={telephone(place.phone)}>Call the stand</a> to check.</p>
+    </div>
+  </div>
+  <EndBand headline="See you at the window." label="Hours & directions" url="/visit" />
+</Base>
+<script>
+  import '../scripts/section-tabs';
+  import '../scripts/flavor-search';
+</script>

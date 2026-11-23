@@ -59,6 +59,9 @@ interface CacheHint {
   lastModified?: Date;
 }
 
+/** Every collection the public pages read. Saving any entry in one purges them. */
+export const CONTENT_TAGS = ['settings', 'categories', 'flavors', 'pages', 'visit', 'periods', 'products', 'servings', 'emdash:settings', 'emdash:menu:primary'];
+
 interface RouteCache {
   enabled: boolean;
   set(options: { maxAge?: number; tags?: string[]; lastModified?: Date }): void;
@@ -81,4 +84,22 @@ export function cachePage(
   for (const hint of hints) cache.set(hint);
   cache.set({ maxAge });
   headers.set('Cache-Control', BROWSER_CACHE_CONTROL);
+}
+
+interface PageContext {
+  cache: RouteCache | undefined;
+  response: { headers: Headers };
+  url: URL;
+}
+
+/**
+ * Cache a content page until something it might show is published, or New York
+ * midnight, when hours and periods can change. Staff previews are never cached.
+ */
+export function cacheContentPage({ cache, response, url }: PageContext): void {
+  if (url.searchParams.has('period') || url.searchParams.has('today')) {
+    response.headers.set('Cache-Control', 'private, no-store');
+    return;
+  }
+  cachePage(cache, response.headers, [{ tags: CONTENT_TAGS }], secondsUntilMidnight());
 }

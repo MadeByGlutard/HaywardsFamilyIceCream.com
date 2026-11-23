@@ -1,0 +1,45 @@
+---
+import EndBand from '../components/EndBand.astro';
+import Base from '../layouts/Base.astro';
+import {getLocation,telephone} from '../lib/site';
+import {getScheduleContext,datesLabel,effectiveEnd,isStaleClosure,publicTitle} from '../lib/schedule';
+import {photoSets} from '../lib/photos';
+import {withPlaceholders,withSentences} from '../lib/text';
+import { cacheContentPage } from '../lib/cache';
+cacheContentPage(Astro);
+const location=await getLocation();const place=location.data;
+const schedule=await getScheduleContext(Astro,place);
+const status=schedule.status;
+const statusEdit=status.source==='period'?status.edit:location.edit[status.source];
+const photo=photoSets[schedule.photoSet];
+// A period can replace the Visit introduction (e.g. while closed); empty falls back to Visit information.
+const periodIntro=schedule.active?.data.visit_intro?.trim();
+const intro=periodIntro?{text:periodIntro,edit:schedule.active!.edit.visit_intro}:{text:place.intro,edit:location.edit.intro};
+const closed=schedule.openState==='closed';
+// The hours list: the current period and everything after it (past periods drop off).
+const showNote=!!place.hours_note&&!closed&&status.source!=='notice'&&!schedule.treesOpen&&(!schedule.hours||schedule.hours.closes===place.closes_at);
+const upcoming=schedule.periods.filter(s=>!isStaleClosure(s,schedule.today)).filter(s=>s===schedule.active||!s.start||(effectiveEnd(s,schedule.periods)??'9999-12-31')>=schedule.today);
+---
+<Base title="Hours & directions" image={photo.visit.src}>
+  <section class="page-heading wrap"><p class="eyebrow">{closed ? 'While we’re closed' : 'Come on over'}</p><h1>{closed ? 'Find us on Elm\u00a0Street.' : 'See you in Milford.'}</h1><p class="visit-intro" {...intro.edit}>{intro.text}</p></section>
+  <div class={`visit-layout wrap photo-set-${schedule.photoSet}`}>
+    <section class="visit-place"><p class="eyebrow">Find the stand</p><h2 {...location.edit.address}>{place.address}</h2><p {...location.edit.locality}>{place.locality}</p><a class="button" href={place.directions}>Get directions <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a></section>
+    <section class="visit-hours"><p class="eyebrow">Hours</p><h2 {...statusEdit} set:html={withSentences(status.line)} />{showNote && <p {...location.edit.hours_note}>{place.hours_note}</p>}</section>
+    <section class="visit-contact"><p class="eyebrow">Say hello</p><h2><a href={telephone(place.phone)}>{place.phone}</a></h2><p class="stack-links">{place.email && <a class="text-link" href={`mailto:${place.email}`}>{place.email}</a>}<span class="column-links">{place.facebook && <a class="text-link" href={place.facebook}>Facebook</a>}{place.instagram && <a class="text-link" href={place.instagram}>Instagram</a>}</span></p></section>
+    <figure><div class="crop"><img src={photo.visit.src} alt={photo.visit.alt} width={photo.visit.width} height={photo.visit.height} /></div><figcaption><span class="caption-wide">{photo.visitCaption}</span><span class="caption-phone">{intro.text}</span></figcaption></figure>
+  </div>
+  {upcoming.length>0 && <section class="schedule wrap" aria-labelledby="hours-year"><div class="section-rule"><h2 id="hours-year">Hours through the year</h2></div>
+    <ol class="schedule-list" role="list">{upcoming.map(s=>{const current=s===schedule.active;return <li class={current?'is-current':undefined} aria-current={current?'true':undefined}>
+      <p class="schedule-dates" {...(s.data.dates_label?s.edit.dates_label:s.edit.start_date)} set:html={withPlaceholders(datesLabel(s))} />
+      <h3 {...s.edit.title}>{publicTitle(s.data.title)}{current && ' '}{current && <span class="schedule-now">Now</span>}</h3>
+      {s.data.status_text && <p class="schedule-hours" {...s.edit.status_text} set:html={withSentences(s.data.status_text)} />}
+    </li>})}</ol>
+  </section>}
+  {schedule.treesOpen
+    ? <EndBand headline="Come pick out your tree." label="See trees & wreaths" url="/trees" />
+    : closed && schedule.treesNav
+    ? <EndBand headline="See what’s coming to the lot." label="Trees & wreaths" url="/trees" />
+    : closed
+    ? <EndBand headline="Plan your first scoop." label="Browse the menu" url="/menu" />
+    : <EndBand headline="A seat. A scoop. A little time." label="Browse the menu" url="/menu" />}
+</Base>
