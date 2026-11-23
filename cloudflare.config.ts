@@ -47,6 +47,8 @@ export default defineConfig(({ isPreview }) => {
 			cache: {
 				enabled: true,
 			},
+			// Worker logs: errors, including failed cache purges, show in the dashboard.
+			observability: { enabled: true },
 			// EmDash's maintenance cron. Preview uploads can't carry triggers, and
 			// previews never run crons anyway.
 			...(isPreview ? {} : { triggers: [triggers.scheduled({ schedule: "* * * * *" })] }),

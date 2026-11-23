@@ -24,6 +24,9 @@ export default defineConfig({
 			database: d1({ binding: "DB", session: "auto", coalesce: true }),
 			storage: r2({ binding: "MEDIA" }),
 			authProviders: [password()],
+			// Same public HTML for everyone, so staff share the cached page. The default
+			// injects the toolbar on the server, and it comes and goes with the cache.
+			toolbar: "client",
 			admin: {
 				siteName: "Hayward's",
 				logo: "/icons/icon-192x192.png",

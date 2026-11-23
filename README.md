@@ -168,13 +168,13 @@ Limits:
   cache layer, and its `cloudflare:workers` `cache` has no `purge()`. A publish there logs
   `[cache] Failed to invalidate ... cache.purge is not a function`. EmDash catches this, so
   the write still succeeds.
-- Purging has to be checked once after the first deploy:
-  1. Request `/` twice and check the second response is a cache hit.
-  2. Change the banner in the admin.
-  3. Reload: the new banner should appear immediately.
-
-  If purging ever failed, a page could stay stale until New York midnight. The cap is in
-  `src/lib/cache.ts`.
+- Purge on publish was checked on the deployed Worker on 2026-11-23: a cached homepage went
+  from HIT to MISS with the new banner within a second of publishing, then back to HIT.
+- Only signed-out visits fill the cache; signed-in responses are `no-store`. Once the page is
+  cached, signed-in visits get the cached copy too, which is why `toolbar: "client"` is set.
+- A version address (`<version>-haywardsfamilyicecream-com...workers.dev`) has its own cache,
+  which publishing in production does not purge, and its requests don't show in the logs.
+- The adapter ignores the result of a purge, so a refused one (over the rate limit) is silent.
 
 ## Styling
 
