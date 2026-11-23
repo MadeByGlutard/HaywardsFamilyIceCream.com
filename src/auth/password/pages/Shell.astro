@@ -15,10 +15,13 @@ Astro.response.headers.set("X-Frame-Options", "DENY");
 		<style is:global>
 			body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #1b1b1b; background: #f4f4f5; }
 			main { max-width: 24rem; margin: 10vh auto; padding: 2rem; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
+			main { overflow: hidden; }
+			.logo { margin: -2rem -2rem 1.5rem; padding: 1.25rem; text-align: center; background: rgb(21, 61, 117) linear-gradient(rgb(17, 107, 180), rgb(21, 61, 117)); }
+			.logo img { display: inline-block; vertical-align: middle; }
 			h1 { margin: 0 0 1rem; font-size: 1.4rem; }
 			label { display: block; margin: 0 0 1rem; font-weight: 600; }
 			input { display: block; width: 100%; box-sizing: border-box; margin-top: 0.25rem; padding: 0.6rem; font: inherit; border: 1px solid #8a8a8a; border-radius: 4px; }
-			button { padding: 0.6rem 1rem; font: inherit; font-weight: 600; color: #fff; background: #1f4b8f; border: 0; border-radius: 4px; cursor: pointer; }
+			button { padding: 0.6rem 1rem; font: inherit; font-weight: 600; color: #fff; background: rgb(21, 61, 117); border: 0; border-radius: 4px; cursor: pointer; }
 			form > button { width: 100%; }
 			button:disabled { opacity: 0.6; }
 			[role="alert"] { margin: 1rem 0 0; color: #a11212; }
@@ -29,6 +32,7 @@ Astro.response.headers.set("X-Frame-Options", "DENY");
 	</head>
 	<body>
 		<main>
+			<div class="logo"><img src="/images/logo-256.png" alt="Hayward's Family Ice Cream" width="192" height="54" /></div>
 			<h1>{title}</h1>
 			<slot />
 		</main>

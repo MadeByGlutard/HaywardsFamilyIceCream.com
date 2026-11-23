@@ -24,6 +24,13 @@ export default defineConfig({
 			database: d1({ binding: "DB", session: "auto", coalesce: true }),
 			storage: r2({ binding: "MEDIA" }),
 			authProviders: [password()],
+			admin: {
+				siteName: "Hayward's",
+				logo: "/icons/icon-192x192.png",
+				favicon: "/favicon-32x32.png",
+				// Features this site doesn't use. Their pages stay reachable by URL.
+				hiddenNavItems: ["calendar", "comments", "menus", "redirects", "widgets", "sections", "bylines", "import"],
+			},
 		}),
 	],
 	devToolbar: { enabled: false },

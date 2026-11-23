@@ -56,6 +56,9 @@ The setup URL is disabled in that mode, so seed with `npm run dev` first.
 
 ## Sign-in
 
+The admin is at `/admin`, which redirects to EmDash's fixed `/_emdash/admin`. Sign-in is at
+`/login`. The admin's name, logo and hidden menu items are set in `astro.config.mjs`.
+
 Staff sign in with an email and password. EmDash has no password login of its own, so
 `src/auth/password/` adds one as an EmDash auth provider, and `src/middleware.ts` sends
 EmDash's passkey-first login and invite screens to it:

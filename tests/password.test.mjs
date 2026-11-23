@@ -27,3 +27,7 @@ test('changing passwords and making reset links are not public routes', () => {
   for (const route of ['change', 'reset-link']) assert.ok(!publicRoutes.some((path) => path.endsWith(`/${route}`)));
   assert.ok(!publicRoutes.some((path) => path.endsWith('/')));
 });
+
+test('sign-in lives at /login', () => {
+  assert.ok(password().routes.some(({ pattern }) => pattern === '/login'));
+});

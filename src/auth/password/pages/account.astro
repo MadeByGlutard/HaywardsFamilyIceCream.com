@@ -5,7 +5,7 @@ import { currentUser, database, storage } from "../server";
 
 export const prerender = false;
 const user = currentUser(Astro);
-if (!user) return Astro.redirect("/_emdash/password/login");
+if (!user) return Astro.redirect("/login");
 const hasPassword = Boolean(await storage(database(Astro)).credentials.get(user.id));
 ---
 

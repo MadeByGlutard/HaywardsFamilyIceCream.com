@@ -18,7 +18,7 @@ export function password() {
 			{ pattern: `${API}/reset`, entrypoint: `${DIR}/api/reset.ts` },
 			{ pattern: `${API}/change`, entrypoint: `${DIR}/api/change.ts` },
 			{ pattern: `${API}/reset-link`, entrypoint: `${DIR}/api/reset-link.ts` },
-			{ pattern: `${PAGES}/login`, entrypoint: `${DIR}/pages/login.astro` },
+			{ pattern: "/login", entrypoint: `${DIR}/pages/login.astro` },
 			{ pattern: `${PAGES}/accept`, entrypoint: `${DIR}/pages/accept.astro` },
 			{ pattern: `${PAGES}/reset`, entrypoint: `${DIR}/pages/reset.astro` },
 			{ pattern: `${PAGES}/account`, entrypoint: `${DIR}/pages/account.astro` },
