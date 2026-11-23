@@ -51,6 +51,6 @@ test('the homepage registers every collection EmDash purges on publish', async (
   assert.match(page, /cachePage\(Astro\.cache, Astro\.response\.headers, \[settings\.cacheHint, \.\.\.cacheHints\], secondsUntilMidnight\(\)\)/);
   const config = await readFile(new URL('../astro.config.mjs', import.meta.url), 'utf8');
   assert.match(config, /cache: \{ provider: cacheCloudflare\(\) \}/);
-  const wrangler = await readFile(new URL('../wrangler.jsonc', import.meta.url), 'utf8');
-  assert.match(wrangler, /"cache": \{ "enabled": true \}/);
+  const worker = await readFile(new URL('../cloudflare.config.ts', import.meta.url), 'utf8');
+  assert.match(worker, /cache: \{\s*enabled: true,?\s*\}/);
 });

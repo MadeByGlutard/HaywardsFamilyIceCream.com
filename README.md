@@ -12,13 +12,14 @@ EmDash admin at `/_emdash/admin`. Edits go live without a rebuild.
 | `npm run dev`       | Local server with simulated D1/R2 (workerd)                          |
 | `npm test`          | Seed-vs-original data, gallery, cache policy and `public/` guard tests |
 | `npm run typecheck` | `astro check`                                                        |
-| `npm run build`     | Production Worker build into `dist/`                                 |
+| `npm run build`     | Production Worker build into `.cloudflare/output/`                   |
+| `npm run preview`   | Serve the production build locally                                   |
 | `npm run images`    | Regenerate optimized images in `public/` from `src/assets/`          |
-| `npm run deploy`    | Build and `wrangler deploy` (needs real D1/R2 IDs in `wrangler.jsonc`) |
+| `npm run deploy`    | Build and deploy production with `cf deploy` (config in `cloudflare.config.ts`) |
 
 ### Run locally (fresh clone, macOS)
 
-Requires Node 24 (pinned in `.nvmrc`) and npm. No Cloudflare account or login is needed.
+Requires Node 24.22 or later (`.nvmrc` pins 24; the `cf` CLI needs 24.22+) and npm. No Cloudflare account or login is needed.
 
 ```sh
 git clone <repo-url> haywardsfamilyicecream && cd haywardsfamilyicecream
@@ -37,19 +38,18 @@ It runs the database migrations, applies `seed/seed.json` (flavors, categories, 
 creates a local `dev@emdash.local` admin and signs you in. The admin is at
 http://localhost:4321/_emdash/admin. Later, to sign in again without re-seeding, use
 http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin. Both URLs only
-exist in development. Production returns 403 and needs a real passkey setup.
+exist in development. Production needs the real first-run admin setup.
 
 Everything runs locally:
 
 - `astro dev` runs the Worker in workerd.
-- D1, R2 and KV are emulated in `.wrangler/state/v3/`. `remoteBindings: false` is set in
-  `astro.config.mjs`, and no binding in `wrangler.jsonc` is marked `remote`.
-- To start over with an empty database, stop the server, delete `.wrangler/`, start again
+- D1, R2 and KV are emulated in `.cloudflare/state/`. `remoteBindings: false` is set in
+  `astro.config.mjs`, and no binding in `cloudflare.config.ts` is marked remote.
+- To start over with an empty database, stop the server, delete `.cloudflare/state/`, start again
   and open the setup URL.
-- `.env`, `.wrangler/` and `.emdash/` are git-ignored.
+- `.env`, `.cloudflare/` and `.emdash/` are git-ignored.
 
-To try the production build locally: `npm run build`, then
-`npx wrangler dev -c dist/server/wrangler.json --local --persist-to .wrangler/state`.
+To try the production build locally: `npm run build`, then `npm run preview`.
 The setup URL is disabled in that mode, so seed with `npm run dev` first.
 
 ## Content model (`seed/seed.json`)
@@ -87,8 +87,8 @@ same day gets identical HTML. The photos are static files: originals in
 
 Pages are cached at Cloudflare's edge until their content changes:
 
-- `wrangler.jsonc` turns on the Workers cache, which sits in front of the Worker:
-  `"cache": { "enabled": true }`.
+- `cloudflare.config.ts` turns on the Workers cache, which sits in front of the Worker:
+  `cache: { enabled: true }`.
 - `astro.config.mjs` sets `cache: { provider: cacheCloudflare() }` from
   `@astrojs/cloudflare/cache`.
 - The homepage passes EmDash's `cacheHint`s for `settings`, `categories` and `flavors` to
@@ -111,7 +111,7 @@ Limits:
 
 - `astro dev` uses a no-op route cache. When `Astro.cache.enabled` is false, the page falls
   back to `Cache-Control: public, max-age=60, s-maxage=300`.
-- `wrangler dev` cannot test the edge behaviour. Local workerd does not run the Workers
+- `npm run preview` cannot test the edge behaviour. Local workerd does not run the Workers
   cache layer, and its `cloudflare:workers` `cache` has no `purge()`. A publish there logs
   `[cache] Failed to invalidate ... cache.purge is not a function`. EmDash catches this, so
   the write still succeeds.
@@ -147,6 +147,6 @@ Limits:
 
 `public/` holds static assets only. `tests/public.test.mjs` fails if `public/index.html` or
 any `public/*.js` exists, because Workers would serve those ahead of the Astro routes.
-Never commit `.env`, `.wrangler/`, `.emdash/`, `dist/` or `node_modules/`.
+Never commit `.env`, `.cloudflare/`, `.emdash/`, `dist/` or `node_modules/`.
 
 Agent skills for EmDash are in `.agents/skills/`.
