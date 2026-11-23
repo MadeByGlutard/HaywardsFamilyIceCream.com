@@ -1,0 +1,29 @@
+---
+// Constrained logo image (gatsby-plugin-image StaticImage equivalent).
+interface Props {
+  class: string;
+  widths: number[];
+  sizes: string;
+  loading?: 'eager' | 'lazy';
+}
+const { class: className, widths, sizes, loading = 'lazy' } = Astro.props;
+const srcset = (format: string) => widths.map(w => `/images/logo-${w}.${format} ${w}w`).join(',');
+const largest = widths.at(-1)!;
+---
+
+<div class:list={['image', className]}>
+  <picture>
+    <source type="image/webp" srcset={srcset('webp')} sizes={sizes} />
+    <img
+      src={`/images/logo-${largest}.png`}
+      srcset={srcset('png')}
+      sizes={sizes}
+      width={largest}
+      height={Math.round((largest * 216) / 768)}
+      alt="Hayward's Family"
+      decoding="async"
+      loading={loading}
+      fetchpriority={loading === 'eager' ? 'high' : undefined}
+    />
+  </picture>
+</div>

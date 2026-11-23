@@ -1,0 +1,55 @@
+---
+// navbar.tsx. The React <Sticky offsetY={2}> wrapper is replaced by a tiny
+// inline script that toggles `is-sticky` once the page has scrolled 2px.
+// Non-home pages are always sticky (white).
+import Container from './Container.astro';
+import type { SiteSettings } from '../lib/content';
+
+interface Props {
+  isHomepage: boolean;
+  settings: Pick<SiteSettings, 'social' | 'contact'>;
+}
+const { isHomepage, settings } = Astro.props;
+const facebook = settings.social.find(item => item.type === 'facebook');
+const phone = settings.contact.find(item => item.type === 'phone');
+---
+
+<div class="navbar-spacer">
+  <div id="navbar" class:list={['navbar', { 'is-sticky': !isHomepage }]}>
+    <Container>
+      <a href="/" class="navbar-link navbar-brand">Hayward's Family Ice Cream</a>
+
+      <div class="navbar-nav">
+        {facebook && <a href={facebook.url} class="navbar-link navbar-nav-link">{facebook.label}</a>}
+        {facebook && phone && <div class="navbar-divider"></div>}
+        {phone && <a href={phone.url} class="navbar-link navbar-nav-link">{phone.label}</a>}
+      </div>
+    </Container>
+  </div>
+</div>
+
+{
+  isHomepage && (
+    <script is:inline>
+      (function () {
+        var navbar = document.getElementById('navbar');
+        var pending = false;
+        function update() {
+          pending = false;
+          navbar.classList.toggle('is-sticky', window.scrollY >= 2);
+        }
+        window.addEventListener(
+          'scroll',
+          function () {
+            if (!pending) {
+              pending = true;
+              requestAnimationFrame(update);
+            }
+          },
+          { passive: true },
+        );
+        update();
+      })();
+    </script>
+  )
+}

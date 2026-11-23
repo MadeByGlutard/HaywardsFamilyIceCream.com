@@ -1,0 +1,47 @@
+---
+// gallery.tsx: 4 polaroids, picked per day (see src/lib/gallery.ts).
+import Container from './Container.astro';
+import Divider from './Divider.astro';
+import type { GalleryItem } from '../lib/gallery';
+
+interface Props {
+  photos: GalleryItem[];
+}
+const { photos } = Astro.props;
+const srcset = (id: string, format: string) =>
+  [160, 320, 640].map(w => `/images/gallery/${id}-${w}.${format} ${w}w`).join(',');
+const sizes = '(min-width: 320px) 320px, 100vw';
+---
+
+<div class="viewport-width gallery">
+  <h1 style="text-align:center">Our Gallery</h1>
+  <Divider color="#fff" />
+
+  <Container style="max-width:1200px">
+    <div class="gallery-grid">
+      {
+        photos.map(photo => (
+          <div class="gallery-column">
+            <figure class="polaroid" style={`transform:rotate(${photo.tilt}deg)`}>
+              <div class="image">
+                <picture>
+                  <source type="image/webp" srcset={srcset(photo.id, 'webp')} sizes={sizes} />
+                  <img
+                    src={`/images/gallery/${photo.id}-320.jpg`}
+                    srcset={srcset(photo.id, 'jpg')}
+                    sizes={sizes}
+                    width={photo.width}
+                    height={photo.height}
+                    alt=""
+                    decoding="async"
+                    loading="lazy"
+                  />
+                </picture>
+              </div>
+            </figure>
+          </div>
+        ))
+      }
+    </div>
+  </Container>
+</div>

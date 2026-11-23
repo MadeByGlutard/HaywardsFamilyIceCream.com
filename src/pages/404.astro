@@ -1,0 +1,14 @@
+---
+// pages/404.tsx
+import Layout from '../layouts/Layout.astro';
+import { getSettings } from '../lib/content';
+
+const settings = await getSettings();
+---
+
+<Layout isHomepage={false} settings={settings} title="Not Found">
+  <h1 class="not-found">
+    Whoops, couldn't find that page
+    <div>¯\_(ツ)_/¯</div>
+  </h1>
+</Layout>
