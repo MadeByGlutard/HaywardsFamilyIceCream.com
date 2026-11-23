@@ -23,6 +23,8 @@ const touchIcons = [48, 72, 96, 144, 192, 256, 384, 512];
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    {/* Previews: show EmDash's on-page Edit button without a visit to the admin. Access signs them in on the first click. */}
+    {__ACCESS_SIGN_IN__ && <script is:inline>try { localStorage.setItem('emdash-editor', '1'); } catch (e) {}</script>}
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <ImageLoading />

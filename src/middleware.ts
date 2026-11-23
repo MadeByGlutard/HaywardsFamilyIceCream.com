@@ -1,11 +1,14 @@
 import { defineMiddleware } from "astro:middleware";
 
 // Staff sign in with a password, so EmDash's passkey-first screens hand over to ours.
-const PASSWORD_PAGES: Record<string, string> = {
-	"/_emdash/admin/login": "/login",
-	"/_emdash/password/login": "/login",
-	"/_emdash/admin/invite/accept": "/_emdash/password/accept",
-};
+// Previews are already signed in by Cloudflare Access, so the sign-in page leads to the admin.
+const PASSWORD_PAGES: Record<string, string> = __ACCESS_SIGN_IN__
+	? { "/login": "/_emdash/admin", "/_emdash/admin/login": "/_emdash/admin" }
+	: {
+			"/_emdash/admin/login": "/login",
+			"/_emdash/password/login": "/login",
+			"/_emdash/admin/invite/accept": "/_emdash/password/accept",
+		};
 
 /** Where a short or built-in address leads, or undefined to serve the request as it is. */
 export function destination(pathname: string): string | undefined {
