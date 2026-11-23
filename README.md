@@ -16,18 +16,41 @@ EmDash admin at `/_emdash/admin`. Edits go live without a rebuild.
 | `npm run images`    | Regenerate optimized images in `public/` from `src/assets/`          |
 | `npm run deploy`    | Build and `wrangler deploy` (needs real D1/R2 IDs in `wrangler.jsonc`) |
 
-### Local setup
+### Run locally (fresh clone, macOS)
+
+Requires Node 24 (pinned in `.nvmrc`) and npm. No Cloudflare account or login is needed.
 
 ```sh
-npm install
+git clone <repo-url> haywardsfamilyicecream && cd haywardsfamilyicecream
+nvm install && nvm use            # reads .nvmrc (Node 24); or fnm use / volta
+npm ci                             # exact versions from package-lock.json
 cp .env.example .env
-npx emdash secrets generate --write .env --force
-npm run dev -- --port 4175 --host 127.0.0.1
+npx emdash secrets generate --write .env --force   # fills EMDASH_ENCRYPTION_KEY
+npm run dev                        # http://localhost:4321
 ```
 
-Then open `http://127.0.0.1:4175/_emdash/api/setup/dev-bypass?redirect=/` once. That
-applies `seed/seed.json` to the local database and signs you in as a dev admin. Dev
-bypass only exists in development. Production needs a real passkey setup.
+Then open this URL once:
+
+http://localhost:4321/_emdash/api/setup/dev-bypass?redirect=/
+
+It runs the database migrations, applies `seed/seed.json` (flavors, categories, settings),
+creates a local `dev@emdash.local` admin and signs you in. The admin is at
+http://localhost:4321/_emdash/admin. Later, to sign in again without re-seeding, use
+http://localhost:4321/_emdash/api/auth/dev-bypass?redirect=/_emdash/admin. Both URLs only
+exist in development. Production returns 403 and needs a real passkey setup.
+
+Everything runs locally:
+
+- `astro dev` runs the Worker in workerd.
+- D1, R2 and KV are emulated in `.wrangler/state/v3/`. `remoteBindings: false` is set in
+  `astro.config.mjs`, and no binding in `wrangler.jsonc` is marked `remote`.
+- To start over with an empty database, stop the server, delete `.wrangler/`, start again
+  and open the setup URL.
+- `.env`, `.wrangler/` and `.emdash/` are git-ignored.
+
+To try the production build locally: `npm run build`, then
+`npx wrangler dev -c dist/server/wrangler.json --local --persist-to .wrangler/state`.
+The setup URL is disabled in that mode, so seed with `npm run dev` first.
 
 ## Content model (`seed/seed.json`)
 

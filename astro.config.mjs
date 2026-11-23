@@ -8,7 +8,8 @@ import emdash from "emdash/astro";
 export default defineConfig({
 	site: "https://haywardsfamilyicecream.com",
 	output: "server",
-	adapter: cloudflare({ inspectorPort: false }),
+	// remoteBindings: false keeps `astro dev` on local D1/R2/KV emulation in .wrangler/state.
+	adapter: cloudflare({ inspectorPort: false, remoteBindings: false }),
 	// Route caching on the Workers cache; EmDash purges by tag on publish.
 	// A no-op in `astro dev`.
 	cache: { provider: cacheCloudflare() },
