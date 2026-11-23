@@ -1,7 +1,20 @@
-# Use a global .gitignore to exclude system files
-# git config --global core.excludesfile ~/.gitignore
-
+# Dependencies
 node_modules/
-.cache/
-public/
+
+# Build output
+dist/
+.astro/
+
+# Local Cloudflare / EmDash state (simulated D1/R2, generated schema)
+.wrangler/
+.emdash/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Misc
 *.log
+.cache/
+.DS_Store
