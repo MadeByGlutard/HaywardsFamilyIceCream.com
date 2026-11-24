@@ -63,8 +63,8 @@ Staff sign in with an email and password. EmDash has no password login of its ow
 EmDash's passkey-first login and invite screens to it:
 
 - **First admin:** in the setup wizard, choose "Email and password" on the last step.
-- **Invites only:** an admin invites people from the Users screen. With no email provider set
-  up, EmDash shows the invite link to share. There is no sign-up page.
+- **Invites only:** an admin invites people from the Users screen, and EmDash emails the invite
+  (see Email). There is no sign-up page.
 - **Forgotten password:** an admin makes a one-time link, good for 24 hours, at
   `/_emdash/password/users`. Anyone signed in can change their own at `/_emdash/password/account`.
 - **Storage:** scrypt hashes (OWASP's 16 MiB setting) in EmDash's `_plugin_storage` table.
@@ -108,42 +108,68 @@ and KV namespace (sign-in sessions), named `haywardsfamilyicecream-com-<branch>`
   `npx wrangler preview base-config secret put EMDASH_ENCRYPTION_KEY --worker-name haywardsfamilyicecream-com`,
   and every new preview starts with it.
 
+## Email
+
+The admin sends mail (invites) through Cloudflare's Email Service with EmDash's
+`cloudflareEmail` plugin and the `EMAIL` binding. Mail comes from
+`cms@mail.haywardsfamilyicecream.com`; replies go to the stand's Gmail. Sending is set up on
+the `mail` subdomain only, so the main domain's mail records are untouched. Settings, Email
+in the admin sends a test message.
+
+## Plugins
+
+`cloudflareEmail` comes with EmDash; "Hayward's admin" is `src/admin/`. The sandbox is on, so an
+admin can install plugins from EmDash's registry; those run in their own isolates (the `LOADER`
+binding, a Workers Paid feature).
+
+EmDash indexes where media is used only while its Media screen is open, so `src/admin/shared.ts`
+moves it along whenever someone opens the admin.
+
 ## Content model (`seed/seed.json`)
 
-| Collection   | Fields                                                                        |
-| ------------ | ----------------------------------------------------------------------------- |
-| `settings`   | One entry, slug `site`: `banner` (plain text, empty hides the band), `social` repeater (label, type, url), `contact` repeater (label, type `phone`/`place`/`email`, url, value) |
-| `categories` | `name`, `sort_order`: the flavor headings, in display order                  |
-| `flavors`    | `name`, `category` (select), `sort_order` within the category, `allergens` (multi-select), `half_gallon` |
+| In the admin | Collection           | Fields                                                        |
+| ------------ | -------------------- | ------------------------------------------------------------- |
+| Schedule     | `schedule`           | `title`, `kind`, `start_date`, `status_text`, `hero_headline`, `hero_deck`, `banner_text` |
+| Flavors      | `catalog_flavors`    | `name`, `category`, `description`, `allergens`, `half_gallon`, `photo`             |
+| Menu items   | `catalog_items`      | `name`, `category`, `options`                                 |
+| Categories   | `catalog_categories` | `name`, `flavors`, `items`                                    |
+| Store info   | `store`              | One entry: `phone`, `email`, `address`, `locality`            |
+| Pages        | `site_pages`         | One per page: `title`, `headline`, `excerpt`, `content`       |
 
-The site does not display `allergens` and `half_gallon`, just as the Gatsby site did not.
-They are kept so the data is not lost. "Call for flavor" (Sorbet) never had these keys,
-and the seed keeps them absent.
+EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the four menus of categories (`flavors`,
+`sundaes`, `food`, `trees`). Facebook and Instagram are Settings, Social links.
 
-To add a category, add an entry to **Flavor categories**. Also add the same name to the
-`category` field's options under **Content Types → Flavors**. Flavors whose category has
-no entry are not shown.
-
-The banner is rendered as text, so HTML in it is shown literally. On the Gatsby site it
-went through `dangerouslySetInnerHTML`.
+- **Pages:** every page has an entry, and its slug is its address (`home` is `/`). Unpublishing
+  one takes the page down and out of the navigation. Home's headline comes from the Schedule.
+- **Schedule:** there is always a period, and it is the only source of the hours, the banner
+  and the home page headline. A period runs until the next one starts, so there is no end
+  date: a winter break lasts until staff schedule what comes after. `kind` sets the color,
+  photos, Trees & wreaths link and home page button.
+- **Catalog:** shaped like Square's. Flavors and menu items are records that reference a
+  category, and a menu lists categories in order. A category's item order is set on the
+  category, and flavors sort themselves. A category on no menu isn't shown. `sizes` and `cones-and-toppings` are set apart on the
+  Flavors page; a category added to another menu goes in its last column. A flavors category
+  with no flavors reads "Changes often. Ask at the window."
+- Square IDs aren't content. `seed/square-ids.json` goes into the admin plugin's storage
+  (`src/lib/square.ts`), and the editor's sidebar shows them read-only.
+- Allergens, half gallons and photos are tracked but not shown. Never show an allergen as
+  absent: unchecked doesn't mean "free of".
+- Staff can preview another date with `?today=2026-12-01` or a period with `?period=trees`.
+- `src/admin/`: the Category column and the Square panel (the "Hayward's admin" plugin), the sidebars everyone starts with (no bylines, ownership or URL) and admin CSS.
 
 `content/flavors.json` and `content/settings/settings.yaml` are the original data from
 `main`. They are kept only so `tests/migration.test.mjs` can prove the seed matches them.
-Changing them, or the seed, does not change an existing database.
 
-## Redesign content and upgrades
+### Databases already set up
 
-The port's `settings`, `categories` and `flavors` are unchanged. The redesign adds `pages`,
-`visit`, `periods` (dated schedule periods), `products`, `menu_items` (sundaes, food and drinks, with Square IDs and no prices) and `servings`, and two optional flavor
-fields. EmDash applies the seed during setup only, so `src/lib/upgrade.ts` adds what a database
-is missing once per `CONTENT_VERSION`, on the first request after a deploy. It never changes
-existing entries, labels or choices.
-
-- The Site settings banner, when filled in, is the strip across the top. Empty it to use the
-  current schedule period's own notice.
-- Address, phone, email and social links come from the Visit entry. The same details in Site
-  settings are only used by the port's design.
-- Staff can preview another date with `?today=2026-12-01` or a period with `?period=trees`.
+EmDash applies the seed during setup only, so `src/lib/upgrade.ts` adds what a database is
+missing once per `CONTENT_VERSION`, on the first request after a deploy. That takes about two
+minutes on D1, so open the site yourself right after deploying. The port's flavors
+(with allergens and half gallons), banner and social links carry over, staff's changes included.
+Menus already there are left alone. Its `settings`, `categories`
+and `flavors` collections, and the redesign's first ones on older previews, are then hidden from the admin but kept, with their data (allergens
+and half gallons too), so going back to the port loses nothing. To edit them after going
+back, unhide them under Content Types. Delete them once going back is off the table.
 
 ## Caching
 

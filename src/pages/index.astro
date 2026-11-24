@@ -1,26 +1,21 @@
 ---
-import { getEmDashEntry, getEmDashCollection } from 'emdash';
-import { Image } from 'emdash/ui';
 import EndBand from '../components/EndBand.astro';
 import Base from '../layouts/Base.astro';
-import { getLocation, isNamedFlavor, sameCategory } from '../lib/site';
+import { getLocation, getPage } from '../lib/site';
+import { menuCategories } from '../lib/catalog';
 import { getScheduleContext } from '../lib/schedule';
 import { photoSets } from '../lib/photos';
 import { withPlaceholders } from '../lib/text';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
-const [{entry:home}, {entries:flavors}, location] = await Promise.all([getEmDashEntry('pages','home'), getEmDashCollection('flavors',{limit:200}),getLocation()]);
-if (!home) throw new Error('Home content is missing from EmDash.');
-const iceCream = flavors.filter(f => sameCategory(f.data.category, 'Ice Cream') && isNamedFlavor(f.data.name));
+const [page, categories, location] = await Promise.all([getPage('home'), menuCategories('flavors'), getLocation()]);
+const iceCream = categories.find((category) => category.slug === 'ice-cream')?.flavors ?? [];
 const place = location.data;
-const schedule = await getScheduleContext(Astro, place);
+const schedule = await getScheduleContext(Astro);
 const active = schedule.active;
-// Period fields win when filled in; empty fields fall back to the Home page entry.
-const headline = active?.data.hero_headline?.trim() ? { text: active.data.hero_headline, edit: active.edit.hero_headline } : { text: home.data.title, edit: home.edit.title };
-const deck = active?.data.hero_deck?.trim() ? { text: active.data.hero_deck, edit: active.edit.hero_deck } : { text: home.data.excerpt ?? '', edit: home.edit.excerpt };
+const { hero_headline: headline, hero_deck: deck } = active.data;
 const photos = photoSets[schedule.photoSet];
-const upload = active?.data.hero_image?.id ? active.data.hero_image : undefined;
-const closed = schedule.openState === 'closed';
+const closed = schedule.closed;
 // Closed with the tree lot coming next (e.g. Thanksgiving): point the hero at /trees, not the ice cream menu.
 const treesNext = closed && !!schedule.nextTrees;
 // The hero's main action follows the period: trees while the lot is open or coming,
@@ -34,21 +29,18 @@ const treesDate = !closed && !schedule.treesOpen && schedule.treesNav && schedul
   ? new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(`${schedule.nextTrees.start}T12:00:00Z`))
   : undefined;
 const primaryExternal = !!primary && /^https?:/.test(primary.url);
-const kicker = active?.data.hero_eyebrow?.trim() ? { text: active.data.hero_eyebrow, edit: active.edit.hero_eyebrow } : { text: home.data.eyebrow, edit: home.edit.eyebrow };
 ---
-<Base title="Homemade ice cream" content={{collection:'pages',id:home.data.id,slug:'home'}} image={photos.home[0].src}>
-  <section class="home-intro wrap">{!schedule.status.strip && <p class="eyebrow" {...kicker.edit}>{kicker.text}</p>}<h1 {...headline.edit}>{headline.text.split('\n').map((line) => <><span class="line" set:html={withPlaceholders(line)} />{' '}</>)}</h1><p class="intro-deck" {...deck.edit} set:html={withPlaceholders(deck.text)} />
+<Base title="Homemade ice cream" content={page && { collection: 'site_pages', id: page.data.id, slug: 'home' }} image={photos.home[0].src}>
+  <section class="home-intro wrap">{!schedule.status.strip && <p class="eyebrow">Homemade ice cream · Family owned</p>}<h1 {...active.edit.hero_headline}>{headline.split('\n').map((line) => <><span class="line" set:html={withPlaceholders(line)} />{' '}</>)}</h1><p class="intro-deck" {...active.edit.hero_deck} set:html={withPlaceholders(deck)} />
     {primary && <div class="actions"><a class="button" href={primary.url}>{primary.label} <i class={`ph ${primaryExternal ? 'ph-arrow-up-right' : 'ph-arrow-right'}`} aria-hidden="true"></i></a></div>}</section>
   {treesDate && <section class="trees-line wrap"><h2><a href="/trees">Trees arrive {treesDate} <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2></section>}
   <section class="news-columns wrap" aria-label="The menu">
-    <article><h2><a href="/menu">Flavors <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2><p>{iceCream.length} ice creams, plus frozen yogurt, sherbet, sorbet, vegan and no sugar added.</p></article>
-    <article><h2><a href="/menu/sundaes">Sundaes &amp; shakes <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2><p>Frappes, milkshakes, floats and ice cream sodas. Sundaes, banana boats and twisters. Pints and quarts to take home.</p></article>
-    <article><h2><a href="/menu/food">Food &amp; drinks <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2><p>Hot dogs and grilled cheese. Rolls, wraps and subs with lobster, chicken or tuna. Mac and cheese, chili and drinks.</p></article>
+    <article><h2><a href="/flavors">Flavors <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2><p>{iceCream.length} ice creams, plus frozen yogurt, sherbet, sorbet, vegan and no sugar added.</p></article>
+    <article><h2><a href="/sundaes">Sundaes &amp; shakes <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2><p>Frappes, milkshakes, floats and ice cream sodas. Sundaes, banana boats and twisters. Pints and quarts to take home.</p></article>
+    <article><h2><a href="/food">Food &amp; drinks <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2><p>Hot dogs and grilled cheese. Rolls, wraps and subs with lobster, chicken or tuna. Mac and cheese, chili and drinks.</p></article>
   </section>
   <div class={`photo-spread wrap photo-set-${schedule.photoSet}`}>
-    {photos.home.map((photo, i) => <div class="crop">{i === 0 && upload
-      ? <div {...active!.edit.hero_image}><Image image={upload} /></div>
-      : <img src={photo.src} alt={photo.alt} srcset={photo.srcset} sizes={i === 0 ? '(max-width: 740px) 100vw, 820px' : '(max-width: 740px) 1px, 620px'} width={photo.width} height={photo.height} style={photo.position ? `object-position: ${photo.position}` : undefined} loading={i === 0 ? undefined : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} />}</div>)}
+    {photos.home.map((photo, i) => <div class="crop"><img src={photo.src} alt={photo.alt} srcset={photo.srcset} sizes={i === 0 ? '(max-width: 740px) 100vw, 820px' : '(max-width: 740px) 1px, 620px'} width={photo.width} height={photo.height} style={photo.position ? `object-position: ${photo.position}` : undefined} loading={i === 0 ? undefined : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} /></div>)}
   </div>
   <EndBand headline={'It started with\na milk cart.'} label="Read our history" url="/history" />
 </Base>

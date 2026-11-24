@@ -9,10 +9,12 @@ export const TIME_ZONE = 'America/New_York';
 /** The period fields these helpers read. */
 export interface PeriodFields {
   title: string;
-  dates_label?: string;
-  accent?: string;
-  show_trees_nav?: boolean | number;
+  /** What's happening: 'Closed', 'Trees & wreaths' or 'Open'. */
+  kind?: string;
 }
+
+export const isTrees = (period?: PeriodFields) => period?.kind === 'Trees & wreaths';
+export const isClosed = (period?: PeriodFields) => period?.kind === 'Closed';
 
 /** Calendar day (YYYY-MM-DD) in Milford for a Date or an ISO string. */
 export function milfordDay(value: Date | string | undefined | null): string | undefined {
@@ -26,34 +28,27 @@ export interface PeriodEntry<T extends PeriodFields = PeriodFields> {
   slug: string;
   data: T;
   edit: Record<string, Record<string, string> | undefined>;
-  start?: string;
-  end?: string;
+  /** First day, on Milford's calendar. */
+  start: string;
 }
 
-/** Accent token names understood by theme.css (`[data-accent=…]`). Anything else falls back to red. */
-const ACCENTS = ['red', 'green'] as const;
-export type Accent = (typeof ACCENTS)[number];
-export const accentOf = (period?: PeriodFields): Accent => (ACCENTS as readonly string[]).includes(period?.accent ?? '') ? (period!.accent as Accent) : 'red';
+/** Green while the tree lot is open, otherwise red (`[data-accent=…]` in theme.css). */
+export type Accent = 'red' | 'green';
+export const accentOf = (period?: PeriodFields): Accent => (isTrees(period) ? 'green' : 'red');
 
-/** Is `day` inside the period? Schedule periods without a first day never start on their own. */
-export const isActive = (period: PeriodEntry<any>, day: string) => !!period.start && period.start <= day && (!period.end || day <= period.end);
+/** The period in force on a day: the last one to have started, or the first one if none has. */
+export const pickPeriod = <E extends PeriodEntry<any>>(periods: E[], day: string): E | undefined => {
+  const ordered = scheduleOrder(periods);
+  return ordered.filter((period) => period.start <= day).at(-1) ?? ordered[0];
+};
 
-/**
- * Choose the active period for a day. When periods overlap (an open-ended
- * winter break and next spring's period), the one that started most recently wins.
- */
-export function pickPeriod<E extends PeriodEntry<any>>(periods: E[], day: string): E | undefined {
-  return periods.filter((s) => isActive(s, day)).sort((a, b) => (b.start! > a.start! ? 1 : b.start! < a.start! ? -1 : 0))[0];
-}
-
-/** Schedule periods in schedule order: dated ones by first day, undated ones last (by slug, so the order is stable). */
+/** Periods by first day. */
 export const scheduleOrder = <E extends PeriodEntry<any>>(periods: E[]): E[] =>
-  [...periods].sort((a, b) => (a.start ?? '9999').localeCompare(b.start ?? '9999') || a.slug.localeCompare(b.slug));
+  [...periods].sort((a, b) => a.start.localeCompare(b.start) || a.slug.localeCompare(b.slug));
 
-/** Last day a period is in force for the schedule, allowing for a later period to cut an open end short. */
-export function effectiveEnd(period: PeriodEntry<any>, all: PeriodEntry<any>[]): string | undefined {
-  if (period.end || !period.start) return period.end;
-  const next = all.filter((s) => s.start && s.start > period.start!).map((s) => s.start!).sort()[0];
+/** A period's last day: the day before the next one starts. Undefined for the last period. */
+export function lastDay(period: PeriodEntry<any>, all: PeriodEntry<any>[]): string | undefined {
+  const next = scheduleOrder(all).find((other) => other.start > period.start)?.start;
   if (!next) return undefined;
   const d = new Date(`${next}T12:00:00Z`);
   d.setUTCDate(d.getUTCDate() - 1);
@@ -63,31 +58,9 @@ export function effectiveEnd(period: PeriodEntry<any>, all: PeriodEntry<any>[]):
 /** Whole days from one calendar day to another (negative if `to` is earlier). */
 export const daysBetween = (from: string, to: string) => Math.round((Date.parse(`${to}T12:00:00Z`) - Date.parse(`${from}T12:00:00Z`)) / 86_400_000);
 
-/** Days an open-ended closure is trusted before the site stops claiming it. */
-export const STALE_CLOSURE_DAYS = 60;
-
-/**
- * An open-ended closed period nobody has followed up on. Past reopenings ran to
- * mid-February, so after 60 days the site says "Call for today's hours" instead
- * of claiming the stand is still closed.
- */
-export const isStaleClosure = (period: PeriodEntry<any>, today: string) =>
-  period.data.open_state === 'Closed' && !!period.start && !period.end && daysBetween(period.start, today) > STALE_CLOSURE_DAYS;
-
 /** Public name of a period: "Tree lot 2026" in the admin reads "Tree lot" on the site. */
 export const publicTitle = (title: string) => title.replace(/\s+20\d\d$/, '');
 
-const monthDay = (day: string, withMonth = true) =>
-  new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: withMonth ? 'short' : undefined, day: 'numeric' }).format(new Date(`${day}T12:00:00Z`));
-
-/** "Nov 22 – 26", "Nov 27 – Dec 24", "From Dec 25", or the editor's own label. */
-export function datesLabel(period: PeriodEntry<any>): string {
-  if (period.data.dates_label?.trim()) return period.data.dates_label.trim();
-  if (!period.start) return 'Dates to be announced';
-  const end = period.end;
-  if (!end) return `From ${monthDay(period.start)}`;
-  if (end === period.start) return monthDay(period.start);
-  const sameMonth = end.slice(0, 7) === period.start.slice(0, 7);
-  return `${monthDay(period.start)} – ${monthDay(end, !sameMonth)}`;
-}
-
+/** "From Nov 27". */
+export const datesLabel = (period: PeriodEntry<any>) =>
+  `From ${new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' }).format(new Date(`${period.start}T12:00:00Z`))}`;

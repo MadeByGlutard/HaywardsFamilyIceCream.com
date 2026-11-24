@@ -1,6 +1,6 @@
 ---
 /** The one note under every menu heading: what's on changes, and who to ask about allergies. */
-interface Props { lead: string }
-const { lead } = Astro.props;
+interface Props { lead?: string; edit?: Record<string, string> }
+const { lead, edit } = Astro.props;
 ---
-<p>{lead} <strong>Food allergies?</strong> Please talk with our team before ordering.</p>
+<p>{lead && <span {...edit}>{lead}</span>} <strong>Food allergies?</strong> Please talk with our team before ordering.</p>

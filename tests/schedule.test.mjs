@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { milfordDay, pickPeriod, scheduleOrder, datesLabel, effectiveEnd, accentOf, isStaleClosure, daysBetween, publicTitle } from '../src/lib/schedule-dates.ts';
+import { milfordDay, pickPeriod, scheduleOrder, datesLabel, lastDay, accentOf, isClosed, isTrees, daysBetween, publicTitle } from '../src/lib/schedule-dates.ts';
+import { byName, sharedOptions } from '../src/lib/catalog-text.ts';
 
 const seed = JSON.parse(await readFile(new URL('../seed/seed.json', import.meta.url), 'utf8'));
-const periods = seed.content.periods.map((e) => ({ slug: e.slug, data: e.data, edit: {}, start: milfordDay(e.data.start_date), end: milfordDay(e.data.end_date) }));
+const periods = seed.content.schedule.map((e) => ({ slug: e.slug, data: e.data, edit: {}, start: milfordDay(e.data.start_date) }));
 const at = (day) => pickPeriod(scheduleOrder(periods), day)?.slug;
 
 test('seeded periods are dated on Milford’s calendar', () => {
@@ -13,63 +14,58 @@ test('seeded periods are dated on Milford’s calendar', () => {
 	assert.equal(milfordDay('2026-12-25T04:30:00Z'), '2026-12-24');
 });
 
-test('active period follows the calendar', () => {
-	assert.equal(at('2026-11-21'), undefined, 'before any period: fall back to Visit information');
+test('there is always a period, and each runs until the next one starts', () => {
+	assert.equal(at('2025-01-01'), 'ice-cream-2026', 'before the first period');
+	assert.equal(at('2026-11-21'), 'ice-cream-2026');
 	assert.equal(at('2026-11-22'), 'thanksgiving-2026');
 	assert.equal(at('2026-11-26'), 'thanksgiving-2026');
 	assert.equal(at('2026-11-27'), 'trees-2026');
-	assert.equal(at('2026-12-24'), 'trees-2026', 'the lot runs until the winter break starts');
+	assert.equal(at('2026-12-24'), 'trees-2026');
 	assert.equal(at('2026-12-25'), 'winter-2026');
-	assert.equal(at('2027-06-01'), 'winter-2026', 'ice cream season has no first day yet, so the winter break continues');
-	assert.notEqual(at('2027-07-04'), 'summer-2027', 'summer hours have no set dates until staff give them');
+	assert.equal(at('2027-06-01'), 'winter-2026', 'until staff schedule the next one');
+	const trees = periods.find((s) => s.slug === 'trees-2026');
+	assert.equal(lastDay(trees, periods), '2026-12-24');
+	assert.equal(lastDay(periods.find((s) => s.slug === 'winter-2026'), periods), undefined);
+	assert.equal(pickPeriod([], '2026-12-25'), undefined);
 });
 
-test('a later period cuts an open-ended one short', () => {
-	const dated = periods.map((s) => (s.slug === 'ice-cream-2027' ? { ...s, start: '2027-04-15' } : s));
-	assert.equal(pickPeriod(scheduleOrder(dated), '2027-04-15').slug, 'ice-cream-2027');
-	assert.equal(effectiveEnd(dated.find((s) => s.slug === 'winter-2026'), dated), '2027-04-14');
+test('a period is complete: nothing else supplies its hours or headline', () => {
+	const fields = seed.collections.find((c) => c.slug === 'schedule').fields;
+	const required = fields.filter((f) => f.required).map((f) => f.slug);
+	assert.deepEqual(fields.filter((f) => !f.required).map((f) => f.slug), ['banner_text']);
+	for (const p of seed.content.schedule) for (const slug of required) assert.ok(p.data[slug], `${p.slug}.${slug}`);
+	assert.ok(!seed.collections.find((c) => c.slug === 'store').fields.some((f) => /hours|banner/.test(f.slug)));
+	assert.ok(!seed.content.site_pages.find((p) => p.slug === 'home').data.headline);
 });
 
 test('schedule labels and accents', () => {
 	const bySlug = Object.fromEntries(periods.map((s) => [s.slug, s]));
-	assert.equal(datesLabel(bySlug['thanksgiving-2026']), 'Nov 22 – 26');
 	assert.equal(datesLabel(bySlug['trees-2026']), 'From Nov 27');
-	assert.equal(datesLabel({ ...bySlug['trees-2026'], end: '2026-12-24', data: { title: 'x' } }), 'Nov 27 – Dec 24');
-	assert.equal(datesLabel(bySlug['winter-2026']), 'From Dec 25');
-	assert.equal(datesLabel(bySlug['summer-2027']), 'Summer months');
 	assert.equal(accentOf(bySlug['trees-2026'].data), 'green');
-	assert.equal(accentOf({ title: 'x', accent: 'purple' }), 'red', 'unknown token falls back to red');
-	assert.deepEqual(scheduleOrder(periods).map((s) => s.slug), ['thanksgiving-2026', 'trees-2026', 'winter-2026', 'ice-cream-2027', 'summer-2027']);
+	assert.equal(accentOf(bySlug['winter-2026'].data), 'red');
+	assert.ok(isTrees(bySlug['trees-2026'].data) && isClosed(bySlug['thanksgiving-2026'].data));
+	assert.deepEqual(scheduleOrder(periods).map((s) => s.slug), ['ice-cream-2026', 'thanksgiving-2026', 'trees-2026', 'winter-2026']);
+	assert.equal(daysBetween('2026-12-21', '2027-01-02'), 12);
 });
 
 test('seed content invents no closing times, prices or dates', () => {
 	// Confirmed by the owner: 8pm standard, 9pm in summer. The tree lot's closing
-	// time is not confirmed for 2026. Staff notes may quote past hours.
-	const text = JSON.stringify(seed.content.periods.map((e) => ({ ...e.data, notes: undefined }))) + JSON.stringify(seed.content.products);
+	// time is not confirmed for 2026.
+	const text = JSON.stringify(seed.content.schedule) + JSON.stringify(seed.content.catalog_items) + JSON.stringify(seed.content.catalog_flavors);
 	assert.doesNotMatch(text, /\$\s?\d/, 'no prices');
 	const closings = [...text.matchAll(/\b(1[0-2]|[1-9])(:\d\d)?\s?pm\b/gi)].map((m) => m[0].toLowerCase());
 	assert.deepEqual([...new Set(closings)].filter((t) => !['8pm', '9pm'].includes(t)), [], 'only confirmed closing times (8pm, 9pm); leave others out');
 	assert.doesNotMatch(text, /\[[^\]"]*(confirm|time|date)[^\]"]*\]/, 'no draft placeholders in public copy');
-	assert.equal(seed.content.visit[0].data.hours, 'Open daily, 11am to 8pm. Until 9pm in summer');
-	for (const p of seed.content.products) assert.ok(!('price' in p.data), `${p.slug} has no price field`);
+	assert.equal(seed.content.schedule.find((p) => p.slug === 'ice-cream-2026').data.status_text, 'Open daily, 11am to 8pm. Until 9pm in summer');
 });
 
-test('new collections are additive and Square-ready', () => {
-	const products = seed.collections.find((c) => c.slug === 'products');
-	const periodsCol = seed.collections.find((c) => c.slug === 'periods');
-	assert.ok(products && periodsCol);
-	assert.ok(products.fields.find((f) => f.slug === 'square_id' && !f.required));
-	assert.ok(!products.fields.some((f) => /price/.test(f.slug)));
-	for (const f of [...products.fields, ...periodsCol.fields]) if (f.slug !== 'title' && f.slug !== 'category') assert.ok(!f.required, `${f.slug} should be optional`);
-});
-
-test('an open-ended closure nobody follows up on is not claimed forever', () => {
-	const winter = periods.find((s) => s.slug === 'winter-2026');
-	assert.equal(isStaleClosure(winter, '2027-01-02'), false);
-	assert.equal(isStaleClosure(winter, '2027-02-15'), false, 'past reopenings ran to mid-February');
-	assert.equal(isStaleClosure(winter, '2027-07-04'), true);
-	assert.equal(isStaleClosure({ ...winter, end: '2027-12-31' }, '2027-07-04'), false, 'a dated closure is trusted');
-	assert.equal(daysBetween('2026-12-21', '2027-01-02'), 12);
+test('the forms stay short, with no prices', () => {
+	const most = { schedule: 7, catalog_flavors: 6, catalog_items: 3, catalog_categories: 3, store: 4, site_pages: 4 };
+	assert.deepEqual(seed.collections.map((c) => c.slug), Object.keys(most));
+	for (const c of seed.collections) {
+		assert.ok(c.fields.length <= most[c.slug], `${c.slug} has ${c.fields.length} fields`);
+		assert.ok(!c.fields.some((f) => /price/.test(f.slug)));
+	}
 });
 
 test('public names drop the admin year', () => {
@@ -77,13 +73,29 @@ test('public names drop the admin year', () => {
 	assert.equal(publicTitle('Ice cream season'), 'Ice cream season');
 });
 
-test('menu items match the menu pages and carry no prices', async () => {
-	const source = await readFile(new URL('../src/lib/menu.ts', import.meta.url), 'utf8');
-	const col = seed.collections.find((c) => c.slug === 'menu_items');
-	assert.ok(!col.fields.some((f) => /price/.test(f.slug)));
-	for (const section of col.fields.find((f) => f.slug === 'section').validation.options) assert.ok(source.includes(`'${section}'`), `${section} has a page`);
-	for (const item of seed.content.menu_items) {
-		assert.doesNotMatch(JSON.stringify(item), /\$\s?\d/);
-		assert.ok(item.data.square_id, `${item.slug} has a Square ID`);
+test('every flavor and menu item is in a category, and categories are on a menu', async () => {
+	const ids = new Set(seed.content.catalog_categories.map((c) => `$ref:${c.id}`));
+	for (const entry of [...seed.content.catalog_flavors, ...seed.content.catalog_items]) assert.ok(ids.has(entry.data.category), entry.slug);
+	for (const collection of ['catalog_flavors', 'catalog_items']) assert.ok(seed.collections.find((c) => c.slug === collection).fields.find((f) => f.slug === 'category').required);
+	const onMenus = seed.menus.filter((menu) => menu.name !== 'primary').flatMap((menu) => menu.items.map((item) => item.ref));
+	assert.deepEqual([...onMenus].sort(), seed.content.catalog_categories.map((c) => c.id).sort(), 'each category is on one menu');
+	for (const page of ['food', 'sundaes']) {
+		const source = await readFile(new URL(`../src/pages/${page}.astro`, import.meta.url), 'utf8');
+		for (const [, slug] of source.match(/columns=\{(.*)\}/)[1].matchAll(/'([^']+)'/g)) assert.ok(seed.content.catalog_categories.some((c) => c.slug === slug), slug);
 	}
+	const squareIds = JSON.parse(await readFile(new URL('../seed/square-ids.json', import.meta.url), 'utf8'));
+	assert.equal(Object.keys(squareIds).length, 51);
+	for (const slug of Object.keys(squareIds)) assert.ok(seed.content.catalog_items.some((item) => item.slug === slug), slug);
+	assert.ok(!JSON.stringify(seed).includes('square_id'), 'Square IDs stay out of the content');
+});
+
+test('the navigation links to every page', () => {
+	const primary = seed.menus.find((menu) => menu.name === 'primary');
+	assert.deepEqual(primary.items.map((item) => item.ref).sort(), seed.content.site_pages.map((p) => p.id).sort());
+	for (const item of primary.items) assert.equal(item.collection, 'site_pages');
+});
+
+test('menu helpers', () => {
+	assert.equal(sharedOptions(['24-inch', '24-inch', '24-inch', undefined]), '24-inch');
+	assert.deepEqual(byName(['Snickers', 'S’mores', 'Strawberry'].map((name) => ({ data: { name } }))).map((e) => e.data.name), ['S’mores', 'Snickers', 'Strawberry']);
 });

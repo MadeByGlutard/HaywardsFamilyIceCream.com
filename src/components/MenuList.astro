@@ -1,20 +1,26 @@
 ---
-/** A menu page made of groups (everything except the flavor list). */
+/** A menu page made of categories of menu items (everything except flavors). */
 import MenuGroups from './MenuGroups.astro';
 import MenuNote from './MenuNote.astro';
 import Base from '../layouts/Base.astro';
-import { menuGroups, type MenuPage } from '../lib/menu';
+import { menuCategories, type MenuName } from '../lib/catalog';
 import type { Photo } from '../lib/photos';
-import { getLocation, telephone } from '../lib/site';
-interface Props { page: MenuPage; title: string; description: string; photo?: Photo; /** Group headings per column, in reading order. */ columns: string[][] }
-const { page, title, description, photo, columns } = Astro.props;
-const [groups, { data: place }] = await Promise.all([menuGroups(page), getLocation()]);
+import { getLocation, telephone, type SitePage } from '../lib/site';
+interface Props { menu: MenuName; page: SitePage; description: string; photo?: Photo; /** Category slugs per column, in reading order. A category staff add goes in the last one. */ columns: string[][] }
+const { menu, page, description, photo, columns } = Astro.props;
+const [all, { data: place }] = await Promise.all([menuCategories(menu), getLocation()]);
+const categories = all.filter((category) => category.items.length > 0);
+const placed = columns.flat();
+const inColumn = (slugs: string[], last: boolean) => [
+  ...slugs.flatMap((slug) => categories.filter((category) => category.slug === slug)),
+  ...(last ? categories.filter((category) => !placed.includes(category.slug)) : []),
+];
 ---
-<Base title={title} description={description}>
-  <section class="page-heading wrap"><h1>{title}</h1><MenuNote lead="Not everything is on every day." /></section>
+<Base title={page.data.title} description={description}>
+  <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1><MenuNote lead={page.data.excerpt} edit={page.edit.excerpt} /></section>
   <div class={`menu-groups wrap${photo ? ' has-photo' : ''}`}>
-    {columns.map((headings) => <div class="menu-col"><MenuGroups groups={groups.filter((group) => headings.includes(group.heading))} /></div>)}
+    {columns.map((slugs, i) => <div class="menu-col"><MenuGroups categories={inColumn(slugs, i === columns.length - 1)} /></div>)}
     {photo && <figure class="menu-photo"><img src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} srcset={photo.srcset} sizes="(max-width: 1000px) 100vw, 400px" style={photo.position ? `object-position: ${photo.position}` : undefined} loading="lazy" /></figure>}
-    {groups.length === 0 && <p>Please <a href={telephone(place.phone)}>call the stand</a> for today’s menu.</p>}
+    {categories.length === 0 && <p>Please <a href={telephone(place.phone)}>call the stand</a> for today’s menu.</p>}
   </div>
 </Base>

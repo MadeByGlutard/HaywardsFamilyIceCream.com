@@ -1,9 +1,11 @@
 import cloudflare from "@astrojs/cloudflare";
 import { cacheCloudflare } from "@astrojs/cloudflare/cache";
 import react from "@astrojs/react";
-import { access, d1, r2 } from "@emdash-cms/cloudflare";
+import { access, d1, r2, sandbox } from "@emdash-cms/cloudflare";
+import { cloudflareEmail } from "@emdash-cms/cloudflare/plugins";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
+import { haywardsAdmin } from "./src/admin/index.mjs";
 import { password } from "./src/auth/password/index.mjs";
 
 // Preview builds only (scripts/preview.mjs sets PREVIEW_D1_NAME): whoever Cloudflare Access
@@ -39,6 +41,16 @@ export default defineConfig({
 			database: d1({ binding: "DB", session: "auto", coalesce: true }),
 			storage: r2({ binding: "MEDIA" }),
 			authProviders: [password()],
+			// Plugins installed from EmDash's registry run sandboxed, apart from the site.
+			sandboxRunner: sandbox(),
+			plugins: [
+				// mail.haywardsfamilyicecream.com is set up in Cloudflare's Email Service.
+				cloudflareEmail({
+					from: { email: "cms@mail.haywardsfamilyicecream.com", name: "Hayward's website" },
+					replyTo: "haywardsofmilford@gmail.com",
+				}),
+				haywardsAdmin(),
+			],
 			...(isPreview ? accessSignIn : {}),
 			// Same public HTML for everyone, so staff share the cached page. The default
 			// injects the toolbar on the server, and it comes and goes with the cache.
@@ -48,7 +60,7 @@ export default defineConfig({
 				logo: "/brand/icons/icon-192.png",
 				favicon: "/brand/icons/favicon-32.png",
 				// Features this site doesn't use. Their pages stay reachable by URL.
-				hiddenNavItems: ["calendar", "comments", "menus", "redirects", "widgets", "sections", "bylines", "import"],
+				hiddenNavItems: ["calendar", "comments", "redirects", "widgets", "sections", "bylines", "import"],
 			},
 		}),
 	],

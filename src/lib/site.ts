@@ -1,44 +1,32 @@
-import { getEmDashCollection, getEmDashEntry } from 'emdash';
+import { getEmDashEntry, getSiteSettings } from 'emdash';
+
+/** Social links are saved in Settings as a username; a full address works too. */
+const profile = (site: string, value: string | undefined) => {
+  const name = value?.trim().replace(/^@/, '');
+  return name ? (/^https?:/.test(name) ? name : `${site}/${name}`) : undefined;
+};
+
+/** Store info, with the directions link and the social links from Settings. */
 export async function getLocation() {
-  const { entry } = await getEmDashEntry('visit', 'milford');
-  if (!entry) throw new Error('Location content is missing. Complete EmDash setup with the bundled seed.');
-  return entry;
+  const [{ entry }, settings] = await Promise.all([getEmDashEntry('store', 'milford'), getSiteSettings()]);
+  if (!entry) throw new Error('Store info is missing. Complete EmDash setup with the bundled seed.');
+  const { address, locality } = entry.data;
+  return {
+    edit: entry.edit,
+    data: {
+      ...entry.data,
+      facebook: profile('https://www.facebook.com', settings.social?.facebook),
+      instagram: profile('https://www.instagram.com', settings.social?.instagram),
+      directions: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`Hayward's Ice Cream of Milford, ${address}, ${locality}`)}`,
+    },
+  };
 }
+/** A page's entry in Pages: its headline (or name) and introduction. */
+export async function getPage(slug: string) {
+  const { entry } = await getEmDashEntry('site_pages', slug);
+  if (!entry) return undefined;
+  const { title, headline } = entry.data;
+  return { ...entry, headline: headline || title, headlineEdit: headline ? entry.edit.headline : entry.edit.title };
+}
+export type SitePage = NonNullable<Awaited<ReturnType<typeof getPage>>>;
 export const telephone = (value: string) => `tel:+1${value.replace(/\D/g, '')}`;
-
-/**
- * Flavor categories in the order staff set in EmDash. The names are the values
- * stored on each flavor; display labels are sentence case (`categoryLabels`).
- */
-export async function getCategories(): Promise<string[]> {
-  const { entries } = await getEmDashCollection('categories', { orderBy: { sort_order: 'asc' } });
-  return entries.map((entry) => entry.data.name);
-}
-
-/** "Call for flavor" stands in for a list that changes often; it isn't a flavor. */
-export const isNamedFlavor = (name: string) => name.trim().toLowerCase() !== 'call for flavor';
-
-/** The banner staff type into Site settings, and its visual-editing attributes. */
-export async function getBanner() {
-  const { entry } = await getEmDashEntry('settings', 'site');
-  return { text: entry?.data.banner?.trim() || undefined, edit: entry?.edit.banner as Record<string, string> | undefined };
-}
-const categoryLabels: Record<string, string> = {
-  'ice cream': 'Ice cream',
-  yogurt: 'Frozen yogurt',
-  sherbet: 'Sherbet',
-  sorbet: 'Sorbet',
-  vegan: 'Vegan',
-  'no sugar added': 'No sugar added',
-};
-const normalize = (value: string) => value.trim().toLowerCase().replace(/\s+/g, ' ');
-/** Sentence-case display label for a stored category value. */
-export const categoryLabel = (value: string) => {
-  const key = normalize(value);
-  return categoryLabels[key] ?? key.charAt(0).toUpperCase() + key.slice(1);
-};
-/** Compare categories without depending on stored capitalisation. */
-export const sameCategory = (a: string | undefined, b: string) => !!a && normalize(a) === normalize(b);
-/** Stable anchor id (#ice-cream, #no-sugar-added) for a category. */
-export const categoryId = (value: string) => normalize(value).replace(/\s+/g, '-');
-export const plural = (count: number, one: string, many = `${one}s`) => `${count} ${count === 1 ? one : many}`;

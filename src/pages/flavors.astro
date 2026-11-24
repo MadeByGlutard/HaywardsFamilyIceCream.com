@@ -1,0 +1,49 @@
+---
+import MenuNote from '../components/MenuNote.astro';
+import Base from '../layouts/Base.astro';
+import { photos } from '../lib/photos';
+import { getScheduleContext } from '../lib/schedule';
+import { menuCategories } from '../lib/catalog';
+import { getLocation, getPage, telephone } from '../lib/site';
+import { cacheContentPage } from '../lib/cache';
+cacheContentPage(Astro);
+const [page, categories, location] = await Promise.all([getPage('flavors'), menuCategories('flavors'), getLocation()]);
+if (!page) return Astro.rewrite('/404');
+const place = location.data;
+const { closed } = await getScheduleContext(Astro);
+// Sizes and cones are menu items; every other category here is flavors, the first in the wide column.
+const sizes = categories.find((category) => category.slug === 'sizes');
+const cones = categories.find((category) => category.slug === 'cones-and-toppings');
+const [main, ...rest] = categories.filter((category) => category !== sizes && category !== cones);
+// Scoop sizes read as one line; anything with its own sizes (soft serve) follows.
+const scoops = sizes?.items.filter((item) => !item.data.options) ?? [];
+const others = sizes?.items.filter((item) => item.data.options) ?? [];
+---
+<Base title="Ice cream flavors" description="Hayward’s Milford ice cream flavors, frozen yogurt, sherbet, sorbet, vegan and no-sugar-added options, with sizes and cones.">
+  <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1><MenuNote lead={page.data.excerpt} edit={page.edit.excerpt} /></section>
+  {!!sizes?.items.length && <div class="size-lines wrap">
+    <p><strong>Sizes</strong> {scoops.map((item, i) => <>{i > 0 && ', '}<span {...item.edit.name}>{i > 0 ? item.data.name.toLowerCase() : item.data.name}</span></>)}.{others.map((item) => <>{' '}<span {...item.edit.name}>{item.data.name}</span>: <span {...item.edit.options}>{item.data.options!.toLowerCase()}</span>.</>)}</p>
+    <p class="size-links">{!closed && <a href={telephone(place.phone)}>Ask about sizes: {place.phone}</a>}<a href="/sundaes">Frappes and sundaes</a></p>
+  </div>}
+  <div class="menu-layout wrap">
+    <div class="flavor-main">
+      {main && <section id={main.slug}>
+        <div class="section-rule"><h2 {...main.edit.name}>{main.name}</h2></div>
+        <ul class="flavor-list" role="list">{main.flavors.map((flavor) => <li><span class="row-name" {...flavor.edit.name}>{flavor.data.name}</span>{flavor.data.description && <p {...flavor.edit.description}>{flavor.data.description}</p>}</li>)}</ul>
+      </section>}
+      <div class="flavor-extra">{cones?.items.map((item) => <section>
+        <div class="section-rule"><h2 {...item.edit.name}>{item.data.name}</h2></div>
+        <p {...item.edit.options}>{item.data.options}</p>
+      </section>)}</div>
+    </div>
+    <div class="flavor-side">
+      {rest.map((category) => <section id={category.slug}>
+        <div class="section-rule"><h2 {...category.edit.name}>{category.name}</h2></div>
+        {category.flavors.length > 0
+          ? <ul class="flavor-list" role="list">{category.flavors.map((flavor) => <li><span class="row-name" {...flavor.edit.name}>{flavor.data.name}</span>{flavor.data.description && <p {...flavor.edit.description}>{flavor.data.description}</p>}</li>)}</ul>
+          : <p>Changes often. Ask at the window.</p>}
+      </section>)}
+      <figure class="menu-photo"><img src={photos.twoCups.src} alt={photos.twoCups.alt} srcset={photos.twoCups.srcset} sizes="(max-width: 740px) 100vw, 400px" width={photos.twoCups.width} height={photos.twoCups.height} style={`object-position: ${photos.twoCups.position}`} loading="lazy" /></figure>
+    </div>
+  </div>
+</Base>

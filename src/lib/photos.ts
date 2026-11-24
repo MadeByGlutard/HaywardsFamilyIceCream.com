@@ -1,6 +1,6 @@
 /**
- * Bundled site photos (versioned theme assets, not CMS media). A period picks a
- * set by name in its "Site photos to use" field; crops and alt text live here.
+ * Bundled site photos (versioned theme assets, not CMS media). The schedule
+ * picks the set (the tree lot's while it is open or next); crops and alt text live here.
  */
 export interface Photo {
   src: string;

@@ -1,0 +1,9 @@
+---
+import MenuList from '../components/MenuList.astro';
+import { getPage } from '../lib/site';
+import { cacheContentPage } from '../lib/cache';
+cacheContentPage(Astro);
+const page = await getPage('food');
+if (!page) return Astro.rewrite('/404');
+---
+<MenuList menu="food" page={page} description="Hot dogs, grilled cheese, rolls, wraps and subs, mac and cheese, and hot and cold drinks at Hayward’s in Milford, New Hampshire." columns={[['hot-dogs', 'melts'], ['rolls-wraps-and-subs', 'mac-chili-and-sides'], ['drinks']]} />

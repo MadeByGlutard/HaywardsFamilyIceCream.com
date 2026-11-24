@@ -9,20 +9,28 @@
   "settings": {
     "title": "Hayward's Family Ice Cream",
     "timezone": "America/New_York",
-    "tagline": "Homemade ice cream in Milford, New Hampshire."
+    "tagline": "Homemade ice cream in Milford, New Hampshire.",
+    "social": {
+      "facebook": "Haywardsofmilford",
+      "instagram": "haywards_icecream"
+    }
   },
   "collections": [
     {
-      "slug": "settings",
-      "label": "Site settings",
-      "labelSingular": "Site settings",
-      "description": "One entry (\"site\") holding the homepage banner, social links and contact details.",
+      "slug": "schedule",
+      "label": "Schedule",
+      "labelSingular": "Schedule period",
+      "description": "What’s going on at the stand. Each period runs until the next one starts, and sets the hours, banner and home page.",
+      "icon": "calendar",
       "supports": [
         "drafts",
         "revisions"
       ],
       "routable": false,
+      "hasSeo": false,
+      "sortOrder": 1,
       "titleField": "title",
+      "dateField": "start_date",
       "fields": [
         {
           "slug": "title",
@@ -31,90 +39,71 @@
           "required": true
         },
         {
-          "slug": "banner",
-          "label": "Banner (plain text, leave empty to hide)",
-          "type": "string"
-        },
-        {
-          "slug": "social",
-          "label": "Social links",
-          "type": "repeater",
+          "slug": "kind",
+          "label": "What’s happening",
+          "type": "select",
+          "required": true,
           "validation": {
-            "subFields": [
-              {
-                "slug": "label",
-                "label": "Label",
-                "type": "string",
-                "required": true
-              },
-              {
-                "slug": "type",
-                "label": "Type",
-                "type": "select",
-                "required": true,
-                "options": [
-                  "facebook"
-                ]
-              },
-              {
-                "slug": "url",
-                "label": "URL",
-                "type": "url",
-                "required": true
-              }
+            "options": [
+              "Open",
+              "Closed",
+              "Trees & wreaths"
             ]
           }
         },
         {
-          "slug": "contact",
-          "label": "Contact details",
-          "type": "repeater",
-          "validation": {
-            "subFields": [
-              {
-                "slug": "label",
-                "label": "Label",
-                "type": "string",
-                "required": true
-              },
-              {
-                "slug": "type",
-                "label": "Type",
-                "type": "select",
-                "required": true,
-                "options": [
-                  "phone",
-                  "place",
-                  "email"
-                ]
-              },
-              {
-                "slug": "url",
-                "label": "Link URL",
-                "type": "string",
-                "required": true
-              },
-              {
-                "slug": "value",
-                "label": "Displayed value",
-                "type": "string",
-                "required": true
-              }
-            ]
+          "slug": "start_date",
+          "label": "Starts",
+          "type": "datetime",
+          "required": true,
+          "indexed": true
+        },
+        {
+          "slug": "status_text",
+          "label": "Hours",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "hero_headline",
+          "label": "Home page headline",
+          "type": "text",
+          "required": true,
+          "options": {
+            "rows": 2
+          }
+        },
+        {
+          "slug": "hero_deck",
+          "label": "Home page sentence",
+          "type": "text",
+          "required": true,
+          "options": {
+            "rows": 2
+          }
+        },
+        {
+          "slug": "banner_text",
+          "label": "Banner",
+          "type": "text",
+          "options": {
+            "rows": 2
           }
         }
       ]
     },
     {
-      "slug": "categories",
-      "label": "Flavor categories",
-      "labelSingular": "Flavor category",
-      "description": "Headings on the flavor list, shown in display order.",
+      "slug": "catalog_flavors",
+      "label": "Flavors",
+      "labelSingular": "Flavor",
+      "icon": "ice-cream",
       "supports": [
         "drafts",
         "revisions"
       ],
       "routable": false,
+      "hasSeo": false,
+      "sortOrder": 2,
       "titleField": "name",
       "fields": [
         {
@@ -122,208 +111,168 @@
           "label": "Name",
           "type": "string",
           "required": true,
-          "indexed": true
-        },
-        {
-          "slug": "sort_order",
-          "label": "Display order",
-          "type": "integer",
-          "required": true,
-          "indexed": true
-        }
-      ]
-    },
-    {
-      "slug": "flavors",
-      "label": "Flavors",
-      "labelSingular": "Flavor",
-      "supports": [
-        "drafts",
-        "revisions",
-        "search"
-      ],
-      "routable": false,
-      "titleField": "name",
-      "fields": [
-        {
-          "slug": "name",
-          "label": "Flavor name",
-          "type": "string",
-          "required": true,
-          "searchable": true,
-          "indexed": true
+          "searchable": true
         },
         {
           "slug": "category",
           "label": "Category",
-          "type": "select",
-          "required": true,
-          "indexed": true,
+          "type": "reference",
           "validation": {
-            "options": [
-              "Ice Cream",
-              "Sherbet",
-              "Yogurt",
-              "Sorbet",
-              "Vegan",
-              "No Sugar Added"
-            ]
-          }
-        },
-        {
-          "slug": "sort_order",
-          "label": "Order within category",
-          "type": "integer",
-          "required": true,
-          "indexed": true
-        },
-        {
-          "slug": "allergens",
-          "label": "Allergens (not shown on the site)",
-          "type": "multiSelect",
-          "validation": {
-            "options": [
-              "gluten",
-              "nuts"
-            ]
-          }
-        },
-        {
-          "slug": "half_gallon",
-          "label": "Available in half gallons (not shown on the site)",
-          "type": "boolean"
+            "relation": "flavor_category",
+            "relationSide": "child",
+            "targetCollection": "catalog_categories"
+          },
+          "required": true
         },
         {
           "slug": "description",
           "label": "Description",
           "type": "text",
-          "required": false
+          "validation": {
+            "maxLength": 255
+          },
+          "options": {
+            "rows": 2
+          }
         },
         {
-          "slug": "allergen_notes",
-          "label": "Owner-verified allergen notes",
-          "type": "text",
-          "required": false
+          "slug": "allergens",
+          "label": "Contains",
+          "type": "multiSelect",
+          "validation": {
+            "options": [
+              "Gluten",
+              "Nuts",
+              "Eggs",
+              "Soy"
+            ]
+          }
+        },
+        {
+          "slug": "half_gallon",
+          "label": "Sold in half gallons",
+          "type": "boolean"
+        },
+        {
+          "slug": "photo",
+          "label": "Photo",
+          "type": "image"
         }
       ]
     },
     {
-      "slug": "menu_items",
+      "slug": "catalog_items",
       "label": "Menu items",
       "labelSingular": "Menu item",
-      "description": "Sundaes, shakes, food and drinks on the menu pages (flavors have their own list). No prices. Square ID is reserved for a future Square catalog sync.",
+      "icon": "hamburger",
       "supports": [
         "drafts",
-        "revisions",
-        "search"
+        "revisions"
       ],
       "routable": false,
-      "titleField": "title",
+      "hasSeo": false,
+      "sortOrder": 3,
+      "titleField": "name",
       "fields": [
         {
-          "slug": "title",
+          "slug": "name",
           "label": "Name",
           "type": "string",
           "required": true,
           "searchable": true
         },
         {
-          "slug": "section",
-          "label": "Section",
-          "type": "select",
-          "required": true,
-          "indexed": true,
+          "slug": "category",
+          "label": "Category",
+          "type": "reference",
           "validation": {
-            "options": [
-              "Sizes",
-              "Cones and toppings",
-              "Sundaes",
-              "Twisters and treats",
-              "Shakes and floats",
-              "Take home",
-              "Hot dogs",
-              "Melts",
-              "Rolls, wraps and subs",
-              "Mac, chili and sides",
-              "Cold drinks",
-              "Hot drinks"
-            ]
-          }
+            "relation": "item_category",
+            "relationSide": "child",
+            "targetCollection": "catalog_categories"
+          },
+          "required": true
         },
         {
           "slug": "options",
-          "label": "Sizes, kinds or extras",
+          "label": "Sizes or kinds",
           "type": "string"
-        },
-        {
-          "slug": "square_id",
-          "label": "Square catalog ID (optional, for a future sync)",
-          "type": "string",
-          "indexed": true
-        },
-        {
-          "slug": "sort_order",
-          "label": "Display order",
-          "type": "integer",
-          "indexed": true
         }
       ]
     },
     {
-      "slug": "pages",
-      "label": "Pages",
-      "labelSingular": "Page",
+      "slug": "catalog_categories",
+      "label": "Categories",
+      "labelSingular": "Category",
+      "icon": "list-bullets",
       "supports": [
         "drafts",
-        "revisions",
-        "search"
+        "revisions"
       ],
       "routable": false,
-      "titleField": "title",
+      "hasSeo": false,
+      "sortOrder": 4,
+      "titleField": "name",
+      "admin": {
+        "quickCreate": false
+      },
       "fields": [
         {
-          "slug": "title",
-          "label": "Headline",
+          "slug": "name",
+          "label": "Name",
           "type": "string",
           "required": true,
           "searchable": true
         },
         {
-          "slug": "eyebrow",
-          "label": "Section label",
-          "type": "string"
+          "slug": "flavors",
+          "label": "Flavors",
+          "type": "reference",
+          "validation": {
+            "relation": "flavor_category",
+            "relationSide": "parent",
+            "multiple": true,
+            "targetCollection": "catalog_flavors"
+          }
         },
         {
-          "slug": "excerpt",
-          "label": "Introduction",
-          "type": "text"
-        },
-        {
-          "slug": "content",
-          "label": "Page content",
-          "type": "portableText",
-          "searchable": true
+          "slug": "items",
+          "label": "Menu items",
+          "type": "reference",
+          "validation": {
+            "relation": "item_category",
+            "relationSide": "parent",
+            "multiple": true,
+            "targetCollection": "catalog_items"
+          }
         }
       ],
-      "urlPattern": "/{slug}"
+      "description": "Put a category on a menu, and order it there, under Menus."
     },
     {
-      "slug": "visit",
-      "label": "Visit information",
-      "labelSingular": "Location",
+      "slug": "store",
+      "label": "Store info",
+      "labelSingular": "Store info",
+      "description": "Address and contact details, shown on every page. Facebook and Instagram are under Settings, Social links.",
+      "icon": "storefront",
       "supports": [
         "drafts",
-        "revisions",
-        "search"
+        "revisions"
       ],
       "routable": false,
-      "titleField": "title",
+      "hasSeo": false,
+      "sortOrder": 5,
+      "titleField": "address",
       "fields": [
         {
-          "slug": "title",
-          "label": "Location name",
+          "slug": "phone",
+          "label": "Phone",
           "type": "string",
           "required": true
+        },
+        {
+          "slug": "email",
+          "label": "Email",
+          "type": "string"
         },
         {
           "slug": "address",
@@ -333,930 +282,697 @@
         },
         {
           "slug": "locality",
-          "label": "City and state",
+          "label": "Town, state and ZIP",
           "type": "string",
           "required": true
-        },
-        {
-          "slug": "phone",
-          "label": "Telephone",
-          "type": "string",
-          "required": true
-        },
-        {
-          "slug": "email",
-          "label": "Email address",
-          "type": "string"
-        },
-        {
-          "slug": "hours",
-          "label": "Opening hours",
-          "type": "string",
-          "required": true
-        },
-        {
-          "slug": "hours_note",
-          "label": "Hours note",
-          "type": "text"
-        },
-        {
-          "slug": "notice",
-          "label": "One-off notice, such as a weather closing (replaces the hours line)",
-          "type": "text"
-        },
-        {
-          "slug": "facebook",
-          "label": "Facebook page",
-          "type": "url"
-        },
-        {
-          "slug": "instagram",
-          "label": "Instagram link",
-          "type": "url"
-        },
-        {
-          "slug": "directions",
-          "label": "Directions URL",
-          "type": "url"
-        },
-        {
-          "slug": "intro",
-          "label": "Visit introduction",
-          "type": "text"
         }
       ]
     },
     {
-      "slug": "servings",
-      "label": "Sizes & prices",
-      "labelSingular": "Menu item",
+      "slug": "site_pages",
+      "label": "Pages",
+      "labelSingular": "Page",
+      "icon": "file",
       "supports": [
         "drafts",
-        "revisions",
-        "search"
+        "revisions"
       ],
-      "routable": false,
-      "titleField": "title",
-      "fields": [
-        {
-          "slug": "title",
-          "label": "Item or size",
-          "type": "string",
-          "required": true
-        },
-        {
-          "slug": "price",
-          "label": "Price to display",
-          "type": "string",
-          "required": true
-        },
-        {
-          "slug": "description",
-          "label": "Description",
-          "type": "text"
-        },
-        {
-          "slug": "sort_order",
-          "label": "Display order",
-          "type": "integer",
-          "indexed": true
-        }
-      ]
-    },
-    {
-      "slug": "periods",
-      "label": "Schedule periods",
-      "labelSingular": "Schedule period",
-      "description": "Dated periods (closures, the tree lot, ice cream season) that change the banner, status line, home page hero, navigation and accent colour. The period whose dates include today (Milford time) is used; if two overlap, the one that started most recently wins. With no active period the site falls back to Visit information.",
-      "supports": [
-        "drafts",
-        "revisions",
-        "search"
-      ],
-      "routable": false,
-      "titleField": "title",
-      "fields": [
-        {
-          "slug": "title",
-          "label": "Period name",
-          "type": "string",
-          "required": true,
-          "searchable": true
-        },
-        {
-          "slug": "start_date",
-          "label": "First day",
-          "type": "datetime",
-          "indexed": true
-        },
-        {
-          "slug": "end_date",
-          "label": "Last day (empty means open-ended)",
-          "type": "datetime"
-        },
-        {
-          "slug": "dates_label",
-          "label": "Dates shown in “Hours through the year” (replaces the first and last day)",
-          "type": "string"
-        },
-        {
-          "slug": "status_text",
-          "label": "Hours line (header, footer and Visit page)",
-          "type": "string"
-        },
-        {
-          "slug": "banner_text",
-          "label": "Banner at the top of every page",
-          "type": "text"
-        },
-        {
-          "slug": "hero_eyebrow",
-          "label": "Home page: small line above the headline",
-          "type": "string"
-        },
-        {
-          "slug": "hero_headline",
-          "label": "Home page: headline (one line per row)",
-          "type": "text"
-        },
-        {
-          "slug": "hero_deck",
-          "label": "Home page: sentence under the headline",
-          "type": "text"
-        },
-        {
-          "slug": "hero_image",
-          "label": "Home page: photo (optional)",
-          "type": "image"
-        },
-        {
-          "slug": "photo_set",
-          "label": "Site photos to use",
-          "type": "select",
-          "validation": {
-            "options": [
-              "Ice cream stand",
-              "Tree lot"
-            ]
-          }
-        },
-        {
-          "slug": "accent",
-          "label": "Accent color",
-          "type": "select",
-          "validation": {
-            "options": [
-              "red",
-              "green"
-            ]
-          }
-        },
-        {
-          "slug": "show_trees_nav",
-          "label": "Tree lot period (Trees & wreaths also appears two weeks before)",
-          "type": "boolean"
-        },
-        {
-          "slug": "open_state",
-          "label": "Is the stand open during this period?",
-          "type": "select",
-          "validation": {
-            "options": [
-              "Open",
-              "Closed"
-            ]
-          }
-        },
-        {
-          "slug": "visit_intro",
-          "label": "Visit page introduction (empty uses Visit information)",
-          "type": "text"
-        },
-        {
-          "slug": "notes",
-          "label": "Staff notes (not shown on the site)",
-          "type": "text"
-        }
-      ]
-    },
-    {
-      "slug": "products",
-      "label": "Trees & wreaths",
-      "labelSingular": "Product",
-      "description": "Christmas trees, wreaths, kissing balls and extras listed on /trees while the tree lot is open. No prices: they are marked at the lot. Square ID is reserved for a future Square catalog sync.",
-      "supports": [
-        "drafts",
-        "revisions",
-        "search"
-      ],
-      "routable": false,
+      "routable": true,
+      "hasSeo": false,
+      "sortOrder": 6,
       "titleField": "title",
       "fields": [
         {
           "slug": "title",
           "label": "Name",
           "type": "string",
-          "required": true,
-          "searchable": true
+          "required": true
         },
         {
-          "slug": "category",
-          "label": "Category",
-          "type": "select",
-          "required": true,
-          "indexed": true,
-          "validation": {
-            "options": [
-              "Tree",
-              "Wreath",
-              "Kissing ball",
-              "Extra"
-            ]
+          "slug": "headline",
+          "label": "Headline",
+          "type": "text",
+          "options": {
+            "rows": 2
           }
         },
         {
-          "slug": "options",
-          "label": "Sizes or options",
-          "type": "string"
+          "slug": "excerpt",
+          "label": "Introduction",
+          "type": "text",
+          "options": {
+            "rows": 2
+          }
         },
         {
-          "slug": "square_id",
-          "label": "Square catalog ID (optional, for a future sync)",
-          "type": "string",
-          "indexed": true
-        },
-        {
-          "slug": "sort_order",
-          "label": "Display order",
-          "type": "integer",
-          "indexed": true
+          "slug": "content",
+          "label": "Text",
+          "type": "portableText"
         }
-      ]
+      ],
+      "urlPattern": "/{slug}",
+      "description": "One for every page of the site. Home’s headline comes from the Schedule."
     }
   ],
   "content": {
-    "settings": [
+    "catalog_categories": [
       {
-        "id": "settings-site",
-        "slug": "site",
+        "id": "cat-extras",
+        "slug": "extras",
         "status": "published",
         "data": {
-          "title": "Site settings",
-          "banner": "Closed until Friday, November 27th - Reopening at 11am!",
-          "social": [
-            {
-              "label": "Find us on Facebook",
-              "type": "facebook",
-              "url": "https://facebook.com/haywardsofmilford"
-            }
-          ],
-          "contact": [
-            {
-              "label": "Give us a call",
-              "type": "phone",
-              "url": "tel:16036728383",
-              "value": "(603) 672-8383"
-            },
-            {
-              "label": "Come visit us",
-              "type": "place",
-              "url": "https://www.google.com/maps?q=Hayward's+Ice+Cream+of+Milford,+Elm+Street,+Milford,+NH",
-              "value": "383 Elm St, Milford, NH 03055"
-            },
-            {
-              "label": "Send us a message",
-              "type": "email",
-              "url": "mailto:haywardsofmilford@gmail.com",
-              "value": "haywardsofmilford@gmail.com"
-            }
-          ]
-        }
-      }
-    ],
-    "categories": [
-      {
-        "id": "category-ice-cream",
-        "slug": "ice-cream",
-        "status": "published",
-        "data": {
-          "name": "Ice Cream",
-          "sort_order": 1
+          "name": "Extras"
         }
       },
       {
-        "id": "category-sherbet",
-        "slug": "sherbet",
+        "id": "cat-kissing-balls",
+        "slug": "kissing-balls",
         "status": "published",
         "data": {
-          "name": "Sherbet",
-          "sort_order": 2
+          "name": "Kissing balls"
         }
       },
       {
-        "id": "category-yogurt",
-        "slug": "yogurt",
+        "id": "cat-wreaths",
+        "slug": "wreaths",
         "status": "published",
         "data": {
-          "name": "Yogurt",
-          "sort_order": 3
+          "name": "Wreaths"
         }
       },
       {
-        "id": "category-sorbet",
-        "slug": "sorbet",
+        "id": "cat-trees",
+        "slug": "trees",
         "status": "published",
         "data": {
-          "name": "Sorbet",
-          "sort_order": 4
+          "name": "Christmas trees"
         }
       },
       {
-        "id": "category-vegan",
-        "slug": "vegan",
+        "id": "cat-drinks",
+        "slug": "drinks",
         "status": "published",
         "data": {
-          "name": "Vegan",
-          "sort_order": 5
+          "name": "Drinks"
         }
       },
       {
-        "id": "category-no-sugar-added",
+        "id": "cat-mac-chili-and-sides",
+        "slug": "mac-chili-and-sides",
+        "status": "published",
+        "data": {
+          "name": "Mac, chili and sides"
+        }
+      },
+      {
+        "id": "cat-rolls-wraps-and-subs",
+        "slug": "rolls-wraps-and-subs",
+        "status": "published",
+        "data": {
+          "name": "Rolls, wraps and subs"
+        }
+      },
+      {
+        "id": "cat-melts",
+        "slug": "melts",
+        "status": "published",
+        "data": {
+          "name": "Melts"
+        }
+      },
+      {
+        "id": "cat-hot-dogs",
+        "slug": "hot-dogs",
+        "status": "published",
+        "data": {
+          "name": "Hot dogs"
+        }
+      },
+      {
+        "id": "cat-take-home",
+        "slug": "take-home",
+        "status": "published",
+        "data": {
+          "name": "Take home"
+        }
+      },
+      {
+        "id": "cat-twisters-and-treats",
+        "slug": "twisters-and-treats",
+        "status": "published",
+        "data": {
+          "name": "Twisters and treats"
+        }
+      },
+      {
+        "id": "cat-shakes-and-floats",
+        "slug": "shakes-and-floats",
+        "status": "published",
+        "data": {
+          "name": "Shakes and floats"
+        }
+      },
+      {
+        "id": "cat-sundaes",
+        "slug": "sundaes",
+        "status": "published",
+        "data": {
+          "name": "Sundaes"
+        }
+      },
+      {
+        "id": "cat-cones-and-toppings",
+        "slug": "cones-and-toppings",
+        "status": "published",
+        "data": {
+          "name": "Cones and toppings"
+        }
+      },
+      {
+        "id": "cat-sizes",
+        "slug": "sizes",
+        "status": "published",
+        "data": {
+          "name": "Sizes"
+        }
+      },
+      {
+        "id": "cat-no-sugar-added",
         "slug": "no-sugar-added",
         "status": "published",
         "data": {
-          "name": "No Sugar Added",
-          "sort_order": 6
+          "name": "No sugar added"
+        }
+      },
+      {
+        "id": "cat-vegan",
+        "slug": "vegan",
+        "status": "published",
+        "data": {
+          "name": "Vegan"
+        }
+      },
+      {
+        "id": "cat-sorbet",
+        "slug": "sorbet",
+        "status": "published",
+        "data": {
+          "name": "Sorbet"
+        }
+      },
+      {
+        "id": "cat-yogurt",
+        "slug": "yogurt",
+        "status": "published",
+        "data": {
+          "name": "Frozen yogurt"
+        }
+      },
+      {
+        "id": "cat-sherbet",
+        "slug": "sherbet",
+        "status": "published",
+        "data": {
+          "name": "Sherbet"
+        }
+      },
+      {
+        "id": "cat-ice-cream",
+        "slug": "ice-cream",
+        "status": "published",
+        "data": {
+          "name": "Ice cream"
         }
       }
     ],
-    "flavors": [
+    "catalog_flavors": [
       {
-        "id": "flavor-ice-cream-appalachian-trail",
-        "slug": "ice-cream-appalachian-trail",
+        "id": "flavor-appalachian-trail",
+        "slug": "appalachian-trail",
         "status": "published",
         "data": {
           "name": "Appalachian Trail",
-          "category": "Ice Cream",
-          "sort_order": 1,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-banana-fudge",
-        "slug": "ice-cream-banana-fudge",
+        "id": "flavor-banana-fudge",
+        "slug": "banana-fudge",
         "status": "published",
         "data": {
           "name": "Banana Fudge",
-          "category": "Ice Cream",
-          "sort_order": 2,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-black-diamond",
-        "slug": "ice-cream-black-diamond",
+        "id": "flavor-black-diamond",
+        "slug": "black-diamond",
         "status": "published",
         "data": {
           "name": "Black Diamond",
-          "category": "Ice Cream",
-          "sort_order": 3,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "gluten"
-          ],
-          "half_gallon": false
+            "Gluten"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-black-raspberry",
-        "slug": "ice-cream-black-raspberry",
+        "id": "flavor-black-raspberry",
+        "slug": "black-raspberry",
         "status": "published",
         "data": {
           "name": "Black Raspberry",
-          "category": "Ice Cream",
-          "sort_order": 4,
-          "allergens": [],
+          "category": "$ref:cat-ice-cream",
           "half_gallon": true
         }
       },
       {
-        "id": "flavor-ice-cream-bubble-gum",
-        "slug": "ice-cream-bubble-gum",
+        "id": "flavor-bubble-gum",
+        "slug": "bubble-gum",
         "status": "published",
         "data": {
           "name": "Bubble Gum",
-          "category": "Ice Cream",
-          "sort_order": 5,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-butter-crunch",
-        "slug": "ice-cream-butter-crunch",
+        "id": "flavor-butter-crunch",
+        "slug": "butter-crunch",
         "status": "published",
         "data": {
           "name": "Butter Crunch",
-          "category": "Ice Cream",
-          "sort_order": 6,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-butter-pecan",
-        "slug": "ice-cream-butter-pecan",
+        "id": "flavor-butter-pecan",
+        "slug": "butter-pecan",
         "status": "published",
         "data": {
           "name": "Butter Pecan",
-          "category": "Ice Cream",
-          "sort_order": 7,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "nuts"
-          ],
-          "half_gallon": false
+            "Nuts"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-cake-batter",
-        "slug": "ice-cream-cake-batter",
+        "id": "flavor-cake-batter",
+        "slug": "cake-batter",
         "status": "published",
         "data": {
           "name": "Cake Batter",
-          "category": "Ice Cream",
-          "sort_order": 8,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "gluten"
-          ],
-          "half_gallon": false
+            "Gluten"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-caramel-tsunami",
-        "slug": "ice-cream-caramel-tsunami",
+        "id": "flavor-caramel-tsunami",
+        "slug": "caramel-tsunami",
         "status": "published",
         "data": {
           "name": "Caramel Tsunami",
-          "category": "Ice Cream",
-          "sort_order": 9,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-cherry-vanilla",
-        "slug": "ice-cream-cherry-vanilla",
+        "id": "flavor-cherry-vanilla",
+        "slug": "cherry-vanilla",
         "status": "published",
         "data": {
           "name": "Cherry Vanilla",
-          "category": "Ice Cream",
-          "sort_order": 10,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-chocolate",
-        "slug": "ice-cream-chocolate",
+        "id": "flavor-chocolate",
+        "slug": "chocolate",
         "status": "published",
         "data": {
           "name": "Chocolate",
-          "category": "Ice Cream",
-          "sort_order": 11,
-          "allergens": [],
+          "category": "$ref:cat-ice-cream",
           "half_gallon": true
         }
       },
       {
-        "id": "flavor-ice-cream-chocolate-chip",
-        "slug": "ice-cream-chocolate-chip",
+        "id": "flavor-chocolate-chip",
+        "slug": "chocolate-chip",
         "status": "published",
         "data": {
           "name": "Chocolate Chip",
-          "category": "Ice Cream",
-          "sort_order": 12,
-          "allergens": [],
+          "category": "$ref:cat-ice-cream",
           "half_gallon": true
         }
       },
       {
-        "id": "flavor-ice-cream-chocolate-peanut-butter-cup",
-        "slug": "ice-cream-chocolate-peanut-butter-cup",
+        "id": "flavor-chocolate-peanut-butter-cup",
+        "slug": "chocolate-peanut-butter-cup",
         "status": "published",
         "data": {
           "name": "Chocolate Peanut Butter Cup",
-          "category": "Ice Cream",
-          "sort_order": 13,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "nuts"
-          ],
-          "half_gallon": false
+            "Nuts"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-chocolate-tsunami",
-        "slug": "ice-cream-chocolate-tsunami",
+        "id": "flavor-chocolate-tsunami",
+        "slug": "chocolate-tsunami",
         "status": "published",
         "data": {
           "name": "Chocolate Tsunami",
-          "category": "Ice Cream",
-          "sort_order": 14,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "gluten"
-          ],
-          "half_gallon": false
+            "Gluten"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-coconut-almond",
-        "slug": "ice-cream-coconut-almond",
+        "id": "flavor-coconut-almond",
+        "slug": "coconut-almond",
         "status": "published",
         "data": {
           "name": "Coconut Almond",
-          "category": "Ice Cream",
-          "sort_order": 15,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "nuts"
+            "Nuts"
           ],
           "half_gallon": true
         }
       },
       {
-        "id": "flavor-ice-cream-coffee",
-        "slug": "ice-cream-coffee",
+        "id": "flavor-coffee",
+        "slug": "coffee",
         "status": "published",
         "data": {
           "name": "Coffee",
-          "category": "Ice Cream",
-          "sort_order": 16,
-          "allergens": [],
+          "category": "$ref:cat-ice-cream",
           "half_gallon": true
         }
       },
       {
-        "id": "flavor-ice-cream-coffee-oreo",
-        "slug": "ice-cream-coffee-oreo",
+        "id": "flavor-coffee-oreo",
+        "slug": "coffee-oreo",
         "status": "published",
         "data": {
           "name": "Coffee Oreo",
-          "category": "Ice Cream",
-          "sort_order": 17,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "gluten"
+            "Gluten"
           ],
           "half_gallon": true
         }
       },
       {
-        "id": "flavor-ice-cream-cookie-dough",
-        "slug": "ice-cream-cookie-dough",
+        "id": "flavor-cookie-dough",
+        "slug": "cookie-dough",
         "status": "published",
         "data": {
           "name": "Cookie Dough",
-          "category": "Ice Cream",
-          "sort_order": 18,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "gluten"
+            "Gluten"
           ],
           "half_gallon": true
         }
       },
       {
-        "id": "flavor-ice-cream-cookie-dough-brownie",
-        "slug": "ice-cream-cookie-dough-brownie",
+        "id": "flavor-cookie-dough-brownie",
+        "slug": "cookie-dough-brownie",
         "status": "published",
         "data": {
           "name": "Cookie Dough Brownie",
-          "category": "Ice Cream",
-          "sort_order": 19,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "gluten"
-          ],
-          "half_gallon": false
+            "Gluten"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-cookie-monster",
-        "slug": "ice-cream-cookie-monster",
+        "id": "flavor-cookie-monster",
+        "slug": "cookie-monster",
         "status": "published",
         "data": {
           "name": "Cookie Monster",
-          "category": "Ice Cream",
-          "sort_order": 20,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "gluten"
-          ],
-          "half_gallon": false
+            "Gluten"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-cotton-candy",
-        "slug": "ice-cream-cotton-candy",
+        "id": "flavor-cotton-candy",
+        "slug": "cotton-candy",
         "status": "published",
         "data": {
           "name": "Cotton Candy",
-          "category": "Ice Cream",
-          "sort_order": 21,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-dutch-chocolate-almond",
-        "slug": "ice-cream-dutch-chocolate-almond",
+        "id": "flavor-dutch-chocolate-almond",
+        "slug": "dutch-chocolate-almond",
         "status": "published",
         "data": {
           "name": "Dutch Chocolate Almond",
-          "category": "Ice Cream",
-          "sort_order": 22,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "nuts"
-          ],
-          "half_gallon": false
+            "Nuts"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-fluffernutter",
-        "slug": "ice-cream-fluffernutter",
+        "id": "flavor-fluffernutter",
+        "slug": "fluffernutter",
         "status": "published",
         "data": {
           "name": "Fluffernutter",
-          "category": "Ice Cream",
-          "sort_order": 23,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "nuts"
-          ],
-          "half_gallon": false
+            "Nuts"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-french-vanilla",
-        "slug": "ice-cream-french-vanilla",
+        "id": "flavor-french-vanilla",
+        "slug": "french-vanilla",
         "status": "published",
         "data": {
           "name": "French Vanilla",
-          "category": "Ice Cream",
-          "sort_order": 24,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-m-m",
-        "slug": "ice-cream-m-m",
+        "id": "flavor-m-m",
+        "slug": "m-m",
         "status": "published",
         "data": {
           "name": "M&M",
-          "category": "Ice Cream",
-          "sort_order": 25,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-maple-walnut",
-        "slug": "ice-cream-maple-walnut",
+        "id": "flavor-maple-walnut",
+        "slug": "maple-walnut",
         "status": "published",
         "data": {
           "name": "Maple Walnut",
-          "category": "Ice Cream",
-          "sort_order": 26,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "nuts"
+            "Nuts"
           ],
           "half_gallon": true
         }
       },
       {
-        "id": "flavor-ice-cream-milky-r-way",
-        "slug": "ice-cream-milky-r-way",
+        "id": "flavor-milky-r-way",
+        "slug": "milky-r-way",
         "status": "published",
         "data": {
           "name": "Milky-R-Way",
-          "category": "Ice Cream",
-          "sort_order": 27,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-mint-chocolate-chip",
-        "slug": "ice-cream-mint-chocolate-chip",
+        "id": "flavor-mint-chocolate-chip",
+        "slug": "mint-chocolate-chip",
         "status": "published",
         "data": {
           "name": "Mint Chocolate Chip",
-          "category": "Ice Cream",
-          "sort_order": 28,
-          "allergens": [],
+          "category": "$ref:cat-ice-cream",
           "half_gallon": true
         }
       },
       {
-        "id": "flavor-ice-cream-mint-oreo",
-        "slug": "ice-cream-mint-oreo",
+        "id": "flavor-mint-oreo",
+        "slug": "mint-oreo",
         "status": "published",
         "data": {
           "name": "Mint Oreo",
-          "category": "Ice Cream",
-          "sort_order": 29,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "gluten"
-          ],
-          "half_gallon": false
+            "Gluten"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-mocha-chip",
-        "slug": "ice-cream-mocha-chip",
+        "id": "flavor-mocha-chip",
+        "slug": "mocha-chip",
         "status": "published",
         "data": {
           "name": "Mocha Chip",
-          "category": "Ice Cream",
-          "sort_order": 30,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-monster-trax",
-        "slug": "ice-cream-monster-trax",
+        "id": "flavor-monster-trax",
+        "slug": "monster-trax",
         "status": "published",
         "data": {
           "name": "Monster Trax",
-          "category": "Ice Cream",
-          "sort_order": 31,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-orange-pineapple",
-        "slug": "ice-cream-orange-pineapple",
+        "id": "flavor-orange-pineapple",
+        "slug": "orange-pineapple",
         "status": "published",
         "data": {
           "name": "Orange Pineapple",
-          "category": "Ice Cream",
-          "sort_order": 32,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-oreo",
-        "slug": "ice-cream-oreo",
+        "id": "flavor-oreo",
+        "slug": "oreo",
         "status": "published",
         "data": {
           "name": "Oreo",
-          "category": "Ice Cream",
-          "sort_order": 33,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "gluten"
+            "Gluten"
           ],
           "half_gallon": true
         }
       },
       {
-        "id": "flavor-ice-cream-peanut-butter-snickers",
-        "slug": "ice-cream-peanut-butter-snickers",
+        "id": "flavor-peanut-butter-snickers",
+        "slug": "peanut-butter-snickers",
         "status": "published",
         "data": {
           "name": "Peanut Butter Snickers",
-          "category": "Ice Cream",
-          "sort_order": 34,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "nuts"
-          ],
-          "half_gallon": false
+            "Nuts"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-peppermint-stick",
-        "slug": "ice-cream-peppermint-stick",
+        "id": "flavor-peppermint-stick",
+        "slug": "peppermint-stick",
         "status": "published",
         "data": {
           "name": "Peppermint Stick",
-          "category": "Ice Cream",
-          "sort_order": 35,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-pistachio",
-        "slug": "ice-cream-pistachio",
+        "id": "flavor-pistachio",
+        "slug": "pistachio",
         "status": "published",
         "data": {
           "name": "Pistachio",
-          "category": "Ice Cream",
-          "sort_order": 36,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "nuts"
-          ],
-          "half_gallon": false
+            "Nuts"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-razz-brownie",
-        "slug": "ice-cream-razz-brownie",
+        "id": "flavor-razz-brownie",
+        "slug": "razz-brownie",
         "status": "published",
         "data": {
           "name": "Razz Brownie",
-          "category": "Ice Cream",
-          "sort_order": 37,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "gluten"
-          ],
-          "half_gallon": false
+            "Gluten"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-raspberry-cheesecake-truffle",
-        "slug": "ice-cream-raspberry-cheesecake-truffle",
+        "id": "flavor-raspberry-cheesecake-truffle",
+        "slug": "raspberry-cheesecake-truffle",
         "status": "published",
         "data": {
           "name": "Raspberry Cheesecake Truffle",
-          "category": "Ice Cream",
-          "sort_order": 38,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-salty-caramel-oreo",
-        "slug": "ice-cream-salty-caramel-oreo",
+        "id": "flavor-salty-caramel-oreo",
+        "slug": "salty-caramel-oreo",
         "status": "published",
         "data": {
           "name": "Salty Caramel Oreo",
-          "category": "Ice Cream",
-          "sort_order": 39,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "gluten"
-          ],
-          "half_gallon": false
+            "Gluten"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-snickers",
-        "slug": "ice-cream-snickers",
+        "id": "flavor-snickers",
+        "slug": "snickers",
         "status": "published",
         "data": {
           "name": "Snickers",
-          "category": "Ice Cream",
-          "sort_order": 40,
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "nuts"
-          ],
-          "half_gallon": false
+            "Nuts"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-s-mores",
-        "slug": "ice-cream-s-mores",
+        "id": "flavor-smores",
+        "slug": "smores",
         "status": "published",
         "data": {
-          "name": "S'mores",
-          "category": "Ice Cream",
-          "sort_order": 41,
+          "name": "S’mores",
+          "category": "$ref:cat-ice-cream",
           "allergens": [
-            "gluten"
-          ],
-          "half_gallon": false
+            "Gluten"
+          ]
         }
       },
       {
-        "id": "flavor-ice-cream-strawberry",
-        "slug": "ice-cream-strawberry",
+        "id": "flavor-strawberry",
+        "slug": "strawberry",
         "status": "published",
         "data": {
           "name": "Strawberry",
-          "category": "Ice Cream",
-          "sort_order": 42,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-strawberry-cheesecake",
-        "slug": "ice-cream-strawberry-cheesecake",
+        "id": "flavor-strawberry-cheesecake",
+        "slug": "strawberry-cheesecake",
         "status": "published",
         "data": {
           "name": "Strawberry Cheesecake",
-          "category": "Ice Cream",
-          "sort_order": 43,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-ice-cream"
         }
       },
       {
-        "id": "flavor-ice-cream-vanilla",
-        "slug": "ice-cream-vanilla",
+        "id": "flavor-vanilla",
+        "slug": "vanilla",
         "status": "published",
         "data": {
           "name": "Vanilla",
-          "category": "Ice Cream",
-          "sort_order": 44,
-          "allergens": [],
+          "category": "$ref:cat-ice-cream",
           "half_gallon": true
         }
       },
@@ -1266,10 +982,7 @@
         "status": "published",
         "data": {
           "name": "Lime",
-          "category": "Sherbet",
-          "sort_order": 1,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-sherbet"
         }
       },
       {
@@ -1278,9 +991,7 @@
         "status": "published",
         "data": {
           "name": "Orange",
-          "category": "Sherbet",
-          "sort_order": 2,
-          "allergens": [],
+          "category": "$ref:cat-sherbet",
           "half_gallon": true
         }
       },
@@ -1290,9 +1001,7 @@
         "status": "published",
         "data": {
           "name": "Coffee Heath Bar",
-          "category": "Yogurt",
-          "sort_order": 1,
-          "allergens": [],
+          "category": "$ref:cat-yogurt",
           "half_gallon": true
         }
       },
@@ -1302,10 +1011,7 @@
         "status": "published",
         "data": {
           "name": "Chocolate",
-          "category": "Yogurt",
-          "sort_order": 2,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-yogurt"
         }
       },
       {
@@ -1314,10 +1020,7 @@
         "status": "published",
         "data": {
           "name": "Mint Truffle",
-          "category": "Yogurt",
-          "sort_order": 3,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-yogurt"
         }
       },
       {
@@ -1326,10 +1029,7 @@
         "status": "published",
         "data": {
           "name": "Purple Panther",
-          "category": "Yogurt",
-          "sort_order": 4,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-yogurt"
         }
       },
       {
@@ -1338,20 +1038,7 @@
         "status": "published",
         "data": {
           "name": "Vanilla",
-          "category": "Yogurt",
-          "sort_order": 5,
-          "allergens": [],
-          "half_gallon": false
-        }
-      },
-      {
-        "id": "flavor-sorbet-call-for-flavor",
-        "slug": "sorbet-call-for-flavor",
-        "status": "published",
-        "data": {
-          "name": "Call for flavor",
-          "category": "Sorbet",
-          "sort_order": 1
+          "category": "$ref:cat-yogurt"
         }
       },
       {
@@ -1360,10 +1047,7 @@
         "status": "published",
         "data": {
           "name": "Chocolate",
-          "category": "Vegan",
-          "sort_order": 1,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-vegan"
         }
       },
       {
@@ -1372,10 +1056,7 @@
         "status": "published",
         "data": {
           "name": "Vanilla",
-          "category": "Vegan",
-          "sort_order": 2,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-vegan"
         }
       },
       {
@@ -1384,10 +1065,7 @@
         "status": "published",
         "data": {
           "name": "Coffee",
-          "category": "No Sugar Added",
-          "sort_order": 1,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-no-sugar-added"
         }
       },
       {
@@ -1396,32 +1074,697 @@
         "status": "published",
         "data": {
           "name": "Vanilla",
-          "category": "No Sugar Added",
-          "sort_order": 2,
-          "allergens": [],
-          "half_gallon": false
+          "category": "$ref:cat-no-sugar-added"
         }
       }
     ],
-    "pages": [
+    "catalog_items": [
       {
-        "id": "home",
-        "slug": "home",
+        "id": "item-sizes-kiddie",
+        "slug": "sizes-kiddie",
         "status": "published",
         "data": {
-          "title": "A Milford tradition.\nOne scoop at a time.",
-          "eyebrow": "Homemade ice cream · Family owned",
-          "excerpt": "Good ice cream. Good company. Right here on Elm Street.",
-          "content": []
+          "name": "Kiddie",
+          "category": "$ref:cat-sizes"
         }
       },
       {
-        "id": "our-story",
-        "slug": "our-story",
+        "id": "item-sizes-junior-scoop",
+        "slug": "sizes-junior-scoop",
         "status": "published",
         "data": {
-          "title": "It started with a milk cart.",
-          "eyebrow": "Our history",
+          "name": "Junior scoop",
+          "category": "$ref:cat-sizes"
+        }
+      },
+      {
+        "id": "item-sizes-small",
+        "slug": "sizes-small",
+        "status": "published",
+        "data": {
+          "name": "Small",
+          "category": "$ref:cat-sizes"
+        }
+      },
+      {
+        "id": "item-sizes-large",
+        "slug": "sizes-large",
+        "status": "published",
+        "data": {
+          "name": "Large",
+          "category": "$ref:cat-sizes"
+        }
+      },
+      {
+        "id": "item-sizes-soft-serve",
+        "slug": "sizes-soft-serve",
+        "status": "published",
+        "data": {
+          "name": "Soft serve",
+          "category": "$ref:cat-sizes",
+          "options": "Small or large"
+        }
+      },
+      {
+        "id": "item-cones-and-toppings-cones",
+        "slug": "cones-and-toppings-cones",
+        "status": "published",
+        "data": {
+          "name": "Cones",
+          "category": "$ref:cat-cones-and-toppings",
+          "options": "Sugar cone, waffle cone, dipped waffle cone or waffle bowl"
+        }
+      },
+      {
+        "id": "item-cones-and-toppings-toppings",
+        "slug": "cones-and-toppings-toppings",
+        "status": "published",
+        "data": {
+          "name": "Toppings",
+          "category": "$ref:cat-cones-and-toppings",
+          "options": "Sprinkles, whipped cream, banana, malt, brownie, cookie and more"
+        }
+      },
+      {
+        "id": "item-sundaes-sundae",
+        "slug": "sundaes-sundae",
+        "status": "published",
+        "data": {
+          "name": "Sundae",
+          "category": "$ref:cat-sundaes",
+          "options": "Small or large"
+        }
+      },
+      {
+        "id": "item-sundaes-brownie-sundae",
+        "slug": "sundaes-brownie-sundae",
+        "status": "published",
+        "data": {
+          "name": "Brownie sundae",
+          "category": "$ref:cat-sundaes"
+        }
+      },
+      {
+        "id": "item-sundaes-reeses-sundae",
+        "slug": "sundaes-reeses-sundae",
+        "status": "published",
+        "data": {
+          "name": "Reese’s sundae",
+          "category": "$ref:cat-sundaes"
+        }
+      },
+      {
+        "id": "item-sundaes-banana-boat",
+        "slug": "sundaes-banana-boat",
+        "status": "published",
+        "data": {
+          "name": "Banana boat",
+          "category": "$ref:cat-sundaes",
+          "options": "Small or large"
+        }
+      },
+      {
+        "id": "item-sundaes-holiday-sundaes",
+        "slug": "sundaes-holiday-sundaes",
+        "status": "published",
+        "data": {
+          "name": "Holiday sundaes",
+          "category": "$ref:cat-sundaes",
+          "options": "Around Valentine’s Day, St. Patrick’s Day, Easter, the Fourth and more"
+        }
+      },
+      {
+        "id": "item-shakes-and-floats-milkshake",
+        "slug": "shakes-and-floats-milkshake",
+        "status": "published",
+        "data": {
+          "name": "Milkshake",
+          "category": "$ref:cat-shakes-and-floats"
+        }
+      },
+      {
+        "id": "item-shakes-and-floats-frappe",
+        "slug": "shakes-and-floats-frappe",
+        "status": "published",
+        "data": {
+          "name": "Frappe",
+          "category": "$ref:cat-shakes-and-floats",
+          "options": "Regular or extra thick"
+        }
+      },
+      {
+        "id": "item-shakes-and-floats-float",
+        "slug": "shakes-and-floats-float",
+        "status": "published",
+        "data": {
+          "name": "Float",
+          "category": "$ref:cat-shakes-and-floats"
+        }
+      },
+      {
+        "id": "item-shakes-and-floats-freeze",
+        "slug": "shakes-and-floats-freeze",
+        "status": "published",
+        "data": {
+          "name": "Freeze",
+          "category": "$ref:cat-shakes-and-floats"
+        }
+      },
+      {
+        "id": "item-shakes-and-floats-ice-cream-soda",
+        "slug": "shakes-and-floats-ice-cream-soda",
+        "status": "published",
+        "data": {
+          "name": "Ice cream soda",
+          "category": "$ref:cat-shakes-and-floats"
+        }
+      },
+      {
+        "id": "item-twisters-and-treats-twister",
+        "slug": "twisters-and-treats-twister",
+        "status": "published",
+        "data": {
+          "name": "Twister",
+          "category": "$ref:cat-twisters-and-treats",
+          "options": "Oreo, peanut butter, s’mores, cheesecake, banana, Choc-Nado or dirt cup"
+        }
+      },
+      {
+        "id": "item-twisters-and-treats-cookie-sandwich",
+        "slug": "twisters-and-treats-cookie-sandwich",
+        "status": "published",
+        "data": {
+          "name": "Cookie sandwich",
+          "category": "$ref:cat-twisters-and-treats",
+          "options": "Vanilla or M&M"
+        }
+      },
+      {
+        "id": "item-twisters-and-treats-brownie",
+        "slug": "twisters-and-treats-brownie",
+        "status": "published",
+        "data": {
+          "name": "Brownie",
+          "category": "$ref:cat-twisters-and-treats"
+        }
+      },
+      {
+        "id": "item-twisters-and-treats-whoopie-pie",
+        "slug": "twisters-and-treats-whoopie-pie",
+        "status": "published",
+        "data": {
+          "name": "Whoopie pie",
+          "category": "$ref:cat-twisters-and-treats"
+        }
+      },
+      {
+        "id": "item-take-home-pint",
+        "slug": "take-home-pint",
+        "status": "published",
+        "data": {
+          "name": "Pint",
+          "category": "$ref:cat-take-home"
+        }
+      },
+      {
+        "id": "item-take-home-quart",
+        "slug": "take-home-quart",
+        "status": "published",
+        "data": {
+          "name": "Quart",
+          "category": "$ref:cat-take-home"
+        }
+      },
+      {
+        "id": "item-take-home-2-5-gallon-tub",
+        "slug": "take-home-2-5-gallon-tub",
+        "status": "published",
+        "data": {
+          "name": "2.5-gallon tub",
+          "category": "$ref:cat-take-home"
+        }
+      },
+      {
+        "id": "item-take-home-tray-of-brownies",
+        "slug": "take-home-tray-of-brownies",
+        "status": "published",
+        "data": {
+          "name": "Tray of brownies",
+          "category": "$ref:cat-take-home"
+        }
+      },
+      {
+        "id": "item-hot-dogs-hot-dog",
+        "slug": "hot-dogs-hot-dog",
+        "status": "published",
+        "data": {
+          "name": "Hot dog",
+          "category": "$ref:cat-hot-dogs",
+          "options": "Add chili, cheese, kraut, bacon or mac and cheese"
+        }
+      },
+      {
+        "id": "item-hot-dogs-deluxe-dog",
+        "slug": "hot-dogs-deluxe-dog",
+        "status": "published",
+        "data": {
+          "name": "Deluxe dog",
+          "category": "$ref:cat-hot-dogs",
+          "options": "Krazy Kraut, chili mac, BBQ bacon onion or bacon cheese"
+        }
+      },
+      {
+        "id": "item-hot-dogs-kids-meal",
+        "slug": "hot-dogs-kids-meal",
+        "status": "published",
+        "data": {
+          "name": "Kid’s meal",
+          "category": "$ref:cat-hot-dogs",
+          "options": "Hot dog, mac and cheese or grilled cheese"
+        }
+      },
+      {
+        "id": "item-grilled-cheese-and-melts-grilled-cheese",
+        "slug": "grilled-cheese-and-melts-grilled-cheese",
+        "status": "published",
+        "data": {
+          "name": "Grilled cheese",
+          "category": "$ref:cat-melts",
+          "options": "Sharp cheddar, American, Swiss, pepper jack, provolone or mac and cheese"
+        }
+      },
+      {
+        "id": "item-grilled-cheese-and-melts-tuna-melt",
+        "slug": "grilled-cheese-and-melts-tuna-melt",
+        "status": "published",
+        "data": {
+          "name": "Tuna melt",
+          "category": "$ref:cat-melts",
+          "options": "Sharp cheddar, American, Swiss or pepper jack"
+        }
+      },
+      {
+        "id": "item-rolls-wraps-and-subs-lobster",
+        "slug": "rolls-wraps-and-subs-lobster",
+        "status": "published",
+        "data": {
+          "name": "Lobster",
+          "category": "$ref:cat-rolls-wraps-and-subs",
+          "options": "Roll, wrap or sub"
+        }
+      },
+      {
+        "id": "item-rolls-wraps-and-subs-classic-chicken",
+        "slug": "rolls-wraps-and-subs-classic-chicken",
+        "status": "published",
+        "data": {
+          "name": "Classic chicken",
+          "category": "$ref:cat-rolls-wraps-and-subs",
+          "options": "Roll, wrap or sub"
+        }
+      },
+      {
+        "id": "item-rolls-wraps-and-subs-cran-walnut-chicken",
+        "slug": "rolls-wraps-and-subs-cran-walnut-chicken",
+        "status": "published",
+        "data": {
+          "name": "Cran walnut chicken",
+          "category": "$ref:cat-rolls-wraps-and-subs",
+          "options": "Roll, wrap or sub"
+        }
+      },
+      {
+        "id": "item-rolls-wraps-and-subs-tuna",
+        "slug": "rolls-wraps-and-subs-tuna",
+        "status": "published",
+        "data": {
+          "name": "Tuna",
+          "category": "$ref:cat-rolls-wraps-and-subs",
+          "options": "Roll, wrap or sub"
+        }
+      },
+      {
+        "id": "item-rolls-wraps-and-subs-blt",
+        "slug": "rolls-wraps-and-subs-blt",
+        "status": "published",
+        "data": {
+          "name": "BLT",
+          "category": "$ref:cat-rolls-wraps-and-subs",
+          "options": "Wrap, sub or grilled"
+        }
+      },
+      {
+        "id": "item-mac-chili-and-sides-mac-and-cheese",
+        "slug": "mac-chili-and-sides-mac-and-cheese",
+        "status": "published",
+        "data": {
+          "name": "Mac and cheese",
+          "category": "$ref:cat-mac-chili-and-sides",
+          "options": "Small or large"
+        }
+      },
+      {
+        "id": "item-mac-chili-and-sides-pulled-pork-mac",
+        "slug": "mac-chili-and-sides-pulled-pork-mac",
+        "status": "published",
+        "data": {
+          "name": "Pulled pork mac",
+          "category": "$ref:cat-mac-chili-and-sides"
+        }
+      },
+      {
+        "id": "item-mac-chili-and-sides-franks-homemade-chili",
+        "slug": "mac-chili-and-sides-franks-homemade-chili",
+        "status": "published",
+        "data": {
+          "name": "Frank’s homemade chili",
+          "category": "$ref:cat-mac-chili-and-sides",
+          "options": "By the pint"
+        }
+      },
+      {
+        "id": "item-mac-chili-and-sides-chips",
+        "slug": "mac-chili-and-sides-chips",
+        "status": "published",
+        "data": {
+          "name": "Chips",
+          "category": "$ref:cat-mac-chili-and-sides"
+        }
+      },
+      {
+        "id": "item-mac-chili-and-sides-applesauce",
+        "slug": "mac-chili-and-sides-applesauce",
+        "status": "published",
+        "data": {
+          "name": "Applesauce",
+          "category": "$ref:cat-mac-chili-and-sides"
+        }
+      },
+      {
+        "id": "item-mac-chili-and-sides-teddy-grahams",
+        "slug": "mac-chili-and-sides-teddy-grahams",
+        "status": "published",
+        "data": {
+          "name": "Teddy Grahams",
+          "category": "$ref:cat-mac-chili-and-sides"
+        }
+      },
+      {
+        "id": "item-cold-drinks-fountain-drink",
+        "slug": "cold-drinks-fountain-drink",
+        "status": "published",
+        "data": {
+          "name": "Fountain drink",
+          "category": "$ref:cat-drinks",
+          "options": "Small, medium or large"
+        }
+      },
+      {
+        "id": "item-cold-drinks-pink-fizz",
+        "slug": "cold-drinks-pink-fizz",
+        "status": "published",
+        "data": {
+          "name": "Pink fizz",
+          "category": "$ref:cat-drinks",
+          "options": "Small or large"
+        }
+      },
+      {
+        "id": "item-cold-drinks-rickey",
+        "slug": "cold-drinks-rickey",
+        "status": "published",
+        "data": {
+          "name": "Rickey",
+          "category": "$ref:cat-drinks",
+          "options": "Lime or raspberry, small or large"
+        }
+      },
+      {
+        "id": "item-cold-drinks-cold-brew-coffee",
+        "slug": "cold-drinks-cold-brew-coffee",
+        "status": "published",
+        "data": {
+          "name": "Cold brew coffee",
+          "category": "$ref:cat-drinks",
+          "options": "Small or large"
+        }
+      },
+      {
+        "id": "item-cold-drinks-bottled-tea",
+        "slug": "cold-drinks-bottled-tea",
+        "status": "published",
+        "data": {
+          "name": "Bottled tea",
+          "category": "$ref:cat-drinks"
+        }
+      },
+      {
+        "id": "item-cold-drinks-bottled-water",
+        "slug": "cold-drinks-bottled-water",
+        "status": "published",
+        "data": {
+          "name": "Bottled water",
+          "category": "$ref:cat-drinks"
+        }
+      },
+      {
+        "id": "item-cold-drinks-milk-or-juice-box",
+        "slug": "cold-drinks-milk-or-juice-box",
+        "status": "published",
+        "data": {
+          "name": "Milk or juice box",
+          "category": "$ref:cat-drinks",
+          "options": "For kids"
+        }
+      },
+      {
+        "id": "item-hot-drinks-hot-chocolate",
+        "slug": "hot-drinks-hot-chocolate",
+        "status": "published",
+        "data": {
+          "name": "Hot chocolate",
+          "category": "$ref:cat-drinks"
+        }
+      },
+      {
+        "id": "item-hot-drinks-hot-coffee",
+        "slug": "hot-drinks-hot-coffee",
+        "status": "published",
+        "data": {
+          "name": "Hot coffee",
+          "category": "$ref:cat-drinks"
+        }
+      },
+      {
+        "id": "item-hot-drinks-hot-tea",
+        "slug": "hot-drinks-hot-tea",
+        "status": "published",
+        "data": {
+          "name": "Hot tea",
+          "category": "$ref:cat-drinks"
+        }
+      },
+      {
+        "id": "item-tree-balsam-fir",
+        "slug": "tree-balsam-fir",
+        "status": "published",
+        "data": {
+          "name": "Balsam fir",
+          "category": "$ref:cat-trees",
+          "options": "4–5, 5–6, 6–7 or 7–8 ft"
+        }
+      },
+      {
+        "id": "item-tree-fraser-fir",
+        "slug": "tree-fraser-fir",
+        "status": "published",
+        "data": {
+          "name": "Fraser fir",
+          "category": "$ref:cat-trees",
+          "options": "7–8 ft"
+        }
+      },
+      {
+        "id": "item-tree-table-top-tree",
+        "slug": "tree-table-top-tree",
+        "status": "published",
+        "data": {
+          "name": "Table top tree",
+          "category": "$ref:cat-trees"
+        }
+      },
+      {
+        "id": "item-wreath-plain",
+        "slug": "wreath-plain",
+        "status": "published",
+        "data": {
+          "name": "Plain",
+          "category": "$ref:cat-wreaths",
+          "options": "24-inch"
+        }
+      },
+      {
+        "id": "item-wreath-with-a-bow",
+        "slug": "wreath-with-a-bow",
+        "status": "published",
+        "data": {
+          "name": "With a bow",
+          "category": "$ref:cat-wreaths",
+          "options": "24-inch"
+        }
+      },
+      {
+        "id": "item-wreath-decorated",
+        "slug": "wreath-decorated",
+        "status": "published",
+        "data": {
+          "name": "Decorated",
+          "category": "$ref:cat-wreaths",
+          "options": "24-inch"
+        }
+      },
+      {
+        "id": "item-kissing-ball-classic",
+        "slug": "kissing-ball-classic",
+        "status": "published",
+        "data": {
+          "name": "Classic",
+          "category": "$ref:cat-kissing-balls"
+        }
+      },
+      {
+        "id": "item-kissing-ball-santa",
+        "slug": "kissing-ball-santa",
+        "status": "published",
+        "data": {
+          "name": "Santa",
+          "category": "$ref:cat-kissing-balls"
+        }
+      },
+      {
+        "id": "item-kissing-ball-snowman",
+        "slug": "kissing-ball-snowman",
+        "status": "published",
+        "data": {
+          "name": "Snowman",
+          "category": "$ref:cat-kissing-balls"
+        }
+      },
+      {
+        "id": "item-kissing-ball-gnome",
+        "slug": "kissing-ball-gnome",
+        "status": "published",
+        "data": {
+          "name": "Gnome",
+          "category": "$ref:cat-kissing-balls"
+        }
+      },
+      {
+        "id": "item-extra-lighted-snowman",
+        "slug": "extra-lighted-snowman",
+        "status": "published",
+        "data": {
+          "name": "Lighted snowman",
+          "category": "$ref:cat-extras"
+        }
+      },
+      {
+        "id": "item-extra-bows",
+        "slug": "extra-bows",
+        "status": "published",
+        "data": {
+          "name": "Bows",
+          "category": "$ref:cat-extras"
+        }
+      },
+      {
+        "id": "item-extra-tree-bags-and-preservative",
+        "slug": "extra-tree-bags-and-preservative",
+        "status": "published",
+        "data": {
+          "name": "Tree bags and preservative",
+          "category": "$ref:cat-extras"
+        }
+      }
+    ],
+    "schedule": [
+      {
+        "id": "ice-cream-2026",
+        "slug": "ice-cream-2026",
+        "status": "published",
+        "data": {
+          "title": "Ice cream season 2026",
+          "kind": "Open",
+          "start_date": "2026-01-10T00:00:00-05:00",
+          "status_text": "Open daily, 11am to 8pm. Until 9pm in summer",
+          "hero_headline": "A Milford tradition.\nOne scoop at a time.",
+          "hero_deck": "Good ice cream. Good company. Right here on Elm Street."
+        }
+      },
+      {
+        "id": "thanksgiving-2026",
+        "slug": "thanksgiving-2026",
+        "status": "published",
+        "data": {
+          "title": "Thanksgiving break 2026",
+          "kind": "Closed",
+          "start_date": "2026-11-22T00:00:00-05:00",
+          "status_text": "Closed until Friday, Nov 27 at 11am",
+          "banner_text": "We’re closed through Thanksgiving. Open again Friday, Nov 27 at 11am.",
+          "hero_headline": "See you Friday\nwith the trees.",
+          "hero_deck": "Christmas trees, wreaths and kissing balls, plus ice cream at the window."
+        }
+      },
+      {
+        "id": "trees-2026",
+        "slug": "trees-2026",
+        "status": "published",
+        "data": {
+          "title": "Trees & wreaths 2026",
+          "kind": "Trees & wreaths",
+          "start_date": "2026-11-27T00:00:00-05:00",
+          "status_text": "Open daily from 11am",
+          "banner_text": "Christmas trees, wreaths and kissing balls are on the lot.",
+          "hero_headline": "Trees and wreaths\nare on the lot.",
+          "hero_deck": "Balsam and Fraser firs, wreaths and kissing balls. Food and ice cream at the window."
+        }
+      },
+      {
+        "id": "winter-2026",
+        "slug": "winter-2026",
+        "status": "published",
+        "data": {
+          "title": "Winter break 2026",
+          "kind": "Closed",
+          "start_date": "2026-12-25T00:00:00-05:00",
+          "status_text": "Closed for a winter break",
+          "banner_text": "We’re on winter break. We’ll post our reopening day on Facebook and Instagram.",
+          "hero_headline": "See you soon,\nMilford.",
+          "hero_deck": "Thank you for another year on Elm Street."
+        }
+      }
+    ],
+    "store": [
+      {
+        "id": "milford",
+        "slug": "milford",
+        "status": "published",
+        "data": {
+          "phone": "603-672-8383",
+          "email": "haywardsofmilford@gmail.com",
+          "address": "383 Elm Street",
+          "locality": "Milford, NH 03055"
+        }
+      }
+    ],
+    "site_pages": [
+      {
+        "id": "page-history",
+        "slug": "history",
+        "status": "published",
+        "data": {
+          "title": "History",
+          "headline": "It started with a milk cart.",
           "excerpt": "A farm on Elm Street, an ice cream stand in 1939, and the one you know today.",
           "content": [
             {
@@ -1608,12 +1951,21 @@
         }
       },
       {
-        "id": "trees",
+        "id": "page-visit",
+        "slug": "visit",
+        "status": "published",
+        "data": {
+          "title": "Hours & directions",
+          "excerpt": "Look for the white stand with the curved roof and the red Hayward’s sign."
+        }
+      },
+      {
+        "id": "page-trees",
         "slug": "trees",
         "status": "published",
         "data": {
-          "title": "Christmas trees & wreaths",
-          "eyebrow": "Every holiday season",
+          "title": "Trees & wreaths",
+          "headline": "Christmas trees & wreaths",
           "excerpt": "Balsam and Fraser firs, 24‑inch wreaths and kissing balls.",
           "content": [
             {
@@ -1632,900 +1984,40 @@
             }
           ]
         }
-      }
-    ],
-    "visit": [
-      {
-        "id": "milford",
-        "slug": "milford",
-        "status": "published",
-        "data": {
-          "title": "Hayward’s Family Ice Cream — Milford",
-          "address": "383 Elm Street",
-          "locality": "Milford, NH 03055",
-          "phone": "603-672-8383",
-          "email": "haywardsofmilford@gmail.com",
-          "hours": "Open daily, 11am to 8pm. Until 9pm in summer",
-          "hours_note": "",
-          "notice": "",
-          "facebook": "https://www.facebook.com/Haywardsofmilford/",
-          "directions": "https://www.google.com/maps/dir/?api=1&destination=Hayward%27s+Ice+Cream+of+Milford%2C+383+Elm+Street%2C+Milford%2C+NH+03055",
-          "intro": "Look for the white stand with the curved roof and the red Hayward’s sign.",
-          "instagram": "https://www.instagram.com/haywards_icecream/"
-        }
-      }
-    ],
-    "periods": [
-      {
-        "id": "thanksgiving-2026",
-        "slug": "thanksgiving-2026",
-        "status": "published",
-        "data": {
-          "title": "Thanksgiving break 2026",
-          "start_date": "2026-11-22T00:00:00-05:00",
-          "end_date": "2026-11-26T00:00:00-05:00",
-          "dates_label": "",
-          "status_text": "Closed until Friday, Nov 27 at 11am",
-          "banner_text": "We’re closed through Thanksgiving. Open again Friday, Nov 27 at 11am.",
-          "hero_eyebrow": "Closed for Thanksgiving",
-          "hero_headline": "See you Friday\nwith the trees.",
-          "hero_deck": "Christmas trees, wreaths and kissing balls, plus ice cream at the window.",
-          "photo_set": "Tree lot",
-          "accent": "red",
-          "show_trees_nav": false,
-          "open_state": "Closed",
-          "visit_intro": "Look for the white stand with the curved roof, the red Hayward’s sign and, from Friday, the trees on the lot.",
-          "notes": "Reopening Friday, Nov 27 at 11am is from the live site banner. Trees on the lot that day match the design mock and 2024 and 2025; confirm for 2026."
-        }
-      },
-      {
-        "id": "trees-2026",
-        "slug": "trees-2026",
-        "status": "published",
-        "data": {
-          "title": "Trees & wreaths 2026",
-          "start_date": "2026-11-27T00:00:00-05:00",
-          "dates_label": "",
-          "status_text": "Open daily from 11am",
-          "banner_text": "Christmas trees, wreaths and kissing balls are on the lot.",
-          "hero_eyebrow": "On the lot now",
-          "hero_headline": "Trees and wreaths\nare on the lot.",
-          "hero_deck": "Balsam and Fraser firs, wreaths and kissing balls. Food and ice cream at the window.",
-          "photo_set": "Tree lot",
-          "accent": "green",
-          "show_trees_nav": true,
-          "open_state": "Open",
-          "visit_intro": "Look for the white stand with the curved roof, the red Hayward’s sign and the trees on the lot. Pick out a tree, grab a wreath and stop at the window.",
-          "notes": "CONFIRM: the closing time. Posted hours were 12 to 7pm in 2024 and 2025; the 2026 banner says only that the stand reopens Friday, Nov 27 at 11am. Once confirmed, put the closing time in the status line. No last day here: the lot runs until the Winter break’s first day (set to Dec 25). Sources: Hayward’s Instagram, Nov 2024 to Dec 2025."
-        }
-      },
-      {
-        "id": "winter-2026",
-        "slug": "winter-2026",
-        "status": "published",
-        "data": {
-          "title": "Winter break 2026",
-          "start_date": "2026-12-25T00:00:00-05:00",
-          "dates_label": "",
-          "status_text": "Closed for a winter break",
-          "banner_text": "We’re on winter break. We’ll post our reopening day on Facebook and Instagram.",
-          "hero_eyebrow": "Winter break",
-          "hero_headline": "See you soon,\nMilford.",
-          "hero_deck": "Thank you for another year on Elm Street.",
-          "photo_set": "Ice cream stand",
-          "accent": "red",
-          "show_trees_nav": false,
-          "open_state": "Closed",
-          "visit_intro": "Look for the white stand with the curved roof and the red Hayward’s sign.",
-          "notes": "Its first day also ends the tree lot: change this one date to move both. Open-ended: ends when the next period with a first day begins. Winter 2024-25: closed Dec 22, planned a mid to late January reopening, opened Feb 15. Winter 2025-26: closed Dec 21, announced a Jan 10 reopening. Sources: Hayward’s Instagram, Nov 2024 to Dec 2025."
-        }
-      },
-      {
-        "id": "ice-cream-2027",
-        "slug": "ice-cream-2027",
-        "status": "published",
-        "data": {
-          "title": "Ice cream season 2027",
-          "dates_label": "After the winter break",
-          "status_text": "Open daily, 11am to 8pm. Until 9pm in summer",
-          "banner_text": "",
-          "hero_headline": "",
-          "hero_deck": "",
-          "photo_set": "Ice cream stand",
-          "accent": "red",
-          "show_trees_nav": false,
-          "open_state": "Open",
-          "notes": "Set the first day once the reopening date is known; this period does not start without one. Standard hours are 11am to 8pm (owner); in 2025 the stand reopened at 11am to 7pm and moved to 8pm in mid-March. For summer hours (until 9pm) use the Summer hours period. Empty headline/introduction fall back to the Home page entry."
-        }
-      },
-      {
-        "id": "summer-2027",
-        "slug": "summer-2027",
-        "status": "published",
-        "data": {
-          "title": "Summer hours 2027",
-          "dates_label": "Summer months",
-          "status_text": "Open daily, 11am to 9pm",
-          "banner_text": "",
-          "hero_headline": "",
-          "hero_deck": "",
-          "photo_set": "Ice cream stand",
-          "accent": "red",
-          "show_trees_nav": false,
-          "open_state": "Open",
-          "notes": "Open until 9pm in the summer months, with no set dates (owner). Give it a first and last day when summer hours start; empty fields fall back to the Home page entry."
-        }
-      }
-    ],
-    "products": [
-      {
-        "id": "tree-balsam-fir",
-        "slug": "tree-balsam-fir",
-        "status": "published",
-        "data": {
-          "title": "Balsam fir",
-          "category": "Tree",
-          "options": "4–5, 5–6, 6–7 or 7–8 ft",
-          "square_id": "",
-          "sort_order": 10
-        }
-      },
-      {
-        "id": "tree-fraser-fir",
-        "slug": "tree-fraser-fir",
-        "status": "published",
-        "data": {
-          "title": "Fraser fir",
-          "category": "Tree",
-          "options": "7–8 ft",
-          "square_id": "",
-          "sort_order": 20
-        }
-      },
-      {
-        "id": "tree-table-top-tree",
-        "slug": "tree-table-top-tree",
-        "status": "published",
-        "data": {
-          "title": "Table top tree",
-          "category": "Tree",
-          "options": "",
-          "square_id": "",
-          "sort_order": 30
-        }
-      },
-      {
-        "id": "wreath-plain",
-        "slug": "wreath-plain",
-        "status": "published",
-        "data": {
-          "title": "Plain",
-          "category": "Wreath",
-          "options": "24-inch",
-          "square_id": "",
-          "sort_order": 40
-        }
-      },
-      {
-        "id": "wreath-with-a-bow",
-        "slug": "wreath-with-a-bow",
-        "status": "published",
-        "data": {
-          "title": "With a bow",
-          "category": "Wreath",
-          "options": "24-inch",
-          "square_id": "",
-          "sort_order": 50
-        }
-      },
-      {
-        "id": "wreath-decorated",
-        "slug": "wreath-decorated",
-        "status": "published",
-        "data": {
-          "title": "Decorated",
-          "category": "Wreath",
-          "options": "24-inch",
-          "square_id": "",
-          "sort_order": 60
-        }
-      },
-      {
-        "id": "kissing-ball-classic",
-        "slug": "kissing-ball-classic",
-        "status": "published",
-        "data": {
-          "title": "Classic",
-          "category": "Kissing ball",
-          "options": "",
-          "square_id": "",
-          "sort_order": 70
-        }
-      },
-      {
-        "id": "kissing-ball-santa",
-        "slug": "kissing-ball-santa",
-        "status": "published",
-        "data": {
-          "title": "Santa",
-          "category": "Kissing ball",
-          "options": "",
-          "square_id": "",
-          "sort_order": 80
-        }
-      },
-      {
-        "id": "kissing-ball-snowman",
-        "slug": "kissing-ball-snowman",
-        "status": "published",
-        "data": {
-          "title": "Snowman",
-          "category": "Kissing ball",
-          "options": "",
-          "square_id": "",
-          "sort_order": 90
-        }
-      },
-      {
-        "id": "kissing-ball-gnome",
-        "slug": "kissing-ball-gnome",
-        "status": "published",
-        "data": {
-          "title": "Gnome",
-          "category": "Kissing ball",
-          "options": "",
-          "square_id": "",
-          "sort_order": 100
-        }
-      },
-      {
-        "id": "extra-lighted-snowman",
-        "slug": "extra-lighted-snowman",
-        "status": "published",
-        "data": {
-          "title": "Lighted snowman",
-          "category": "Extra",
-          "options": "",
-          "square_id": "",
-          "sort_order": 110
-        }
-      },
-      {
-        "id": "extra-bows",
-        "slug": "extra-bows",
-        "status": "published",
-        "data": {
-          "title": "Bows",
-          "category": "Extra",
-          "options": "",
-          "square_id": "",
-          "sort_order": 120
-        }
-      },
-      {
-        "id": "extra-tree-bags-and-preservative",
-        "slug": "extra-tree-bags-and-preservative",
-        "status": "published",
-        "data": {
-          "title": "Tree bags and preservative",
-          "category": "Extra",
-          "options": "",
-          "square_id": "",
-          "sort_order": 130
-        }
-      }
-    ],
-    "menu_items": [
-      {
-        "id": "sizes-kiddie",
-        "slug": "sizes-kiddie",
-        "status": "published",
-        "data": {
-          "title": "Kiddie",
-          "section": "Sizes",
-          "options": "",
-          "square_id": "XSGFH2WYBBBIOMMNPEJMXRQ3",
-          "sort_order": 10
-        }
-      },
-      {
-        "id": "sizes-junior-scoop",
-        "slug": "sizes-junior-scoop",
-        "status": "published",
-        "data": {
-          "title": "Junior scoop",
-          "section": "Sizes",
-          "options": "",
-          "square_id": "XLCTP3HV7P5WLYTDWJVZWOQW",
-          "sort_order": 20
-        }
-      },
-      {
-        "id": "sizes-small",
-        "slug": "sizes-small",
-        "status": "published",
-        "data": {
-          "title": "Small",
-          "section": "Sizes",
-          "options": "",
-          "square_id": "PMTYDD5HYQQHC7SCKJ3FKPLL",
-          "sort_order": 30
-        }
-      },
-      {
-        "id": "sizes-large",
-        "slug": "sizes-large",
-        "status": "published",
-        "data": {
-          "title": "Large",
-          "section": "Sizes",
-          "options": "",
-          "square_id": "Y4LUMQSDDDTMX72U7KS5XTEN",
-          "sort_order": 40
-        }
-      },
-      {
-        "id": "sizes-soft-serve",
-        "slug": "sizes-soft-serve",
-        "status": "published",
-        "data": {
-          "title": "Soft serve",
-          "section": "Sizes",
-          "options": "Small or large",
-          "square_id": "J3KMZXXL7QRY6PMYR6WTZAZL",
-          "sort_order": 50
-        }
-      },
-      {
-        "id": "cones-and-toppings-cones",
-        "slug": "cones-and-toppings-cones",
-        "status": "published",
-        "data": {
-          "title": "Cones",
-          "section": "Cones and toppings",
-          "options": "Sugar cone, waffle cone, dipped waffle cone or waffle bowl",
-          "square_id": "3ZBM3NZ5WM4LWR5NHXKFG4JJ",
-          "sort_order": 60
-        }
-      },
-      {
-        "id": "cones-and-toppings-toppings",
-        "slug": "cones-and-toppings-toppings",
-        "status": "published",
-        "data": {
-          "title": "Toppings",
-          "section": "Cones and toppings",
-          "options": "Sprinkles, whipped cream, banana, malt, brownie, cookie and more",
-          "square_id": "3ZBM3NZ5WM4LWR5NHXKFG4JJ",
-          "sort_order": 70
-        }
-      },
-      {
-        "id": "sundaes-sundae",
-        "slug": "sundaes-sundae",
-        "status": "published",
-        "data": {
-          "title": "Sundae",
-          "section": "Sundaes",
-          "options": "Small or large",
-          "square_id": "PQTIYDUU75MWUGHCWHBSC7ML",
-          "sort_order": 80
-        }
-      },
-      {
-        "id": "sundaes-brownie-sundae",
-        "slug": "sundaes-brownie-sundae",
-        "status": "published",
-        "data": {
-          "title": "Brownie sundae",
-          "section": "Sundaes",
-          "options": "",
-          "square_id": "DSHGEVKMJTYSMNGF34OFA2EE",
-          "sort_order": 90
-        }
-      },
-      {
-        "id": "sundaes-reeses-sundae",
-        "slug": "sundaes-reeses-sundae",
-        "status": "published",
-        "data": {
-          "title": "Reese’s sundae",
-          "section": "Sundaes",
-          "options": "",
-          "square_id": "TW3I3IWSPYIODQ3WBJHXOWWE",
-          "sort_order": 100
-        }
-      },
-      {
-        "id": "sundaes-banana-boat",
-        "slug": "sundaes-banana-boat",
-        "status": "published",
-        "data": {
-          "title": "Banana boat",
-          "section": "Sundaes",
-          "options": "Small or large",
-          "square_id": "22UQPQ6MD4DKLIFDSKKTLX2D",
-          "sort_order": 110
-        }
-      },
-      {
-        "id": "sundaes-holiday-sundaes",
-        "slug": "sundaes-holiday-sundaes",
-        "status": "published",
-        "data": {
-          "title": "Holiday sundaes",
-          "section": "Sundaes",
-          "options": "Around Valentine’s Day, St. Patrick’s Day, Easter, the Fourth and more",
-          "square_id": "U4GKU6RGZH5RC57EI2OD7DAE",
-          "sort_order": 120
-        }
-      },
-      {
-        "id": "twisters-and-treats-twister",
-        "slug": "twisters-and-treats-twister",
-        "status": "published",
-        "data": {
-          "title": "Twister",
-          "section": "Twisters and treats",
-          "options": "Oreo, peanut butter, s’mores, cheesecake, banana, Choc-Nado or dirt cup",
-          "square_id": "BAO3HKGVLB74FFSZEFBAQ3UV",
-          "sort_order": 130
-        }
-      },
-      {
-        "id": "twisters-and-treats-cookie-sandwich",
-        "slug": "twisters-and-treats-cookie-sandwich",
-        "status": "published",
-        "data": {
-          "title": "Cookie sandwich",
-          "section": "Twisters and treats",
-          "options": "Vanilla or M&M",
-          "square_id": "V7FE7DUWDN6CBWE3HFP2O46I",
-          "sort_order": 140
-        }
-      },
-      {
-        "id": "twisters-and-treats-brownie",
-        "slug": "twisters-and-treats-brownie",
-        "status": "published",
-        "data": {
-          "title": "Brownie",
-          "section": "Twisters and treats",
-          "options": "",
-          "square_id": "CCDHMPHEGV6ZVXNZWPBR3A3D",
-          "sort_order": 150
-        }
-      },
-      {
-        "id": "twisters-and-treats-whoopie-pie",
-        "slug": "twisters-and-treats-whoopie-pie",
-        "status": "published",
-        "data": {
-          "title": "Whoopie pie",
-          "section": "Twisters and treats",
-          "options": "",
-          "square_id": "RK3KGVDOQ5OKOVCPMPTRWGT7",
-          "sort_order": 160
-        }
-      },
-      {
-        "id": "shakes-and-floats-milkshake",
-        "slug": "shakes-and-floats-milkshake",
-        "status": "published",
-        "data": {
-          "title": "Milkshake",
-          "section": "Shakes and floats",
-          "options": "",
-          "square_id": "GQPTTVJCKZPIA2W566SSUDGD",
-          "sort_order": 170
-        }
-      },
-      {
-        "id": "shakes-and-floats-frappe",
-        "slug": "shakes-and-floats-frappe",
-        "status": "published",
-        "data": {
-          "title": "Frappe",
-          "section": "Shakes and floats",
-          "options": "Regular or extra thick",
-          "square_id": "M6NMMQ6FJW3BDUUBR5BAIIRD",
-          "sort_order": 180
-        }
-      },
-      {
-        "id": "shakes-and-floats-float",
-        "slug": "shakes-and-floats-float",
-        "status": "published",
-        "data": {
-          "title": "Float",
-          "section": "Shakes and floats",
-          "options": "",
-          "square_id": "GU7WR73KCWFVBX7MRVVZE7YR",
-          "sort_order": 190
-        }
-      },
-      {
-        "id": "shakes-and-floats-freeze",
-        "slug": "shakes-and-floats-freeze",
-        "status": "published",
-        "data": {
-          "title": "Freeze",
-          "section": "Shakes and floats",
-          "options": "",
-          "square_id": "6BWG4J47637SR7C4VMDPFJKR",
-          "sort_order": 200
-        }
-      },
-      {
-        "id": "shakes-and-floats-ice-cream-soda",
-        "slug": "shakes-and-floats-ice-cream-soda",
-        "status": "published",
-        "data": {
-          "title": "Ice cream soda",
-          "section": "Shakes and floats",
-          "options": "",
-          "square_id": "AWWETTHWOU2Q7G2UFZC7KSHH",
-          "sort_order": 210
-        }
-      },
-      {
-        "id": "take-home-pint",
-        "slug": "take-home-pint",
-        "status": "published",
-        "data": {
-          "title": "Pint",
-          "section": "Take home",
-          "options": "",
-          "square_id": "6EXO5DCW3HWLIW5U6TMAHRRX",
-          "sort_order": 220
-        }
-      },
-      {
-        "id": "take-home-quart",
-        "slug": "take-home-quart",
-        "status": "published",
-        "data": {
-          "title": "Quart",
-          "section": "Take home",
-          "options": "",
-          "square_id": "CWILXMSR6L5ENYSMO5IZNA5T",
-          "sort_order": 230
-        }
-      },
-      {
-        "id": "take-home-2-5-gallon-tub",
-        "slug": "take-home-2-5-gallon-tub",
-        "status": "published",
-        "data": {
-          "title": "2.5-gallon tub",
-          "section": "Take home",
-          "options": "",
-          "square_id": "KFBWWE2MC7XI5C5O5UOEI556",
-          "sort_order": 240
-        }
-      },
-      {
-        "id": "take-home-tray-of-brownies",
-        "slug": "take-home-tray-of-brownies",
-        "status": "published",
-        "data": {
-          "title": "Tray of brownies",
-          "section": "Take home",
-          "options": "",
-          "square_id": "DTHQUFHDKYWGGGI5CFXFZLM2",
-          "sort_order": 250
-        }
-      },
-      {
-        "id": "hot-dogs-hot-dog",
-        "slug": "hot-dogs-hot-dog",
-        "status": "published",
-        "data": {
-          "title": "Hot dog",
-          "section": "Hot dogs",
-          "options": "Add chili, cheese, kraut, bacon or mac and cheese",
-          "square_id": "JPNJQMVG56QZFUHXP4V3EEGS",
-          "sort_order": 260
-        }
-      },
-      {
-        "id": "hot-dogs-deluxe-dog",
-        "slug": "hot-dogs-deluxe-dog",
-        "status": "published",
-        "data": {
-          "title": "Deluxe dog",
-          "section": "Hot dogs",
-          "options": "Krazy Kraut, chili mac, BBQ bacon onion or bacon cheese",
-          "square_id": "NGGOPRIRPVPWVMOQ4GWCYGSB",
-          "sort_order": 270
-        }
-      },
-      {
-        "id": "hot-dogs-kids-meal",
-        "slug": "hot-dogs-kids-meal",
-        "status": "published",
-        "data": {
-          "title": "Kid’s meal",
-          "section": "Hot dogs",
-          "options": "Hot dog, mac and cheese or grilled cheese",
-          "square_id": "WSNWFEP5D3TUCZUZKRE6W3FJ",
-          "sort_order": 280
-        }
-      },
-      {
-        "id": "grilled-cheese-and-melts-grilled-cheese",
-        "slug": "grilled-cheese-and-melts-grilled-cheese",
-        "status": "published",
-        "data": {
-          "title": "Grilled cheese",
-          "section": "Melts",
-          "options": "Sharp cheddar, American, Swiss, pepper jack, provolone or mac and cheese",
-          "square_id": "SDQVPFK4KXMBXHRL3AEMFGHR",
-          "sort_order": 290
-        }
-      },
-      {
-        "id": "grilled-cheese-and-melts-tuna-melt",
-        "slug": "grilled-cheese-and-melts-tuna-melt",
-        "status": "published",
-        "data": {
-          "title": "Tuna melt",
-          "section": "Melts",
-          "options": "Sharp cheddar, American, Swiss or pepper jack",
-          "square_id": "DRHNGC7YWLDIOJUB5DUISOMP",
-          "sort_order": 300
-        }
-      },
-      {
-        "id": "rolls-wraps-and-subs-lobster",
-        "slug": "rolls-wraps-and-subs-lobster",
-        "status": "published",
-        "data": {
-          "title": "Lobster",
-          "section": "Rolls, wraps and subs",
-          "options": "Roll, wrap or sub",
-          "square_id": "PRWEVNFPACXEGCTON63VKN5E",
-          "sort_order": 310
-        }
-      },
-      {
-        "id": "rolls-wraps-and-subs-classic-chicken",
-        "slug": "rolls-wraps-and-subs-classic-chicken",
-        "status": "published",
-        "data": {
-          "title": "Classic chicken",
-          "section": "Rolls, wraps and subs",
-          "options": "Roll, wrap or sub",
-          "square_id": "JJVQJM623EFFQOT6ZT6IDTMJ",
-          "sort_order": 320
-        }
-      },
-      {
-        "id": "rolls-wraps-and-subs-cran-walnut-chicken",
-        "slug": "rolls-wraps-and-subs-cran-walnut-chicken",
-        "status": "published",
-        "data": {
-          "title": "Cran walnut chicken",
-          "section": "Rolls, wraps and subs",
-          "options": "Roll, wrap or sub",
-          "square_id": "LHNUYSJS6UZXVFCUBMH3XMWR",
-          "sort_order": 330
-        }
-      },
-      {
-        "id": "rolls-wraps-and-subs-tuna",
-        "slug": "rolls-wraps-and-subs-tuna",
-        "status": "published",
-        "data": {
-          "title": "Tuna",
-          "section": "Rolls, wraps and subs",
-          "options": "Roll, wrap or sub",
-          "square_id": "4TS2XGD2GZI363QZMSVEYEGB",
-          "sort_order": 340
-        }
-      },
-      {
-        "id": "rolls-wraps-and-subs-blt",
-        "slug": "rolls-wraps-and-subs-blt",
-        "status": "published",
-        "data": {
-          "title": "BLT",
-          "section": "Rolls, wraps and subs",
-          "options": "Wrap, sub or grilled",
-          "square_id": "5KYZIVTII3BD2HATYNWVPHUL",
-          "sort_order": 350
-        }
-      },
-      {
-        "id": "mac-chili-and-sides-mac-and-cheese",
-        "slug": "mac-chili-and-sides-mac-and-cheese",
-        "status": "published",
-        "data": {
-          "title": "Mac and cheese",
-          "section": "Mac, chili and sides",
-          "options": "Small or large",
-          "square_id": "SU4XL4JBRWB4YJJ6AABUNOLI",
-          "sort_order": 360
-        }
-      },
-      {
-        "id": "mac-chili-and-sides-pulled-pork-mac",
-        "slug": "mac-chili-and-sides-pulled-pork-mac",
-        "status": "published",
-        "data": {
-          "title": "Pulled pork mac",
-          "section": "Mac, chili and sides",
-          "options": "",
-          "square_id": "HWX2EE36ZLNUHEO6VZXQH4L4",
-          "sort_order": 370
-        }
-      },
-      {
-        "id": "mac-chili-and-sides-franks-homemade-chili",
-        "slug": "mac-chili-and-sides-franks-homemade-chili",
-        "status": "published",
-        "data": {
-          "title": "Frank’s homemade chili",
-          "section": "Mac, chili and sides",
-          "options": "By the pint",
-          "square_id": "CMSGKHOUNAORLSVLWVFJBVS7",
-          "sort_order": 380
-        }
-      },
-      {
-        "id": "mac-chili-and-sides-chips",
-        "slug": "mac-chili-and-sides-chips",
-        "status": "published",
-        "data": {
-          "title": "Chips",
-          "section": "Mac, chili and sides",
-          "options": "",
-          "square_id": "SLNYX3P3GAY3JF27AC5A6CLC",
-          "sort_order": 390
-        }
-      },
-      {
-        "id": "mac-chili-and-sides-applesauce",
-        "slug": "mac-chili-and-sides-applesauce",
-        "status": "published",
-        "data": {
-          "title": "Applesauce",
-          "section": "Mac, chili and sides",
-          "options": "",
-          "square_id": "IXPKWH7EFLJKIBRIELWOJ42N",
-          "sort_order": 400
-        }
-      },
-      {
-        "id": "mac-chili-and-sides-teddy-grahams",
-        "slug": "mac-chili-and-sides-teddy-grahams",
-        "status": "published",
-        "data": {
-          "title": "Teddy Grahams",
-          "section": "Mac, chili and sides",
-          "options": "",
-          "square_id": "5SD2SHAZ7RILBKZJTYS5U6HA",
-          "sort_order": 410
-        }
-      },
-      {
-        "id": "cold-drinks-fountain-drink",
-        "slug": "cold-drinks-fountain-drink",
-        "status": "published",
-        "data": {
-          "title": "Fountain drink",
-          "section": "Cold drinks",
-          "options": "Small, medium or large",
-          "square_id": "KYJY3V5BIAGX4YIDKJHJUVSA",
-          "sort_order": 420
-        }
-      },
-      {
-        "id": "cold-drinks-pink-fizz",
-        "slug": "cold-drinks-pink-fizz",
-        "status": "published",
-        "data": {
-          "title": "Pink fizz",
-          "section": "Cold drinks",
-          "options": "Small or large",
-          "square_id": "467SKA6DNXSIXRZMNS3WZHGV",
-          "sort_order": 430
-        }
-      },
-      {
-        "id": "cold-drinks-rickey",
-        "slug": "cold-drinks-rickey",
-        "status": "published",
-        "data": {
-          "title": "Rickey",
-          "section": "Cold drinks",
-          "options": "Lime or raspberry, small or large",
-          "square_id": "USOR3BDQGKVNRQDABX3UNUPY",
-          "sort_order": 440
-        }
-      },
-      {
-        "id": "cold-drinks-cold-brew-coffee",
-        "slug": "cold-drinks-cold-brew-coffee",
-        "status": "published",
-        "data": {
-          "title": "Cold brew coffee",
-          "section": "Cold drinks",
-          "options": "Small or large",
-          "square_id": "FJXFZ3IZLH6UTJICI5XWATOJ",
-          "sort_order": 450
-        }
-      },
-      {
-        "id": "cold-drinks-bottled-tea",
-        "slug": "cold-drinks-bottled-tea",
-        "status": "published",
-        "data": {
-          "title": "Bottled tea",
-          "section": "Cold drinks",
-          "options": "",
-          "square_id": "R6XUNYH2DWBR3FGFF43FEB5T",
-          "sort_order": 460
-        }
-      },
-      {
-        "id": "cold-drinks-bottled-water",
-        "slug": "cold-drinks-bottled-water",
-        "status": "published",
-        "data": {
-          "title": "Bottled water",
-          "section": "Cold drinks",
-          "options": "",
-          "square_id": "KOUCATZMIGUD3R5MDFESV2TX",
-          "sort_order": 470
-        }
       },
       {
-        "id": "cold-drinks-milk-or-juice-box",
-        "slug": "cold-drinks-milk-or-juice-box",
+        "id": "page-food",
+        "slug": "food",
         "status": "published",
         "data": {
-          "title": "Milk or juice box",
-          "section": "Cold drinks",
-          "options": "For kids",
-          "square_id": "OPOLU5NYHNHFA542PDDKOIWN",
-          "sort_order": 480
+          "title": "Food & drinks",
+          "excerpt": "Not everything is on every day."
         }
       },
       {
-        "id": "hot-drinks-hot-chocolate",
-        "slug": "hot-drinks-hot-chocolate",
+        "id": "page-sundaes",
+        "slug": "sundaes",
         "status": "published",
         "data": {
-          "title": "Hot chocolate",
-          "section": "Hot drinks",
-          "options": "",
-          "square_id": "JOKT5ZCIFBACNVH6YJ7QQOCI",
-          "sort_order": 490
+          "title": "Sundaes & shakes",
+          "excerpt": "Not everything is on every day."
         }
       },
       {
-        "id": "hot-drinks-hot-coffee",
-        "slug": "hot-drinks-hot-coffee",
+        "id": "page-flavors",
+        "slug": "flavors",
         "status": "published",
         "data": {
-          "title": "Hot coffee",
-          "section": "Hot drinks",
-          "options": "",
-          "square_id": "JKF2VNSS6ZN5KVDBVLZHNKZZ",
-          "sort_order": 500
+          "title": "Flavors",
+          "excerpt": "Flavors come and go."
         }
       },
       {
-        "id": "hot-drinks-hot-tea",
-        "slug": "hot-drinks-hot-tea",
+        "id": "page-home",
+        "slug": "home",
         "status": "published",
         "data": {
-          "title": "Hot tea",
-          "section": "Hot drinks",
-          "options": "",
-          "square_id": "RGYHS7P3VMZNC5UZQZIEPJDU",
-          "sort_order": 510
+          "title": "Home"
         }
       }
     ]
@@ -2536,36 +2028,218 @@
       "label": "Main navigation",
       "items": [
         {
-          "type": "custom",
-          "label": "Home",
-          "url": "/"
+          "type": "collection",
+          "collection": "site_pages",
+          "ref": "page-home",
+          "label": "Home"
         },
         {
-          "type": "custom",
-          "label": "Flavors",
-          "url": "/menu"
+          "type": "collection",
+          "collection": "site_pages",
+          "ref": "page-flavors",
+          "label": "Flavors"
         },
         {
-          "type": "custom",
-          "label": "Sundaes & shakes",
-          "url": "/menu/sundaes"
+          "type": "collection",
+          "collection": "site_pages",
+          "ref": "page-sundaes",
+          "label": "Sundaes & shakes"
         },
         {
-          "type": "custom",
-          "label": "Food & drinks",
-          "url": "/menu/food"
+          "type": "collection",
+          "collection": "site_pages",
+          "ref": "page-food",
+          "label": "Food & drinks"
         },
         {
-          "type": "custom",
-          "label": "Hours & directions",
-          "url": "/visit"
+          "type": "collection",
+          "collection": "site_pages",
+          "ref": "page-trees",
+          "label": "Trees & wreaths"
         },
         {
-          "type": "custom",
-          "label": "History",
-          "url": "/history"
+          "type": "collection",
+          "collection": "site_pages",
+          "ref": "page-visit",
+          "label": "Hours & directions"
+        },
+        {
+          "type": "collection",
+          "collection": "site_pages",
+          "ref": "page-history",
+          "label": "History"
         }
       ]
+    },
+    {
+      "name": "flavors",
+      "label": "Flavors",
+      "items": [
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-ice-cream",
+          "label": "Ice cream"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-sherbet",
+          "label": "Sherbet"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-yogurt",
+          "label": "Frozen yogurt"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-sorbet",
+          "label": "Sorbet"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-vegan",
+          "label": "Vegan"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-no-sugar-added",
+          "label": "No sugar added"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-sizes",
+          "label": "Sizes"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-cones-and-toppings",
+          "label": "Cones and toppings"
+        }
+      ]
+    },
+    {
+      "name": "sundaes",
+      "label": "Sundaes & shakes",
+      "items": [
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-sundaes",
+          "label": "Sundaes"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-shakes-and-floats",
+          "label": "Shakes and floats"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-twisters-and-treats",
+          "label": "Twisters and treats"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-take-home",
+          "label": "Take home"
+        }
+      ]
+    },
+    {
+      "name": "food",
+      "label": "Food & drinks",
+      "items": [
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-hot-dogs",
+          "label": "Hot dogs"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-melts",
+          "label": "Melts"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-rolls-wraps-and-subs",
+          "label": "Rolls, wraps and subs"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-mac-chili-and-sides",
+          "label": "Mac, chili and sides"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-drinks",
+          "label": "Drinks"
+        }
+      ]
+    },
+    {
+      "name": "trees",
+      "label": "Trees & wreaths",
+      "items": [
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-trees",
+          "label": "Christmas trees"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-wreaths",
+          "label": "Wreaths"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-kissing-balls",
+          "label": "Kissing balls"
+        },
+        {
+          "type": "collection",
+          "collection": "catalog_categories",
+          "ref": "cat-extras",
+          "label": "Extras"
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "slug": "flavor_category",
+      "parentCollection": "catalog_categories",
+      "childCollection": "catalog_flavors",
+      "parentLabel": "Category",
+      "childLabel": "Flavors",
+      "childLabelSingular": "Flavor",
+      "maxParentsPerChild": 1
+    },
+    {
+      "slug": "item_category",
+      "parentCollection": "catalog_categories",
+      "childCollection": "catalog_items",
+      "parentLabel": "Category",
+      "childLabel": "Menu items",
+      "childLabelSingular": "Menu item",
+      "maxParentsPerChild": 1
     }
   ]
 }

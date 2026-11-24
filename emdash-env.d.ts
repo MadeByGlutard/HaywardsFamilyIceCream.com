@@ -3,14 +3,19 @@
 
 /// <reference types="emdash/locals" />
 
-import type { BylineSummary, ContentBylineCredit, TaxonomyTerm, PortableTextBlock } from "emdash";
+import type { BylineSummary, ContentBylineCredit, TaxonomyTerm, PortableTextBlock, ReferencePage } from "emdash";
 
-export interface Category {
+export interface Schedule {
   id: string;
   slug: string | null;
   status: string;
-  name: string;
-  sort_order: number;
+  title: string;
+  kind: "Open" | "Closed" | "Trees & wreaths";
+  start_date: string;
+  status_text: string;
+  hero_headline: string;
+  hero_deck: string;
+  banner_text?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -19,17 +24,15 @@ export interface Category {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
-export interface Flavor {
+export interface CatalogFlavor {
   id: string;
   slug: string | null;
   status: string;
   name: string;
-  category: "Ice Cream" | "Sherbet" | "Yogurt" | "Sorbet" | "Vegan" | "No Sugar Added";
-  sort_order: number;
-  allergens?: ("gluten" | "nuts")[];
-  half_gallon?: boolean;
   description?: string;
-  allergen_notes?: string;
+  allergens?: ("Gluten" | "Nuts" | "Eggs" | "Soy")[];
+  half_gallon?: boolean;
+  photo?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -38,15 +41,12 @@ export interface Flavor {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
-export interface MenuItem {
+export interface CatalogItem {
   id: string;
   slug: string | null;
   status: string;
-  title: string;
-  section: "Sizes" | "Cones and toppings" | "Sundaes" | "Twisters and treats" | "Shakes and floats" | "Take home" | "Hot dogs" | "Melts" | "Rolls, wraps and subs" | "Mac, chili and sides" | "Cold drinks" | "Hot drinks";
+  name: string;
   options?: string;
-  square_id?: string;
-  sort_order?: number;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -55,12 +55,41 @@ export interface MenuItem {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
-export interface Page {
+export interface CatalogCategory {
+  id: string;
+  slug: string | null;
+  status: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface Store {
+  id: string;
+  slug: string | null;
+  status: string;
+  phone: string;
+  email?: string;
+  address: string;
+  locality: string;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
+export interface SitePage {
   id: string;
   slug: string | null;
   status: string;
   title: string;
-  eyebrow?: string;
+  headline?: string;
   excerpt?: string;
   content?: PortableTextBlock[];
   createdAt: Date;
@@ -71,117 +100,31 @@ export interface Page {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
-export interface Period {
-  id: string;
-  slug: string | null;
-  status: string;
-  title: string;
-  start_date?: string;
-  end_date?: string;
-  dates_label?: string;
-  status_text?: string;
-  banner_text?: string;
-  hero_eyebrow?: string;
-  hero_headline?: string;
-  hero_deck?: string;
-  hero_image?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };
-  photo_set?: "Ice cream stand" | "Tree lot";
-  accent?: "red" | "green";
-  show_trees_nav?: boolean;
-  open_state?: "Open" | "Closed";
-  visit_intro?: string;
-  notes?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  publishedAt: Date | null;
-  byline?: BylineSummary | null;
-  bylines?: ContentBylineCredit[];
-  terms?: Record<string, TaxonomyTerm[]>;
+export interface CatalogFlavorReferences {
+  category: ReferencePage<CatalogCategory>;
 }
 
-export interface Product {
-  id: string;
-  slug: string | null;
-  status: string;
-  title: string;
-  category: "Tree" | "Wreath" | "Kissing ball" | "Extra";
-  options?: string;
-  square_id?: string;
-  sort_order?: number;
-  createdAt: Date;
-  updatedAt: Date;
-  publishedAt: Date | null;
-  byline?: BylineSummary | null;
-  bylines?: ContentBylineCredit[];
-  terms?: Record<string, TaxonomyTerm[]>;
+export interface CatalogItemReferences {
+  category: ReferencePage<CatalogCategory>;
 }
 
-export interface Serving {
-  id: string;
-  slug: string | null;
-  status: string;
-  title: string;
-  price: string;
-  description?: string;
-  sort_order?: number;
-  createdAt: Date;
-  updatedAt: Date;
-  publishedAt: Date | null;
-  byline?: BylineSummary | null;
-  bylines?: ContentBylineCredit[];
-  terms?: Record<string, TaxonomyTerm[]>;
-}
-
-export interface Setting {
-  id: string;
-  slug: string | null;
-  status: string;
-  title: string;
-  banner?: string;
-  social?: { "label": string; "type": "facebook"; "url": string }[];
-  contact?: { "label": string; "type": "phone" | "place" | "email"; "url": string; "value": string }[];
-  createdAt: Date;
-  updatedAt: Date;
-  publishedAt: Date | null;
-  byline?: BylineSummary | null;
-  bylines?: ContentBylineCredit[];
-  terms?: Record<string, TaxonomyTerm[]>;
-}
-
-export interface Visit {
-  id: string;
-  slug: string | null;
-  status: string;
-  title: string;
-  address: string;
-  locality: string;
-  phone: string;
-  email?: string;
-  hours: string;
-  hours_note?: string;
-  notice?: string;
-  facebook?: string;
-  instagram?: string;
-  directions?: string;
-  intro?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  publishedAt: Date | null;
-  byline?: BylineSummary | null;
-  bylines?: ContentBylineCredit[];
-  terms?: Record<string, TaxonomyTerm[]>;
+export interface CatalogCategoryReferences {
+  flavors: ReferencePage<CatalogFlavor>;
+  items: ReferencePage<CatalogItem>;
 }
 
 declare module "emdash" {
   interface EmDashCollections {
-    categories: Category;
-    flavors: Flavor;
-    menu_items: MenuItem;
-    pages: Page;
-    periods: Period;
-    products: Product;
-    servings: Serving;
-    settings: Setting;
-    visit: Visit;
+    schedule: Schedule;
+    catalog_flavors: CatalogFlavor;
+    catalog_items: CatalogItem;
+    catalog_categories: CatalogCategory;
+    store: Store;
+    site_pages: SitePage;
+  }
+  interface EmDashCollectionReferences {
+    catalog_flavors: CatalogFlavorReferences;
+    catalog_items: CatalogItemReferences;
+    catalog_categories: CatalogCategoryReferences;
   }
 }

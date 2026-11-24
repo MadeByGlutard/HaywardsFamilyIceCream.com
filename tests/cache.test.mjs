@@ -45,7 +45,7 @@ test('every content page is cached and purged by every collection it can show', 
   const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8');
   const seed = JSON.parse(await read('seed/seed.json'));
   for (const { slug } of seed.collections) assert.ok(CONTENT_TAGS.includes(slug), `${slug} is missing from CONTENT_TAGS`);
-  for (const page of ['index', 'menu', 'menu/sundaes', 'menu/food', 'history', 'trees', 'visit']) assert.match(await read(`src/pages/${page}.astro`), /cacheContentPage\(Astro\);/, page);
+  for (const page of ['index', 'flavors', 'sundaes', 'food', 'history', 'trees', 'visit']) assert.match(await read(`src/pages/${page}.astro`), /cacheContentPage\(Astro\);/, page);
   assert.match(await read('astro.config.mjs'), /cache: \{ provider: cacheCloudflare\(\) \}/);
   assert.match(await read('cloudflare.config.ts'), /cache: \{\s*enabled: true,?\s*\}/);
 });

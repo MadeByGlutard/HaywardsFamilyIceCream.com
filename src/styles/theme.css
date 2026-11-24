@@ -441,10 +441,6 @@ mark.placeholder {
 }
 
 /* The notice bar already says it. */
-.says-closed .opening {
-	display: none;
-}
-
 /* A long line ("Closed through Thanksgiving…") takes two even lines on tablets. */
 .opening {
 	min-width: 0;
@@ -1410,18 +1406,6 @@ main:has(> .end-band:last-child) + .footer {
 		height: auto;
 		aspect-ratio: 5 / 3;
 		object-position: 50% 72%;
-	}
-
-	.says-closed .opening {
-		display: flex;
-	}
-
-	.says-closed .status-text {
-		display: none;
-	}
-
-	.says-closed .status-alt {
-		display: inline;
 	}
 
 	.end-band .wrap {

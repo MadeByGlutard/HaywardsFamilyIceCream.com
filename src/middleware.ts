@@ -1,4 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
+import { withSharedAdmin } from "./admin/shared";
 import { ensureContentModel } from "./lib/upgrade";
 
 // Staff sign in with a password, so EmDash's passkey-first screens hand over to ours.
@@ -19,9 +20,11 @@ export function destination(pathname: string): string | undefined {
 	return admin ? `/_emdash/admin${admin[1] ?? ""}` : PASSWORD_PAGES[path];
 }
 
-export const onRequest = defineMiddleware(async ({ url, request, redirect, isPrerendered }, next) => {
+export const onRequest = defineMiddleware(async (context, next) => {
+	const { url, request, redirect, isPrerendered } = context;
 	const to = request.method === "GET" ? destination(url.pathname) : undefined;
 	if (to) return redirect(to + url.search);
 	if (!isPrerendered) await ensureContentModel();
-	return next();
+	const response = await next();
+	return request.method === "GET" ? withSharedAdmin(context, response) : response;
 });

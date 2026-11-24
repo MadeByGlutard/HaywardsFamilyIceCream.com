@@ -60,6 +60,10 @@ export default defineConfig(({ isPreview }) => {
 				MEDIA: bindings.r2({ name: resources.r2 }),
 				// Declared so previews get one: only a full deploy creates it by itself.
 				SESSION: bindings.kv({ id: resources.kv }),
+				// Runs plugins installed from the admin in their own isolates.
+				LOADER: bindings.workerLoader(),
+				// Invites and other admin mail (astro.config.mjs). Can only send as the admin.
+				EMAIL: bindings.sendEmail({ allowedSenderAddresses: ["cms@mail.haywardsfamilyicecream.com"] }),
 			},
 		},
 	};

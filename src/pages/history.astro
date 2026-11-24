@@ -1,15 +1,16 @@
 ---
-import { getEmDashEntry, getSeoMeta } from 'emdash';
+import { getSeoMeta } from 'emdash';
 import { PortableText } from 'emdash/ui';
 import Base from '../layouts/Base.astro';
+import { getPage } from '../lib/site';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
-const {entry:story}=await getEmDashEntry('pages','our-story');
+const story=await getPage('history');
 if(!story)return Astro.rewrite('/404');
 const seo=getSeoMeta(story,{defaultTitle:'History',defaultDescription:story.data.excerpt});
 ---
-<Base title={seo.title} description={seo.description || story.data.excerpt} content={{collection:'pages',id:story.data.id,slug:'our-story'}}>
-  <section class="page-heading story-heading wrap"><p class="eyebrow" {...story.edit.eyebrow}>{story.data.eyebrow}</p><h1 {...story.edit.title}>{story.data.title.replace(/Elm Street/g, 'Elm\u00a0Street')}</h1><p {...story.edit.excerpt}>{story.data.excerpt}</p></section>
+<Base title={seo.title} description={seo.description || story.data.excerpt} content={{collection: 'site_pages',id:story.data.id,slug:'history'}}>
+  <section class="page-heading story-heading wrap"><p class="eyebrow">Our history</p><h1 {...story.headlineEdit}>{story.headline.replace(/Elm Street/g, 'Elm\u00a0Street')}</h1><p {...story.edit.excerpt}>{story.data.excerpt}</p></section>
   <figure class="story-banner wrap"><img src="/images/postcard-milford-stand.jpg" alt="Color postcard of a long white ice cream stand with a red hipped roof and a Hayward Farms sign, titled “One of our ice cream stands on Route 101, Milford, New Hampshire”" width="1222" height="750" /><figcaption>The old Milford stand on an undated postcard. Boston Public Library, Tichnor Brothers Collection.</figcaption></figure>
   <article class="story-body wrap"><div class="story-prose" {...story.edit.content}><PortableText value={story.data.content || []} /></div></article>
   <section class="sources wrap" id="sources"><details><summary>Sources <i class="ph ph-plus" aria-hidden="true"></i></summary><p>Sources don’t all agree. We use 1939 for the Milford stand because the 1962 obituary and the local history both give it and the town’s records fit; 1940 is when the family’s Nashua stand opened. If you have a photo or a correction, please get in touch.</p><ol>

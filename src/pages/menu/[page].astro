@@ -1,0 +1,5 @@
+---
+// The menu pages' first addresses.
+const moved = { sundaes: '/sundaes', food: '/food' }[Astro.params.page!];
+return moved ? Astro.redirect(moved, 301) : Astro.rewrite('/404');
+---

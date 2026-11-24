@@ -1,43 +1,40 @@
 import type { AstroGlobal } from 'astro';
 import { getEmDashCollection } from 'emdash';
-import { getBanner } from './site';
-import type { Period, Visit } from '../../emdash-env';
-import { accentOf, type Accent } from './schedule-dates';
-import { locationStatus, type SiteStatus } from './status';
-import { daysBetween, effectiveEnd, isStaleClosure, milfordDay, pickPeriod, publicTitle, scheduleOrder, type PeriodEntry as BaseEntry } from './schedule-dates';
+import type { Schedule } from '../../emdash-env';
+import type { SiteStatus } from './status';
+import { accentOf, daysBetween, isClosed, isTrees, lastDay, milfordDay, pickPeriod, scheduleOrder, type Accent, type PeriodEntry as BaseEntry } from './schedule-dates';
 
-export type PeriodEntry = BaseEntry<Period & { show_trees_nav?: boolean | number }>;
+export type PeriodEntry = BaseEntry<Schedule>;
 export * from './schedule-dates';
 
 export interface ScheduleContext {
   /** Milford calendar day the page was rendered for. */
   today: string;
-  active?: PeriodEntry;
+  /** The period in force: the only source of the hours, banner and home page headline. */
+  active: PeriodEntry;
   periods: PeriodEntry[];
   status: SiteStatus;
   accent: Accent;
+  /** The stand is closed for this whole period. */
+  closed: boolean;
   /** Tree lot open: Trees & wreaths nav item and product list. */
   treesOpen: boolean;
-  /** Next period that opens the tree lot, if one is scheduled after today. */
+  /** The next tree lot, if one is scheduled after today. */
   nextTrees?: PeriodEntry;
   photoSet: 'stand' | 'trees';
   /** Trees & wreaths in the navigation: while the lot is open, for six weeks before, and for five days after (to say it has closed). */
   treesNav: boolean;
   /** Show the product list: while the lot is open and in the month before. */
   treesListed: boolean;
-  /** The line is "Call for today's hours": make it dial. */
-  call: boolean;
   /** The most recent tree lot, if it ended in the last two months. */
   endedTrees?: PeriodEntry;
-  /** Open/closed from the period's optional "Open or closed" field; undefined when unknown or a Visit notice is in effect. */
-  openState?: 'open' | 'closed';
   /** Set when a design-review preview (`?period=` / `?today=`) is in effect. */
   preview?: string;
 }
 
 /**
- * Design-review previews: `?period=trees` (slug or slug prefix, or `none`
- * for no period) and `?today=2026-12-01`. Honoured in `astro dev`, on preview builds (behind Cloudflare Access) and for
+ * Design-review previews: `?period=trees` (slug or slug prefix) and `?today=2026-12-01`.
+ * Honoured in `astro dev`, on preview builds (behind Cloudflare Access) and for
  * signed-in EmDash staff only; ignored for public visitors.
  */
 function previewParams(Astro: AstroGlobal) {
@@ -51,79 +48,57 @@ function previewParams(Astro: AstroGlobal) {
 const cache = new WeakMap<Request, Promise<ScheduleContext>>();
 
 /** Period context for this request (memoised, so layout and page share one query). */
-export function getScheduleContext(Astro: AstroGlobal, place: Pick<Visit, 'hours' | 'notice'>): Promise<ScheduleContext> {
+export function getScheduleContext(Astro: AstroGlobal): Promise<ScheduleContext> {
   let pending = cache.get(Astro.request);
   if (!pending) {
-    pending = build(Astro, place);
+    pending = build(Astro);
     cache.set(Astro.request, pending);
   }
   return pending;
 }
 
-async function build(Astro: AstroGlobal, place: Pick<Visit, 'hours' | 'notice'>): Promise<ScheduleContext> {
-  const [{ entries, error }, banner] = await Promise.all([getEmDashCollection('periods', { limit: 100 }), getBanner()]);
-  if (error) console.warn('Schedule periods could not be loaded; using Visit information.', error);
-  const periods: PeriodEntry[] = (entries ?? []).map((e) => ({
-    slug: e.id,
-    data: e.data as Period,
-    edit: e.edit as unknown as PeriodEntry['edit'],
-    start: milfordDay(e.data.start_date),
-    end: milfordDay(e.data.end_date),
-  }));
-  const ordered = scheduleOrder(periods);
+async function build(Astro: AstroGlobal): Promise<ScheduleContext> {
+  const { entries, error } = await getEmDashCollection('schedule', { limit: 200 });
+  if (error) throw error;
+  const periods = scheduleOrder(entries.map((entry): PeriodEntry => ({
+    slug: entry.id,
+    data: entry.data as Schedule,
+    edit: entry.edit as unknown as PeriodEntry['edit'],
+    start: milfordDay(entry.data.start_date)!,
+  })));
   const preview = previewParams(Astro);
   let today = preview.today ?? milfordDay(new Date())!;
+  const asked = preview.period ? periods.filter((period) => period.slug.startsWith(preview.period!)).at(-1) : undefined;
+  // Previewing a period: look at it from its own first day.
+  if (asked && !preview.today) today = asked.start;
+  const active = asked ?? pickPeriod(periods, today);
+  if (!active) throw new Error('Nothing is published in Schedule. Publish a period to bring the site back.');
 
-  let active: PeriodEntry | undefined;
-  if (preview.period === 'none') active = undefined;
-  else if (preview.period) {
-    active = ordered.filter((s) => s.slug === preview.period || s.slug.startsWith(`${preview.period}-`) || s.slug.startsWith(preview.period!)).at(-1);
-  } else active = pickPeriod(ordered, today);
-  // Previewing a period without ?today: look at it from its own first day, so
-  // the Visit schedule and "next tree lot" read as they will on that day.
-  if (preview.period && !preview.today && active?.start && active.start > today) today = active.start;
-
-  // Nobody followed up on an open-ended closure: stop claiming it.
-  const stale = !!active && isStaleClosure(active, today);
-  if (stale) active = undefined;
-
-  // A location notice (e.g. a weather closure) beats the period's status line;
-  // the period's status beats the everyday opening statement.
-  const fallback: SiteStatus = stale && !place.notice?.trim() ? { line: 'Call for today’s hours', source: 'notice' } : locationStatus(place);
-  const periodLine = active?.data.status_text?.trim();
-  const base: SiteStatus = fallback.source === 'notice' || !periodLine ? fallback : { line: periodLine, source: 'period', edit: active!.edit.status_text };
-  // A location notice (a snow day) takes the bar, then the Site settings banner staff type by
-  // hand, then the period's own. Previews of another period or date show that period's.
-  const notice = place.notice?.trim() || undefined;
-  const typed = preview.period || preview.today ? undefined : banner.text;
-  const strip = notice ?? typed ?? active?.data.banner_text?.trim();
-  const status: SiteStatus = { ...base, strip: strip && (notice || strip !== base.line) ? strip : undefined, stripEdit: notice ? undefined : typed ? banner.edit : active?.edit.banner_text };
-
-  const treesOpen = !!active?.data.show_trees_nav;
-  // Measured from the later of today and the active period's first day, so a
-  // previewed period (?period=winter) doesn't count a tree lot that is before it.
-  const from = active?.start && active.start > today ? active.start : today;
-  const nextTrees = ordered.find((s) => !!s.data.show_trees_nav && !!s.start && s.start > from);
-  const openState = status.source === 'period' && active?.data.open_state ? (active.data.open_state === 'Closed' ? ('closed' as const) : ('open' as const)) : undefined;
-  const endedTrees = ordered.filter((s) => {
-    const end = effectiveEnd(s, ordered);
-    return !!s.data.show_trees_nav && !!end && end < today && daysBetween(end, today) <= 60;
+  const line = active.data.status_text;
+  const strip = active.data.banner_text?.trim();
+  const treesOpen = isTrees(active.data);
+  const closed = isClosed(active.data);
+  const nextTrees = periods.find((period) => isTrees(period.data) && period.start > today);
+  const endedTrees = periods.filter((period) => {
+    const end = lastDay(period, periods);
+    return isTrees(period.data) && !!end && end < today && daysBetween(end, today) <= 60;
   }).at(-1);
-  const untilTrees = nextTrees?.start ? daysBetween(today, nextTrees.start) : Infinity;
+  const untilTrees = nextTrees ? daysBetween(today, nextTrees.start) : Infinity;
+  // Closed just before the tree lot (Thanksgiving): its photos already.
+  const treesNext = closed && !!nextTrees && periods[periods.indexOf(active) + 1] === nextTrees;
   return {
     today,
     active,
-    periods: ordered,
-    status,
-    accent: accentOf(active?.data),
-    call: stale && !notice,
+    periods,
+    status: { line, edit: active.edit.status_text, ...(strip && strip !== line ? { strip, stripEdit: active.edit.banner_text } : {}) },
+    accent: accentOf(active.data),
+    closed,
     treesOpen,
     nextTrees,
-    treesNav: treesOpen || untilTrees <= 45 || (!!endedTrees && daysBetween(effectiveEnd(endedTrees, ordered)!, today) <= 5),
+    treesNav: treesOpen || untilTrees <= 45 || (!!endedTrees && daysBetween(lastDay(endedTrees, periods)!, today) <= 5),
     treesListed: treesOpen || untilTrees <= 30,
     endedTrees,
-    photoSet: active?.data.photo_set === 'Tree lot' ? 'trees' : 'stand',
-    openState,
+    photoSet: treesOpen || treesNext ? 'trees' : 'stand',
     preview: preview.period || preview.today ? `${preview.period ?? ''}${preview.today ? ` @ ${preview.today}` : ''}`.trim() : undefined,
   };
 }

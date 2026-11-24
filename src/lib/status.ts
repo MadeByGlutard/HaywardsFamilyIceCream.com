@@ -1,25 +1,14 @@
-import type { Visit } from '../../emdash-env';
-
 type EditAttrs = Record<string, string> | undefined;
 
-/** What the header, footer and Visit page say about today. */
+/** What the header, footer and Hours & directions page say about today. */
 export interface SiteStatus {
-  /** Short status line, e.g. "Open daily, 11am to 8pm", a notice or the period's status. */
+  /** The current period's hours line. */
   line: string;
-  /** Text for the banner strip under the navigation, if any. */
+  /** Text for the banner at the top, if any. */
   strip?: string;
-  /** Where the line came from. */
-  source: 'hours' | 'notice' | 'period';
-  /** Visual-editing attributes for the line and strip. */
+  /** Visual-editing attributes for the line and the banner. */
   edit?: EditAttrs;
   stripEdit?: EditAttrs;
-}
-
-/** Status from the location entry alone: a seasonal notice wins over the opening statement. */
-export function locationStatus(place: Pick<Visit, 'hours' | 'notice'>): SiteStatus {
-  const notice = place.notice?.trim();
-  if (notice) return { line: notice, source: 'notice' };
-  return { line: place.hours, source: 'hours' };
 }
 
 /** Ends a status line with a full stop unless it already has punctuation. */

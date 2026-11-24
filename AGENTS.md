@@ -13,8 +13,8 @@ Read `.agents/skills/building-emdash-site/SKILL.md` for content APIs and `.agent
 
 ## Architecture
 
-- `seed/seed.json`: schema and starting content. Databases already set up get new collections and fields from `src/lib/upgrade.ts` (raise `CONTENT_VERSION`); existing entries are never changed. Schema changes only add.
-- `src/lib/site.ts`: shared location query and category helpers.
+- `seed/seed.json`: schema and starting content. Databases already set up get new collections and fields from `src/lib/upgrade.ts` (raise `CONTENT_VERSION`); the port's collections are hidden, never deleted. Keep the forms short: add a field only when staff will use it.
+- `src/lib/site.ts`: store info, directions and social links. `src/lib/catalog.ts`: categories with their flavors and menu items.
 - `src/layouts/Base.astro`: common masthead, menu, SEO hooks and footer.
 - `src/pages/`: server-rendered home, menu, story and visit pages.
 - `src/styles/theme.css`: responsive newspaper design.
