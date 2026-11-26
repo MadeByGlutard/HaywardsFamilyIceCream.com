@@ -280,7 +280,8 @@ async function upgradeContent() {
 	// The workers.dev address, not the custom domain: the zone's Bot Fight Mode answers requests
 	// from CI servers with a 403 before Access sees them, and workers.dev isn't in the zone.
 	const { result } = await api(`/accounts/${account}/workers/subdomain`);
-	const url = `https://${slug}-${PREFIX}.${result.subdomain}.workers.dev/`;
+	// A query string nobody else uses, so the Workers cache can't answer with the last deploy's page.
+	const url = `https://${slug}-${PREFIX}.${result.subdomain}.workers.dev/?upgrade=${Date.now()}`;
 	const started = Date.now();
 	for (let attempt = 1; attempt <= 6; attempt++) {
 		try {

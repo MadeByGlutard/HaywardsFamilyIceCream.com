@@ -210,7 +210,7 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages: all of 
 EmDash applies the seed during setup only, so `src/lib/upgrade.ts` adds what a database is
 missing once per `CONTENT_VERSION`, on the first request after a deploy, and other requests wait
 for it (several seconds on D1). Preview deploys make that request themselves (see Previews); after a
-production deploy, open the site yourself right away. The port's flavors
+production deploy, open the site yourself right away, with a query string the cache hasn't seen. The port's flavors
 (with allergens and half gallons), banner and social links carry over, staff's changes included.
 Menus already there are left alone. Its `settings`, `categories`
 and `flavors` collections, and the redesign's first ones on older previews, are then hidden from the admin but kept, with their data (allergens
@@ -267,7 +267,8 @@ the domains to the Pages project.
 2. **Admin first:** deploy (`npm run deploy`) and finish setup on the `workers.dev` address
    (behind Access) before the domain points here. Otherwise whoever opens the wizard first
    becomes admin. Invite staff; check the invite email arrives.
-3. **Content upgrade:** load the `workers.dev` address once and wait for the page, so the upgrade
+3. **Content upgrade:** load the `workers.dev` address once, with a query string the cache hasn't
+   seen (`/?upgrade=1`, a new number each time), and wait for the page, so the upgrade
    runs then and not for a visitor. A failed upgrade shows "We're updating the website" (503,
    not cached) instead of a broken page; the Worker logs say why.
 4. **Pause Pages:** turn off automatic deployments on the Pages project, so a push to `main`
