@@ -692,10 +692,6 @@ html:has(.menu-sheet[open]) {
 	grid-column: span 2;
 }
 
-.photo-set-trees.photo-spread .crop:first-child img {
-	object-position: 50% 10% !important;
-}
-
 .news-columns {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1176,10 +1172,6 @@ html:has(.menu-sheet[open]) {
 .trees-lead .crop img {
 	position: absolute;
 	inset: 0;
-}
-
-.trees-lead img {
-	object-position: 66% 50%;
 }
 
 .trees-list {
@@ -1722,21 +1714,20 @@ main:has(> .end-band:last-child) + .footer {
 		aspect-ratio: 3 / 2;
 	}
 
-	.trees-lead img {
-		object-position: 50% 20%;
-	}
-
 	.photo-row {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: var(--s3) 10px;
 		margin-top: var(--s4);
 	}
 
-	.photo-row figure:first-child {
+	/* Full-width first photo, and the last one too when it would sit alone. */
+	.photo-row figure:first-child,
+	.photo-row figure:last-child:nth-child(even) {
 		grid-column: 1 / -1;
 	}
 
-	.photo-row figure:first-child .crop {
+	.photo-row figure:first-child .crop,
+	.photo-row figure:last-child:nth-child(even) .crop {
 		aspect-ratio: 3 / 2;
 	}
 
