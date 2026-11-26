@@ -63,7 +63,7 @@ const themeColor = schedule.accent === 'green' ? '#2e5a3c' : '#a71d2a';
       </div>
       <div class="nav-bar"><div class="nav-wrap wrap">
         <nav class="main-nav" aria-label="Main navigation">{navItems.map(item => <a href={item.url} aria-current={path === item.url ? 'page' : undefined}>{item.label}</a>)}</nav>
-        <div class="status-row"><a class="opening" href="/visit"><span class="status-text" {...statusEdit} set:html={withSentences(status.line)} /><span class="status-alt">Hours &amp; directions</span><span class="sr-only">, hours and directions</span></a><a class="directions-link" href={place.directions}><i class="ph ph-map-pin" aria-hidden="true"></i><span>{place.address}</span><span class="sr-only">, directions</span></a></div>
+        <div class="status-row"><span class="opening-cell"><a class="opening" href="/visit"><span class="status-text" {...statusEdit} set:html={withSentences(status.line)} /><span class="status-alt">Hours &amp; directions</span><span class="sr-only">, hours and directions</span></a></span><a class="directions-link" href={place.directions}><i class="ph ph-map-pin" aria-hidden="true"></i><span>{place.address}</span><span class="sr-only">, directions</span></a></div>
       </div></div>
     </header>
     {/* The Menu button's dialog on phones and tablets. Without script, Menu jumps to the page list in the footer. */}

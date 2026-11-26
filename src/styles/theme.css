@@ -451,6 +451,11 @@ mark.placeholder {
 	justify-content: flex-end;
 }
 
+/* Desktop: the link itself sits in the row. */
+.opening-cell {
+	display: contents;
+}
+
 /* The notice bar already says it. */
 /* A long line ("Closed through Thanksgiving…") takes two even lines on tablets. */
 .opening {
@@ -1378,10 +1383,27 @@ main:has(> .end-band:last-child) + .footer {
 		font-size: .9375rem;
 	}
 
-	/* Large text: the hours and the address take a row each. */
-	.opening {
+	/* Large text: the hours and the address take a row each. The cell lays out the row; the
+	   link inside is plain text, so its tap area follows its words, even over two lines. */
+	.opening-cell {
+		display: block;
 		flex: 1 1 8.5em;
 		min-width: min(100%, 8.5em);
+		max-width: max-content;
+		padding-block: 10px;
+		line-height: 1.3;
+		text-wrap: balance;
+	}
+
+	.opening {
+		display: inline;
+		min-height: 0;
+		padding-block: 6px;
+	}
+
+	.opening .status-text,
+	.opening .sentence {
+		display: inline;
 	}
 
 	.directions-link {
@@ -1822,9 +1844,12 @@ main:has(> .end-band:last-child) + .footer {
 		width: 150px;
 	}
 
-	.opening,
 	.directions-link {
 		min-height: 40px;
+	}
+
+	.opening-cell {
+		padding-block: 6px;
 	}
 }
 
