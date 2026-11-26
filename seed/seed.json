@@ -2441,14 +2441,7 @@
                 }
               ]
             }
-          ],
-          "photo": {
-            "id": "two-scoops",
-            "src": "/images/two-scoops.jpg",
-            "width": 1080,
-            "height": 1080,
-            "alt": "Two cups of ice cream on an outdoor table at Hayward’s, one piled with caramel pieces and one green"
-          }
+          ]
         },
         "bylines": [
           {

@@ -171,7 +171,7 @@ async function renameUnedited(db: any) {
 }
 
 /**
- * The first post had its sources at the end of its text; posts now have Sources and Photo fields.
+ * The first post had its sources at the end of its text; posts now have a Sources field.
  * Moves them over, only while the post still has its sources in the text and none of its own.
  */
 async function splitFirstPost(db: any) {
@@ -182,5 +182,5 @@ async function splitFirstPost(db: any) {
   const content = rows[0]?.content;
   if (!content || !content.includes('"Sources"')) return;
   await sql`UPDATE ec_posts SET content = ${JSON.stringify(post.data.content)}, sources = ${JSON.stringify(post.data.sources)},
-    photo = ${JSON.stringify(post.data.photo)} WHERE slug = 'milkshake-vs-frappe' AND sources IS NULL`.execute(db);
+    photo = ${post.data.photo ? JSON.stringify(post.data.photo) : null} WHERE slug = 'milkshake-vs-frappe' AND sources IS NULL`.execute(db);
 }
