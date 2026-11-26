@@ -403,14 +403,15 @@ mark.placeholder {
 	flex-wrap: wrap;
 	align-items: stretch;
 	justify-content: space-between;
-	gap: 0 24px;
+	gap: 0 16px;
 }
 
+/* Link spacing narrows with the window, so today's hours fit beside the menu on small laptops. */
 .main-nav {
 	display: flex;
 	flex: none;
 	flex-wrap: wrap;
-	gap: 0 24px;
+	gap: 0 clamp(12px, 1.7vw, 24px);
 	max-width: 100%;
 }
 
@@ -447,8 +448,16 @@ mark.placeholder {
 
 .status-row {
 	display: flex;
-	flex: 1 1 8em;
+	flex: 1 0 auto;
 	justify-content: flex-end;
+}
+
+/* Desktop: the hours stay on one line. When they don't fit beside the menu they take the
+   next line under it, still at the right, instead of squeezing into a narrow stack. */
+@media (min-width: 1001px) {
+	.opening {
+		white-space: nowrap;
+	}
 }
 
 /* Desktop: the link itself sits in the row. */
@@ -1286,14 +1295,6 @@ main:has(> .end-band:last-child) + .footer {
 
 	.visit-layout h2 {
 		font-size: 1.625rem;
-	}
-
-	.main-nav {
-		gap: 0 15px;
-	}
-
-	.nav-wrap {
-		gap: 0 16px;
 	}
 
 	.main-nav a,
