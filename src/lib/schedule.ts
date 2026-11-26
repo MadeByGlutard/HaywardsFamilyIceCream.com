@@ -60,12 +60,11 @@ export function getScheduleContext(Astro: AstroGlobal): Promise<ScheduleContext>
 async function build(Astro: AstroGlobal): Promise<ScheduleContext> {
   const { entries, error } = await getEmDashCollection('schedule', { limit: 200 });
   if (error) throw error;
-  const periods = scheduleOrder(entries.map((entry): PeriodEntry => ({
-    slug: entry.id,
-    data: entry.data as Schedule,
-    edit: entry.edit as unknown as PeriodEntry['edit'],
-    start: milfordDay(entry.data.start_date)!,
-  })));
+  // A period with no first day isn't on the calendar yet, even if it's published.
+  const periods = scheduleOrder(entries.flatMap((entry): PeriodEntry[] => {
+    const start = milfordDay(entry.data.start_date);
+    return start ? [{ slug: entry.id, data: entry.data as Schedule, edit: entry.edit as unknown as PeriodEntry['edit'], start }] : [];
+  }));
   const preview = previewParams(Astro);
   let today = preview.today ?? milfordDay(new Date())!;
   const asked = preview.period ? periods.filter((period) => period.slug.startsWith(preview.period!)).at(-1) : undefined;
