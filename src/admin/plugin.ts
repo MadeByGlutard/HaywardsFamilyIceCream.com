@@ -1,6 +1,7 @@
 import { definePlugin } from "emdash";
 import { categoryLinks } from "../lib/catalog-links";
-import { changeTubs, readTubs, type TubAction } from "./tubs";
+import { ACTIONS, type TubAction } from "./tub-flow";
+import { changeTubs, readTubs } from "./tubs";
 
 export const createPlugin = () =>
 	definePlugin({
@@ -18,13 +19,13 @@ export const createPlugin = () =>
 				handler: async (ctx) => {
 					const storage = ctx.storage as any;
 					if (ctx.request.method === "POST") {
-						const { flavor, action } = (ctx.input ?? {}) as { flavor?: string; action?: TubAction };
-						const actions: TubAction[] = ["front+", "front-", "back+", "back-", "case", "move"];
+						const { flavor, action, count } = (ctx.input ?? {}) as { flavor?: string; action?: TubAction; count?: number };
 						const { rows } = await readTubs(storage);
 						const row = rows.find((r) => r.id === flavor);
-						if (!row || !action || !actions.includes(action)) throw new Error("Unknown flavor or action");
+						if (!row || !action || !ACTIONS.includes(action)) throw new Error("Unknown flavor or action");
 						const name = row.category && rows.filter((r) => r.name === row.name).length > 1 ? `${row.name} (${row.category})` : row.name;
-						await changeTubs(storage, { id: row.id, name }, action, ctx.user?.name || ctx.user?.email || "");
+						const notice = await changeTubs(storage, { id: row.id, name }, action, ctx.user?.name || ctx.user?.email || "", Number(count ?? 1));
+						return { ...(await readTubs(storage)), notice };
 					}
 					return readTubs(storage);
 				},

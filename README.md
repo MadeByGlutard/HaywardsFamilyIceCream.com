@@ -173,10 +173,17 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the
 - Staff can preview another date with `?today=2026-12-01` or a period with `?period=trees` (or `summer`;
   a published period with no start date yet is shown as of today). `/design-preview` shows one page
   in every published period side by side.
-- **Tub counts** (Plugins → Tub counts, `src/admin/tubs.ts` and `tub-counts.tsx`): staff count
-  tubs in the front and back freezers per flavor. "Into the case" takes from the front (or the
-  back if the front is out); "Back to front" moves one up. Counts live in the plugin's storage
-  with a short change log, are guarded so two taps can't go below zero, and never change the website.
+- **Tub counts** (Plugins → Tub counts, `src/admin/tubs.ts`, `tub-flow.ts` and `tub-counts.tsx`):
+  staff track tubs the way they move: made → back freezer → front freezer → dipping case. "+" or
+  "+5" in the back freezer records tubs just made, with the Milford (America/New_York) day they
+  went in. Tubs are ready to move to the front from the next calendar day in Milford (made any
+  time on the 26th, ready from midnight starting the 27th); each flavor shows how many back tubs
+  are ready now and how many tomorrow. "Back to front" moves one ready tub, oldest first, and says
+  so if none are ready yet. "Into the case" takes one from the front only. "Last one out of front"
+  sets the front to 0 when its last tub is gone, so the flavor shows "Move from back" (or "Out").
+  − on the back takes off the newest tubs, for corrections. Counts live in the plugin's storage
+  with a short change log; each tap is a versioned compare-and-set, so simultaneous taps can't
+  go below zero or get lost. Counts never change the website.
 - `src/admin/`: the Category column and the Square panel (the "Hayward's admin" plugin), the sidebars everyone starts with (no bylines, ownership or URL) and admin CSS.
 
 `content/flavors.json` and `content/settings/settings.yaml` are the original data from
