@@ -176,17 +176,19 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages: all of 
 - **Tub counts** (Plugins → Tub counts, `src/admin/tubs.ts`, `tub-flow.ts` and `tub-counts.tsx`):
   staff only, built around where a tub is: Hardening (just made) → Back freezer → Front freezer →
   Cabinets. The first three are counts; Cabinets is In or Out, one tub per flavor in its slot. On a
-  phone, tabs pick the place (each shows its tubs; Cabinets counts flavors in), which lists the
-  flavors there with their one next move: To back, To front, Into cabinets, Swap tub (fresh tub in,
-  front count down one) or Used up (only when nothing is up front). A row stays, faded, after its
-  last tub leaves until you switch places or search. "Made a batch" (on Hardening) adds tubs;
-  tapping a flavor opens its sheet to set every count at once. Every change shows an 8-second
-  Undo, and repeating the same move adds up ("Moved 3 Chocolate to the front freezer") under one
-  Undo. The overview lists every flavor A–Z with the last 5 changes; on a wide screen it sits
-  beside the places. Counts live in the plugin's storage with a short change log. Each tap is one
-  guarded update, so simultaneous taps can't go below zero; a saved sheet is last-write-wins.
-  Older records are converted on first load (four-count sheet: Freezing → Hardening, any Cabinets
-  → In; first version: back tubs added that day → Hardening). Counts never change the website.
+  wide screen (1024px and up) the page is one table of every flavor A–Z with a search box, "Made a
+  batch" and the last 5 changes; clicking a row opens that flavor in a dialog with its next moves
+  (To back, To front, Into cabinets or Swap tub, Used up) above all four values. On phones and
+  tablets a switch picks Places or All flavors. Places has tabs for each place (with its tubs;
+  Cabinets counts flavors in), each listing the flavors there with their one next move; a row
+  stays, faded, after its last tub leaves until you switch places or search. All flavors is a
+  compact list of every flavor's counts. A flavor's sheet (a bottom sheet on phones, a dialog from
+  768px) has the same moves plus every count. Every change shows an 8-second Undo, and repeating
+  the same move adds up ("Moved 3 Chocolate to the front freezer") under one Undo. Counts live in
+  the plugin's storage with a short change log. Each tap is one guarded update, so simultaneous
+  taps can't go below zero; a saved sheet is last-write-wins. Older records are converted on first
+  load (four-count sheet: Freezing → Hardening, any Cabinets → In; first version: back tubs added
+  that day → Hardening). Counts never change the website.
 - `src/admin/`: the Category column and the Square panel (the "Hayward's admin" plugin), and the sidebars everyone starts with (no ownership or URL panels).
 
 `content/flavors.json` and `content/settings/settings.yaml` are the original data from

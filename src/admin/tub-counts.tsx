@@ -31,6 +31,12 @@ interface Snack {
 	/** A note (nothing to move, couldn't undo) has no Undo. */
 	note?: boolean;
 }
+interface Move {
+	text: string;
+	aria: string;
+	stop?: boolean;
+	run: () => void;
+}
 /** Taps shown under one Undo: what they were, how many, and what the server said went through. */
 interface Group {
 	flavor: string;
@@ -80,15 +86,31 @@ const css = `
   --tc-in: light-dark(#1f7a46, #6fdca0); --tc-in-tint: light-dark(#e2f3e9, rgba(111, 220, 160, .15));
   --tc-snack: light-dark(#1d2024, #f2f4f6); --tc-snack-fg: light-dark(#f2f4f6, #111316); --tc-snack-act: light-dark(#8fb8ff, #1a5fd0);
   --tc-scrim: light-dark(rgba(20, 23, 26, .45), rgba(0, 0, 0, .55)); --tc-sheet: light-dark(#ffffff, #1d2024);
-  container-type: inline-size; color: var(--tc-fg); font: 16px/1.35 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  color: var(--tc-fg); font: 16px/1.35 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
 .tc button, .tc input { font: inherit; color: inherit; }
 .tc :focus-visible { outline: 3px solid var(--tc-go); outline-offset: 2px; }
-.tc-grid { display: grid; gap: 32px; align-items: start; }
-.tc-places { max-width: 480px; min-width: 0; }
-.tc-desk { min-width: 0; display: grid; gap: 16px; }
+.tc-narrow { max-width: 480px; min-width: 0; }
+.tc-wide { display: none; min-width: 0; gap: 20px; }
+@media (min-width: 1024px) { .tc-narrow { display: none; } .tc-wide { display: grid; } }
 .tc-top { padding: 0 0 8px; display: flex; align-items: center; justify-content: space-between; }
 .tc-top h1 { margin: 0; font-size: 1.375rem; font-weight: 700; letter-spacing: -0.01em; }
-.tc .tc-link { appearance: none; border: 0; background: none; color: var(--tc-go); font-weight: 600; min-height: 48px; padding: 0 4px; cursor: pointer; }
+.tc-view { display: grid; grid-template-columns: auto auto; background: var(--tc-raised); border: 1px solid var(--tc-line); border-radius: 10px; padding: 2px; }
+.tc .tc-view button { appearance: none; border: 0; background: transparent; border-radius: 8px; min-height: 36px; padding: 0 12px; font-size: .8125rem; font-weight: 600; color: var(--tc-muted); cursor: pointer; position: relative; }
+.tc-view button::before { content: ""; position: absolute; inset: -4px 0; }
+.tc .tc-view button[aria-pressed="true"] { background: light-dark(#ffffff, #2c3036); color: var(--tc-fg); box-shadow: 0 1px 2px rgba(0, 0, 0, .12), 0 0 0 1px var(--tc-line); }
+.tc-all-head, .tc-all-row { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, 34px) 40px; column-gap: 6px; align-items: center; }
+.tc-all-head { position: sticky; top: var(--tc-sticky, 0px); z-index: 1; margin-top: 8px; background: var(--tc-bg); border-bottom: 1px solid var(--tc-line); padding-block: 10px 8px; font-size: .6875rem; font-weight: 600; color: var(--tc-muted); text-align: center; }
+.tc-all-head span:first-child { text-align: left; font-size: .8125rem; }
+.tc .tc-all-row { appearance: none; border: 0; border-bottom: 1px solid var(--tc-line); background: none; width: 100%; min-height: 56px; padding: 6px 0; text-align: center; cursor: pointer; font-variant-numeric: tabular-nums; }
+.tc .tc-all-row:active { background: var(--tc-raised); }
+.tc-all-row b { text-align: left; font-size: .9375rem; font-weight: 600; line-height: 1.25; }
+.tc-all-row b small { display: block; font-size: .75rem; font-weight: 400; color: var(--tc-muted); }
+.tc-all-row span { font-size: 1.0625rem; font-weight: 700; }
+.tc-all-row span.z { color: var(--tc-muted); font-weight: 400; }
+.tc-all-row .tc-state { font-size: .6875rem; padding: 3px 6px; justify-self: center; }
+.tc-moves { display: flex; flex-wrap: wrap; gap: 8px; }
+.tc .tc-moves .tc-pill { margin-left: 0; }
+.tc-moves-label { margin: 0 0 -6px; font-size: .8125rem; font-weight: 600; color: var(--tc-muted); }
 .tc-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--tc-raised); border: 1px solid var(--tc-line); border-radius: 12px; padding: 3px; }
 .tc .tc-tabs button { appearance: none; border: 0; min-height: 54px; border-radius: 9px; background: transparent; cursor: pointer; padding: 6px 2px 5px; display: grid; place-content: center; gap: 1px; position: relative; color: var(--tc-muted); }
 .tc-tabs button + button::before { content: ""; position: absolute; left: -1px; top: 14px; bottom: 14px; width: 1px; background: var(--tc-line); }
@@ -175,10 +197,17 @@ const css = `
 .tc-picked { margin: 0; font-size: .9375rem; }
 
 .tc-table { background: var(--tc-card); border: 1px solid var(--tc-line); border-radius: 12px; overflow: hidden; }
-.tc-table-head { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baseline; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--tc-line); }
-.tc-table-head strong { font-size: 1.0625rem; }
-.tc-table-head span { color: var(--tc-muted); font-size: .875rem; }
-.tc-wrap { overflow: auto; max-height: 520px; }
+.tc-desk-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--tc-line); }
+.tc-desk-tools h1 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+.tc-desk-tools div { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tc .tc-desk-tools input { height: 40px; width: 220px; max-width: 100%; box-sizing: border-box; border-radius: 10px; border: 1px solid var(--tc-line); background: var(--tc-bg); font-size: 16px; padding: 0 12px; }
+.tc-desk-tools input::placeholder { color: var(--tc-muted); }
+.tc .tc-add { height: 40px; border: 0; border-radius: 10px; padding: 0 16px; background: var(--tc-fg); color: var(--tc-card); font-weight: 700; cursor: pointer; }
+.tc-pad { padding: 0 20px; }
+.tc-wrap { overflow: auto; max-height: max(360px, calc(100dvh - 260px)); }
+.tc-wide tbody tr { cursor: pointer; }
+.tc-wide tbody tr:hover th, .tc-wide tbody tr:hover td, .tc-wide tbody tr:focus-within th, .tc-wide tbody tr:focus-within td { background: var(--tc-bg); }
+.tc td.tc-none { text-align: left; color: var(--tc-muted); font-weight: 400; }
 .tc table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 1.0625rem; min-width: 620px; }
 .tc th, .tc td { text-align: right; padding: 12px 20px; border-bottom: 1px solid var(--tc-line); font-variant-numeric: tabular-nums; background: var(--tc-card); }
 .tc thead th { position: sticky; top: 0; z-index: 2; white-space: nowrap; font-size: .875rem; font-weight: 600; color: var(--tc-muted); background: var(--tc-bg); }
@@ -194,9 +223,6 @@ const css = `
 .tc-log h2 { margin: 0 0 8px; font-size: 1rem; font-weight: 600; }
 .tc-log ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: .9375rem; color: var(--tc-muted); }
 
-/* Phone: one view at a time. Wide: places beside the overview. */
-@container (max-width: 899px) { .tc[data-view="places"] .tc-desk, .tc[data-view="overview"] .tc-places { display: none; } }
-@container (min-width: 900px) { .tc-grid { grid-template-columns: minmax(340px, 420px) minmax(0, 1fr); } .tc .tc-link { display: none; } }
 `;
 
 export function TubCounts() {
@@ -206,7 +232,8 @@ export function TubCounts() {
 	const [place, setPlace] = React.useState<Place>("back");
 	const [query, setQuery] = React.useState("");
 	const [showAll, setShowAll] = React.useState(false);
-	const [view, setView] = React.useState<"places" | "overview">("places");
+	const [view, setView] = React.useState<"places" | "all">("places");
+	const [deskQuery, setDeskQuery] = React.useState("");
 	const [sheet, setSheet] = React.useState<Sheet>(null);
 	const [snack, setSnack] = React.useState<Snack | null>(null);
 	// Changes go to the server one after another, so quick taps are never lost or out of order.
@@ -246,7 +273,7 @@ export function TubCounts() {
 		const id = focusRow.current;
 		if (!id || root.current?.contains(document.activeElement)) return;
 		focusRow.current = null;
-		const row = root.current?.querySelector(`.tc-places [data-row="${CSS.escape(id)}"]`);
+		const row = root.current?.querySelector(`.tc-narrow [data-row="${CSS.escape(id)}"]`);
 		row?.querySelector<HTMLElement>(".tc-pill, .tc-who")?.focus();
 	}, [rows]);
 
@@ -289,7 +316,10 @@ export function TubCounts() {
 	const byId = (id: string) => all.find((r) => r.id === id);
 
 	const change = (r: Row, c: Change) => {
+		// From a sheet, focus goes back to what opened it; from a row, it stays on that row.
+		const from = sheet?.from;
 		setSheet(null);
+		if (from) window.setTimeout(() => from.focus(), 0);
 		const shown: Change = c.action === "into" ? { ...c, swap: r.cab } : c;
 		const repeat = repeatKey(shown);
 		const key = repeat && `${r.id}:${repeat}`;
@@ -306,7 +336,7 @@ export function TubCounts() {
 			groups.current.set(id, group);
 		}
 		last.current = key ? { key, id, at: now } : null;
-		focusRow.current = r.id;
+		if (!from) focusRow.current = r.id;
 		local(r.id, (t) => applyChange(t, c));
 		showSnack({ id, text: changeText({ ...shown, count: group.n } as Change, label(r)) });
 		post(
@@ -331,7 +361,7 @@ export function TubCounts() {
 			(data) => data.failed && note(data.failed),
 		);
 	};
-	const open = (s: { kind: "flavor"; id: string } | { kind: "batch" }) => setSheet({ ...s, from: document.activeElement as HTMLElement | null });
+	const open = (s: { kind: "flavor"; id: string } | { kind: "batch" }, from?: HTMLElement | null) => setSheet({ ...s, from: from ?? (document.activeElement as HTMLElement | null) });
 	const closeSheet = (restore: boolean) => {
 		const from = sheet?.from;
 		setSheet(null);
@@ -371,6 +401,15 @@ export function TubCounts() {
 		if (place === "cab" && r.cab) return pill("Used up", `${label(r)} used up, empty its slot`, () => change(r, { action: "usedUp" }), true);
 		return null;
 	};
+	/** Every move a flavor can make right now, for the top of its sheet. */
+	const movesFor = (r: Row): Move[] => [
+		...(r.hard ? [{ text: "To back", aria: `Move 1 ${label(r)} to the back freezer`, run: () => change(r, { action: "move", from: "hard" }) }] : []),
+		...(r.back ? [{ text: "To front", aria: `Move 1 ${label(r)} to the front freezer`, run: () => change(r, { action: "move", from: "back" }) }] : []),
+		...(r.front
+			? [{ text: r.cab ? "Swap tub" : "Into cabinets", aria: r.cab ? `Swap a fresh ${label(r)} into the cabinets` : `Put ${label(r)} in the cabinets`, run: () => change(r, { action: "into" }) }]
+			: []),
+		...(r.cab ? [{ text: "Used up", aria: `${label(r)} used up, empty its slot`, stop: true, run: () => change(r, { action: "usedUp" }) }] : []),
+	];
 	const row = (r: Row) => (
 		<div key={r.id} data-row={r.id} className={!has(r, place) && pinned.current.has(r.id) ? "tc-row left" : "tc-row"}>
 			{place === "cab" ? (
@@ -396,17 +435,32 @@ export function TubCounts() {
 	const ready = place === "cab" ? match.filter((r) => !here.includes(r) && r.front) : [];
 	const rest = match.filter((r) => !here.includes(r) && !ready.includes(r));
 
+	const deskQ = deskQuery.trim().toLowerCase();
+	const deskRows = all.filter((r) => `${r.name} ${r.category}`.toLowerCase().includes(deskQ));
+	const counts = (r: Row) => (["hard", "back", "front"] as const).map((k) => (r[k] ? String(r[k]) : "none"));
+	const pickView = (v: "places" | "all") => {
+		setView(v);
+		setQuery("");
+		pinned.current = new Set();
+	};
+
 	return (
-		<div className="tc" data-view={view} ref={root}>
+		<div className="tc" ref={root}>
 			<style>{css}</style>
-			<div className="tc-grid">
-				<section className="tc-places" aria-labelledby="tc-title">
-					<div className="tc-top">
-						<h1 id="tc-title">Tub counts</h1>
-						<button type="button" className="tc-link" onClick={() => setView("overview")}>
-							Overview
+			{/* Phones and tablets: where you're standing, or every flavor. */}
+			<section className="tc-narrow" aria-labelledby="tc-title">
+				<div className="tc-top">
+					<h1 id="tc-title">Tub counts</h1>
+					<div className="tc-view" role="group" aria-label="View">
+						<button type="button" aria-pressed={view === "places"} onClick={() => pickView("places")}>
+							Places
+						</button>
+						<button type="button" aria-pressed={view === "all"} onClick={() => pickView("all")}>
+							All flavors
 						</button>
 					</div>
+				</div>
+				{view === "places" && (
 					<div className="tc-tabs" role="tablist" aria-labelledby="tc-title">
 						{PLACES.map(([p, name, full]) => {
 							// Each place shows how many tubs are there; Cabinets counts flavors in.
@@ -420,139 +474,190 @@ export function TubCounts() {
 							);
 						})}
 					</div>
-					<div className="tc-tools">
-						{place === "hard" && (
-							<button type="button" className="tc-primary" onClick={() => open({ kind: "batch" })}>
-								+&nbsp; Made a batch
-							</button>
+				)}
+				<div className="tc-tools">
+					{(place === "hard" || view === "all") && (
+						<button type="button" className="tc-primary" onClick={() => open({ kind: "batch" })}>
+							+&nbsp; Made a batch
+						</button>
+					)}
+					<label className="tc-search">
+						<SearchIcon />
+						<input
+							type="search"
+							placeholder="Find a flavor"
+							aria-label="Find a flavor"
+							autoComplete="off"
+							value={query}
+							onChange={(e) => {
+								setQuery(e.target.value);
+								pinned.current = new Set();
+							}}
+						/>
+					</label>
+				</div>
+				{error && (
+					<p className="tc-error" role="alert">
+						{error}
+					</p>
+				)}
+				{rows === null && !error && (
+					<div className="tc-empty">
+						<span>Loading…</span>
+					</div>
+				)}
+				{rows !== null && view === "places" && (
+					<div id="tc-list" role="tabpanel" aria-labelledby={`tc-tab-${place}`}>
+						{here.length > 0 && heading(HERE[place])}
+						{here.map(row)}
+						{here.length === 0 && !q && (
+							<div className="tc-empty">
+								<b>{EMPTY_TITLE[place]}</b>
+								<span>{EMPTY_HINT[place]}</span>
+							</div>
 						)}
-						<label className="tc-search">
-							<SearchIcon />
-							<input
-								type="search"
-								placeholder="Find a flavor"
-								aria-label="Find a flavor"
-								autoComplete="off"
-								value={query}
-								onChange={(e) => {
-									setQuery(e.target.value);
-									pinned.current = new Set();
-								}}
-							/>
-						</label>
+						{ready.length > 0 && heading("Ready from the front freezer")}
+						{ready.map(row)}
+						{rest.length > 0 &&
+							(showAll || q ? (
+								<>
+									{heading(place === "cab" ? "Out, nothing up front" : "None here")}
+									{rest.map(row)}
+								</>
+							) : (
+								<button type="button" className="tc-more" onClick={() => setShowAll(true)}>
+									Show {rest.length} flavors with none here
+								</button>
+							))}
+					</div>
+				)}
+				{rows !== null && view === "all" && (
+					<div>
+						<div className="tc-all-head" aria-hidden="true">
+							<span>Flavor</span>
+							<span>Hard.</span>
+							<span>Back</span>
+							<span>Front</span>
+							<span>Cab.</span>
+						</div>
+						{match.map((r) => {
+							const [h, b, f] = counts(r);
+							return (
+								<button
+									key={r.id}
+									type="button"
+									className="tc-all-row"
+									data-row={r.id}
+									aria-label={`${label(r)}: Hardening ${h}, back freezer ${b}, front freezer ${f}, ${r.cab ? "in" : "out of"} the cabinets. Open ${label(r)}`}
+									onClick={() => open({ kind: "flavor", id: r.id })}
+								>
+									<b>
+										{r.name}
+										{twin(r) && <small>{r.category}</small>}
+									</b>
+									{(["hard", "back", "front"] as const).map((k) => (
+										<span key={k} className={r[k] ? undefined : "z"}>
+											{r[k] || "–"}
+										</span>
+									))}
+									<span className={r.cab ? "tc-state in" : "tc-state out"}>{r.cab ? "In" : "Out"}</span>
+								</button>
+							);
+						})}
+					</div>
+				)}
+				{rows !== null && q && match.length === 0 && (
+					<div className="tc-empty">
+						<b>No flavor matches “{query.trim()}”</b>
+						<span>Check the spelling, or clear the search.</span>
+					</div>
+				)}
+			</section>
+
+			{/* Wide screens: the table is the page; a row opens that flavor. */}
+			<section className="tc-wide" aria-labelledby="tc-wide-title">
+				<div className="tc-table">
+					<div className="tc-desk-tools">
+						<h1 id="tc-wide-title">Tub counts</h1>
+						<div>
+							<input type="search" placeholder="Find a flavor" aria-label="Find a flavor" autoComplete="off" value={deskQuery} onChange={(e) => setDeskQuery(e.target.value)} />
+							<button type="button" className="tc-add" onClick={() => open({ kind: "batch" })}>
+								+ Made a batch
+							</button>
+						</div>
 					</div>
 					{error && (
-						<p className="tc-error" role="alert">
+						<p className="tc-error tc-pad" role="alert">
 							{error}
 						</p>
 					)}
-					<div id="tc-list" role="tabpanel" aria-labelledby={`tc-tab-${place}`} aria-busy={rows === null}>
-						{rows === null && !error && (
-							<div className="tc-empty">
-								<span>Loading…</span>
-							</div>
-						)}
-						{rows !== null && (
-							<>
-								{here.length > 0 && heading(HERE[place])}
-								{here.map(row)}
-								{here.length === 0 && !q && (
-									<div className="tc-empty">
-										<b>{EMPTY_TITLE[place]}</b>
-										<span>{EMPTY_HINT[place]}</span>
-									</div>
-								)}
-								{ready.length > 0 && heading("Ready from the front freezer")}
-								{ready.map(row)}
-								{rest.length > 0 &&
-									(showAll || q ? (
-										<>
-											{heading(place === "cab" ? "Out, nothing up front" : "None here")}
-											{rest.map(row)}
-										</>
-									) : (
-										<button type="button" className="tc-more" onClick={() => setShowAll(true)}>
-											Show {rest.length} flavors with none here
-										</button>
-									))}
-								{q && match.length === 0 && (
-									<div className="tc-empty">
-										<b>No flavor matches “{query.trim()}”</b>
-										<span>Check the spelling, or clear the search.</span>
-									</div>
-								)}
-							</>
-						)}
-					</div>
-				</section>
-
-				<section className="tc-desk" aria-labelledby="tc-overview">
-					<div className="tc-top">
-						<h1 id="tc-overview">Overview</h1>
-						<button type="button" className="tc-link" onClick={() => setView("places")}>
-							By place
-						</button>
-					</div>
-					<div className="tc-table">
-						<div className="tc-table-head">
-							<strong>What we have</strong>
-							<span>Every flavor, A–Z · a dash means none</span>
-						</div>
-						<div className="tc-wrap">
-							<table>
-								<thead>
-									<tr>
-										<th scope="col">Flavor</th>
-										<th scope="col">Hardening</th>
-										<th scope="col">Back freezer</th>
-										<th scope="col">Front freezer</th>
-										<th scope="col">Cabinets</th>
+					<div className="tc-wrap">
+						<table>
+							<thead>
+								<tr>
+									<th scope="col">Flavor</th>
+									<th scope="col">Hardening</th>
+									<th scope="col">Back freezer</th>
+									<th scope="col">Front freezer</th>
+									<th scope="col">Cabinets</th>
+								</tr>
+							</thead>
+							<tbody>
+								{deskRows.map((r) => (
+									<tr key={r.id} onClick={(e) => open({ kind: "flavor", id: r.id }, e.currentTarget.querySelector("button"))}>
+										<th scope="row">
+											<button
+												type="button"
+												onClick={(e) => {
+													e.stopPropagation();
+													open({ kind: "flavor", id: r.id }, e.currentTarget);
+												}}
+											>
+												{r.name}
+												{twin(r) && <small>{r.category}</small>}
+											</button>
+										</th>
+										{(["hard", "back", "front"] as const).map((k) =>
+											r[k] ? (
+												<td key={k}>{r[k]}</td>
+											) : (
+												<td key={k} className="z" aria-label="none">
+													–
+												</td>
+											),
+										)}
+										<td>
+											<span className={r.cab ? "tc-state in" : "tc-state out"}>{r.cab ? "In" : "Out"}</span>
+										</td>
 									</tr>
-								</thead>
-								<tbody>
-									{all.map((r) => (
-										<tr key={r.id}>
-											<th scope="row">
-												<button type="button" onClick={() => open({ kind: "flavor", id: r.id })}>
-													{r.name}
-													{twin(r) && <small>{r.category}</small>}
-												</button>
-											</th>
-											{(["hard", "back", "front"] as const).map((k) =>
-												r[k] ? (
-													<td key={k}>{r[k]}</td>
-												) : (
-													<td key={k} className="z" aria-label="none">
-														–
-													</td>
-												),
-											)}
-											<td>
-												<span className={r.cab ? "tc-state in" : "tc-state out"}>{r.cab ? "In" : "Out"}</span>
-											</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
+								))}
+								{rows !== null && deskRows.length === 0 && (
+									<tr>
+										<td colSpan={5} className="tc-none">
+											No flavor matches “{deskQuery.trim()}”.
+										</td>
+									</tr>
+								)}
+							</tbody>
+						</table>
 					</div>
-					<section className="tc-log" aria-labelledby="tc-log-title">
-						<h2 id="tc-log-title">Recent changes</h2>
-						<ul>
-							{log.length === 0 ? (
-								<li>No changes yet.</li>
-							) : (
-								log.map((c) => (
-									<li key={c.at + c.text}>
-										{when(c.at)} · {c.text}
-										{c.by && ` · ${c.by}`}
-									</li>
-								))
-							)}
-						</ul>
-					</section>
+				</div>
+				<section className="tc-log" aria-labelledby="tc-log-title">
+					<h2 id="tc-log-title">Recent changes</h2>
+					<ul>
+						{log.length === 0 ? (
+							<li>No changes yet.</li>
+						) : (
+							log.map((c) => (
+								<li key={c.at + c.text}>
+									{when(c.at)} · {c.text}
+									{c.by && ` · ${c.by}`}
+								</li>
+							))
+						)}
+					</ul>
 				</section>
-			</div>
+			</section>
 
 			{snack && (
 				<div className="tc-snack">
@@ -565,7 +670,7 @@ export function TubCounts() {
 				</div>
 			)}
 			{sheet?.kind === "flavor" && byId(sheet.id) && (
-				<FlavorSheet row={byId(sheet.id)!} title={label(byId(sheet.id)!)} onClose={closeSheet} onSave={(to) => change(byId(sheet.id)!, { action: "save", to })} />
+				<FlavorSheet row={byId(sheet.id)!} title={label(byId(sheet.id)!)} moves={movesFor(byId(sheet.id)!)} onClose={closeSheet} onSave={(to) => change(byId(sheet.id)!, { action: "save", to })} />
 			)}
 			{sheet?.kind === "batch" && <BatchSheet rows={all} label={label} onClose={closeSheet} onAdd={(r, count) => change(r, { action: "batch", count })} />}
 		</div>
@@ -640,7 +745,7 @@ function Stepper({ id, name, value, min, big, onChange }: { id: string; name: st
 	);
 }
 
-function FlavorSheet({ row, title, onClose, onSave }: { row: Row; title: string; onClose: (restore: boolean) => void; onSave: (to: Tubs) => void }) {
+function FlavorSheet({ row, title, moves, onClose, onSave }: { row: Row; title: string; moves: Move[]; onClose: (restore: boolean) => void; onSave: (to: Tubs) => void }) {
 	const [draft, setDraft] = React.useState({ hard: String(row.hard), back: String(row.back), front: String(row.front) });
 	const [cab, setCab] = React.useState(row.cab);
 	const [dirty, setDirty] = React.useState(false);
@@ -654,7 +759,20 @@ function FlavorSheet({ row, title, onClose, onSave }: { row: Row; title: string;
 		else onSave(to);
 	};
 	return (
-		<SheetFrame title={title} titleId="tc-sheet-title" sub="Set any count, then Save." dirty={dirty} onClose={onClose}>
+		<SheetFrame title={title} titleId="tc-sheet-title" dirty={dirty} onClose={onClose}>
+			{moves.length > 0 && (
+				<>
+					<p className="tc-moves-label">Move a tub</p>
+					<div className="tc-moves">
+						{moves.map((m) => (
+							<button key={m.text} type="button" className={m.stop ? "tc-pill stop" : "tc-pill"} aria-label={m.aria} onClick={m.run}>
+								{m.text}
+							</button>
+						))}
+					</div>
+					<p className="tc-moves-label">Or set the counts</p>
+				</>
+			)}
 			<div>
 				{fields.map(([k, name]) => (
 					<div className="tc-field" key={k}>
