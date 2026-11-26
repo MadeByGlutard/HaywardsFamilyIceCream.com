@@ -89,7 +89,7 @@ const css = `
   color: var(--tc-fg); font: 16px/1.35 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
 .tc button, .tc input { font: inherit; color: inherit; }
 .tc :focus-visible { outline: 3px solid var(--tc-go); outline-offset: 2px; }
-.tc-narrow { max-width: 480px; min-width: 0; }
+.tc-narrow { min-width: 0; }
 .tc-wide { display: none; min-width: 0; gap: 20px; }
 @media (min-width: 1024px) { .tc-narrow { display: none; } .tc-wide { display: grid; } }
 .tc-top { padding: 0 0 8px; display: flex; align-items: center; justify-content: space-between; }
