@@ -252,7 +252,10 @@ async function upgradeContent() {
 	const id = process.env.PREVIEW_ACCESS_CLIENT_ID;
 	const secret = process.env.PREVIEW_ACCESS_CLIENT_SECRET;
 	if (!id || !secret) return log("No Access service token; the first visitor will run the content upgrade");
-	const url = `https://${slug}.previews.haywardsfamilyicecream.com/`;
+	// The workers.dev address, not the custom domain: the zone's Bot Fight Mode answers requests
+	// from CI servers with a 403 before Access sees them, and workers.dev isn't in the zone.
+	const { result } = await api(`/accounts/${account}/workers/subdomain`);
+	const url = `https://${slug}-${PREFIX}.${result.subdomain}.workers.dev/`;
 	const started = Date.now();
 	for (let attempt = 1; attempt <= 6; attempt++) {
 		try {
