@@ -24,7 +24,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 19;
+export const CONTENT_VERSION = 20;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -195,9 +195,21 @@ async function historyEnding(db: any) {
   const blocks = JSON.parse(rows[0].content) as any[];
   const text = (block: any) => block?.children?.map((child: any) => child.text ?? '').join('');
   const at = blocks.findIndex((block) => earlier.includes(text(block)));
-  if (at < 0) return;
-  blocks.splice(at, 1, ...ending);
-  await sql`UPDATE ec_site_pages SET content = ${JSON.stringify(blocks)} WHERE slug = 'history'`.execute(db);
+  if (at >= 0) blocks.splice(at, 1, ...ending);
+  // The first version of the section, before the family's full names (also unedited only).
+  const firstDraft = [
+    'Sharon Robinson runs the stand on Elm Street today, and the ice cream in the case is made right here. Chris runs Hayward’s in Nashua, and Diane runs Hayward’s in Merrimack. Mike runs Mike’s Ice Cream.',
+    'They’re all of the grandchildren, and every one of them stayed in ice cream.',
+  ];
+  let changed = at >= 0;
+  firstDraft.forEach((old, i) => {
+    const found = blocks.findIndex((block) => text(block) === old);
+    if (found >= 0) {
+      blocks[found] = ending[i + 1];
+      changed = true;
+    }
+  });
+  if (changed) await sql`UPDATE ec_site_pages SET content = ${JSON.stringify(blocks)} WHERE slug = 'history'`.execute(db);
 }
 
 /**
