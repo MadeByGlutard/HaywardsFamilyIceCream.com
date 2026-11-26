@@ -106,8 +106,8 @@ export interface SitePage {
   title: string;
   headline?: string;
   excerpt?: string;
-  content?: PortableTextBlock[];
   top_menu?: boolean;
+  content?: PortableTextBlock[];
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;

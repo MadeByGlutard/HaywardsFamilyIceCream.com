@@ -23,7 +23,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 16;
+export const CONTENT_VERSION = 17;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -99,6 +99,8 @@ async function addMissing(db: any, options: OptionsRepository) {
     for (const field of collection.fields)
       if (!(await registry.getField(collection.slug, field.slug))) await registry.createField(collection.slug, { ...field, required: false } as any);
   }
+  // A field added later lands last; Pages keep the seed's order, with the text (any length) last.
+  await registry.reorderFields('site_pages', (file.collections ?? []).find((c) => c.slug === 'site_pages')!.fields.map((f) => f.slug));
   // EmDash replaces the items of a menu it finds in the seed; staff's menus stay theirs.
   const { rows: menus } = await sql<{ name: string }>`SELECT name FROM _emdash_menus`.execute(db);
   const newMenus = file.menus?.filter((menu) => !menus.some((row) => row.name === menu.name));

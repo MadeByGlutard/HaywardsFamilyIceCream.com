@@ -367,14 +367,14 @@
           }
         },
         {
-          "slug": "content",
-          "label": "Text",
-          "type": "portableText"
-        },
-        {
           "slug": "top_menu",
           "label": "Show in the top menu",
           "type": "boolean"
+        },
+        {
+          "slug": "content",
+          "label": "Text",
+          "type": "portableText"
         }
       ],
       "urlPattern": "/{slug}",
