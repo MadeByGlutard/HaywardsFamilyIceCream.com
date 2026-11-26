@@ -1,9 +1,14 @@
 ---
-// Design review: one page in every schedule period, side by side at a chosen width.
+import { getEmDashCollection } from 'emdash';
+import { milfordDay } from '../lib/schedule';
+// Design review: one page in every published schedule period, side by side at a chosen width.
 // Dev server, preview builds (behind Cloudflare Access) and signed-in EmDash staff; 404 for everyone else.
 if (!import.meta.env.DEV && !__ACCESS_SIGN_IN__ && !Astro.locals.user) return new Response(null, { status: 404 });
 const pages = [['/', 'Home'], ['/flavors', 'Flavors'], ['/sundaes', 'Sundaes'], ['/trees', 'Trees'], ['/food', 'Food'], ['/history', 'History'], ['/visit', 'Hours']] as const;
-const periods = [['thanksgiving', 'Thanksgiving break'], ['trees', 'Trees & wreaths'], ['winter', 'Winter break'], ['ice-cream', 'Ice cream season']] as const;
+// Every published period, in calendar order; ones with no first day yet go last.
+const { entries } = await getEmDashCollection('schedule', { limit: 200 });
+const dayOf = (e: (typeof entries)[number]) => milfordDay(e.data.start_date) ?? '9999';
+const periods = [...entries].sort((a, b) => dayOf(a).localeCompare(dayOf(b)) || a.id.localeCompare(b.id)).map((e) => [e.id, `${e.data.title}${dayOf(e) === '9999' ? ' (no start date yet)' : ''}`] as const);
 const widths = [['390', 'Phone'], ['820', 'iPad'], ['1440', 'Desktop']] as const;
 const q = Astro.url.searchParams;
 const page = pages.find(([p]) => p === q.get('page'))?.[0] ?? '/';

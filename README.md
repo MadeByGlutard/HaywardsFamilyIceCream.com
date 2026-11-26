@@ -164,7 +164,9 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the
   (`src/lib/square.ts`), and the editor's sidebar shows them read-only.
 - Allergens, half gallons and photos are tracked but not shown. Never show an allergen as
   absent: unchecked doesn't mean "free of".
-- Staff can preview another date with `?today=2026-12-01` or a period with `?period=trees`.
+- Staff can preview another date with `?today=2026-12-01` or a period with `?period=trees` (or `summer`;
+  a published period with no start date yet is shown as of today). `/design-preview` shows one page
+  in every published period side by side.
 - **Tub counts** (Plugins → Tub counts, `src/admin/tubs.ts` and `tub-counts.tsx`): staff count
   tubs in the front and back freezers per flavor. "Into the case" takes from the front (or the
   back if the front is out); "Back to front" moves one up. Counts live in the plugin's storage

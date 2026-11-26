@@ -60,15 +60,21 @@ export function getScheduleContext(Astro: AstroGlobal): Promise<ScheduleContext>
 async function build(Astro: AstroGlobal): Promise<ScheduleContext> {
   const { entries, error } = await getEmDashCollection('schedule', { limit: 200 });
   if (error) throw error;
+  const toPeriod = (entry: (typeof entries)[number], start: string): PeriodEntry =>
+    ({ slug: entry.id, data: entry.data as Schedule, edit: entry.edit as unknown as PeriodEntry['edit'], start });
   // A period with no first day isn't on the calendar yet, even if it's published.
-  const periods = scheduleOrder(entries.flatMap((entry): PeriodEntry[] => {
+  const periods = scheduleOrder(entries.flatMap((entry) => {
     const start = milfordDay(entry.data.start_date);
-    return start ? [{ slug: entry.id, data: entry.data as Schedule, edit: entry.edit as unknown as PeriodEntry['edit'], start }] : [];
+    return start ? [toPeriod(entry, start)] : [];
   }));
   const preview = previewParams(Astro);
   let today = preview.today ?? milfordDay(new Date())!;
-  const asked = preview.period ? periods.filter((period) => period.slug.startsWith(preview.period!)).at(-1) : undefined;
-  // Previewing a period: look at it from its own first day.
+  // Previewing a period: look at it from its own first day. One with no first day yet is shown as of today.
+  const undated = entries.filter((entry) => !milfordDay(entry.data.start_date));
+  const asked = preview.period
+    ? periods.filter((period) => period.slug.startsWith(preview.period!)).at(-1)
+      ?? undated.filter((entry) => entry.id.startsWith(preview.period!)).map((entry) => toPeriod(entry, today)).at(-1)
+    : undefined;
   if (asked && !preview.today) today = asked.start;
   const active = asked ?? pickPeriod(periods, today);
   if (!active) throw new Error('Nothing is published in Schedule. Publish a period to bring the site back.');
