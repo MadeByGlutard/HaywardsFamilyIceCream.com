@@ -471,7 +471,7 @@
         "slug": "shakes-and-floats",
         "status": "published",
         "data": {
-          "name": "Shakes and floats"
+          "name": "Frappes and floats"
         }
       },
       {
@@ -2053,7 +2053,7 @@
         "slug": "sundaes",
         "status": "published",
         "data": {
-          "title": "Sundaes & shakes",
+          "title": "Sundaes & frappes",
           "excerpt": "Not everything is on every day."
         }
       },
@@ -2182,7 +2182,7 @@
           "type": "collection",
           "collection": "site_pages",
           "ref": "page-sundaes",
-          "label": "Sundaes & shakes"
+          "label": "Sundaes & frappes"
         },
         {
           "type": "collection",
@@ -2266,7 +2266,7 @@
     },
     {
       "name": "sundaes",
-      "label": "Sundaes & shakes",
+      "label": "Sundaes & frappes",
       "items": [
         {
           "type": "collection",
@@ -2278,7 +2278,7 @@
           "type": "collection",
           "collection": "catalog_categories",
           "ref": "cat-shakes-and-floats",
-          "label": "Shakes and floats"
+          "label": "Frappes and floats"
         },
         {
           "type": "collection",

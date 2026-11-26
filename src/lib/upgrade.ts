@@ -22,8 +22,8 @@ import { linkSquareItems } from './square';
 const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
-/** Raise when seed.json gains a collection or field. */
-export const CONTENT_VERSION = 11;
+/** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
+export const CONTENT_VERSION = 12;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -113,6 +113,7 @@ async function addMissing(db: any, options: OptionsRepository) {
   if (!social.length) await setSiteSettings({ social: file.settings?.social }, db);
   for (const slug of REPLACED) if (had.has(slug)) await registry.updateCollection(slug, { hidden: true });
   await linkSquareItems(db);
+  await renameUnedited(db);
   // EmDash's stock Categories and Tags, which are for blog posts.
   await sql`DELETE FROM _emdash_taxonomy_defs WHERE id IN ('taxdef_category', 'taxdef_tag')
     AND name NOT IN (SELECT name FROM taxonomies)`.execute(db);
@@ -156,4 +157,14 @@ async function carryOver(db: any, added: Record<string, any[]>, file: SeedFile) 
   const started = added.schedule.filter((entry) => new Date(entry.data.start_date).toISOString() <= now);
   const current = started.sort((x, y) => Date.parse(x.data.start_date) - Date.parse(y.data.start_date)).at(-1);
   if (current) current.data.banner_text = banner;
+}
+
+/** Labels the seed renamed, changed only where they still read the old way (staff's own edits stay). */
+async function renameUnedited(db: any) {
+  // Hayward's calls them frappes, not shakes.
+  await sql`UPDATE ec_catalog_categories SET name = 'Frappes and floats' WHERE slug = 'shakes-and-floats' AND name = 'Shakes and floats'`.execute(db);
+  await sql`UPDATE ec_site_pages SET title = 'Sundaes & frappes' WHERE slug = 'sundaes' AND title = 'Sundaes & shakes'`.execute(db);
+  await sql`UPDATE _emdash_menus SET label = 'Sundaes & frappes' WHERE name = 'sundaes' AND label = 'Sundaes & shakes'`.execute(db);
+  await sql`UPDATE _emdash_menu_items SET label = 'Sundaes & frappes' WHERE label = 'Sundaes & shakes'`.execute(db);
+  await sql`UPDATE _emdash_menu_items SET label = 'Frappes and floats' WHERE label = 'Shakes and floats'`.execute(db);
 }

@@ -911,7 +911,7 @@ html:has(.menu-sheet[open]) {
 	color: var(--muted);
 }
 
-/* Sizes and cones; Sundaes & shakes; Food & drinks. */
+/* Sizes and cones; Sundaes & frappes; Food & drinks. */
 .menu-groups {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));

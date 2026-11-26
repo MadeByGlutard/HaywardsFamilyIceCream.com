@@ -8,7 +8,7 @@ No generated photography is used in the implemented website.
 | `public/images/sundae.jpg` | Existing repository, gallery image 02 | Home product photo |
 | `public/images/scoops-caramel.jpg` | Existing repository, gallery image 06 | Home photo |
 | `public/images/two-cups.jpg` | Existing repository, gallery image 07 | Flavors photo |
-| `public/images/two-scoops.jpg` | Existing repository, gallery image 03 | Sundaes & shakes photo |
+| `public/images/two-scoops.jpg` | Existing repository, gallery image 03 | Sundaes & frappes photo |
 | `public/images/milford-stand.jpg` | BringFido's Milford listing, credited there to `@Haywardsofmilford` | Hours and History only |
 
 Building reference: https://photos.bringfido.com/restaurants/2/7/7/93772/93772_350010.jpg?density=2x&size=tile
