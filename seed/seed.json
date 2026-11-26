@@ -374,6 +374,43 @@
       ],
       "urlPattern": "/{slug}",
       "description": "One for every page of the site. Home’s headline comes from the Schedule."
+    },
+    {
+      "slug": "posts",
+      "label": "Blog",
+      "labelSingular": "Post",
+      "icon": "newspaper",
+      "supports": [
+        "drafts",
+        "revisions"
+      ],
+      "routable": true,
+      "hasSeo": false,
+      "sortOrder": 7,
+      "titleField": "title",
+      "urlPattern": "/blog/{slug}",
+      "description": "Posts at /blog. The author is the post's byline.",
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "excerpt",
+          "label": "Introduction",
+          "type": "text",
+          "options": {
+            "rows": 2
+          }
+        },
+        {
+          "slug": "content",
+          "label": "Text",
+          "type": "portableText"
+        }
+      ]
     }
   ],
   "content": {
@@ -2159,6 +2196,136 @@
           "hiring": false
         }
       }
+    ],
+    "posts": [
+      {
+        "id": "post-milkshake-vs-frappe",
+        "slug": "milkshake-vs-frappe",
+        "status": "published",
+        "data": {
+          "title": "Milkshake vs. frappe: what’s the difference?",
+          "excerpt": "If you grew up in New England, you already know. If you didn’t, here’s why there are two lines on our menu.",
+          "content": [
+            {
+              "_type": "block",
+              "_key": "m1",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "m1s",
+                  "text": "Every summer someone steps up to the window, reads the menu twice and asks: what’s the difference between a milkshake and a frappe? It’s a fair question. Most of the country would tell you there isn’t one.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "m2",
+              "style": "h2",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "m2s",
+                  "text": "Around here, there is",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "m3",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "m3s",
+                  "text": "In much of New England, a milkshake is the old-fashioned kind: milk and flavored syrup, blended until it’s frothy. No ice cream. Order one in Boston expecting something thick and you’ll get a lesson in regional vocabulary instead.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "m4",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "m4s",
+                  "text": "A frappe is milk, syrup and ice cream blended together. Thick, cold and exactly what most people elsewhere would call a milkshake. Plenty of us say it “frap,” with a quiet e.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "m5",
+              "style": "h2",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "m5s",
+                  "text": "And then there’s Rhode Island",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "m6",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "m6s",
+                  "text": "Cross into Rhode Island and the same drink is called a cabinet. We don’t make the rules.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "m7",
+              "style": "h2",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "m7s",
+                  "text": "So which one do you want?",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "m8",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "m8s",
+                  "text": "We have both on the menu. If you want it thick, get a frappe, regular or extra thick. If you’re not sure which you’re after, ask at the window.",
+                  "marks": []
+                }
+              ]
+            }
+          ]
+        },
+        "bylines": [
+          {
+            "byline": "byline-jennifer"
+          }
+        ]
+      }
     ]
   },
   "menus": [
@@ -2379,6 +2546,13 @@
       "childLabel": "Menu items",
       "childLabelSingular": "Menu item",
       "maxParentsPerChild": 1
+    }
+  ],
+  "bylines": [
+    {
+      "id": "byline-jennifer",
+      "slug": "jennifer",
+      "displayName": "Jennifer"
     }
   ]
 }

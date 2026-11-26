@@ -164,6 +164,10 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the
   (`src/lib/square.ts`), and the editor's sidebar shows them read-only.
 - Allergens, half gallons and photos are tracked but not shown. Never show an allergen as
   absent: unchecked doesn't mean "free of".
+- **Blog** (`posts`, `/blog` and `/blog/<slug>`): title, introduction and text; the author is the
+  post's EmDash byline (Jennifer on the first post). The Bylines panel is hidden in everyone's editor
+  sidebar by default; turn it back on under Settings, Sidebars to change a post's author. The footer
+  links to the blog after Join our team.
 - Staff can preview another date with `?today=2026-12-01` or a period with `?period=trees` (or `summer`;
   a published period with no start date yet is shown as of today). `/design-preview` shows one page
   in every published period side by side.

@@ -115,6 +115,21 @@ export interface SitePage {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
+export interface Post {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  excerpt?: string;
+  content?: PortableTextBlock[];
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
 export interface CatalogFlavorReferences {
   category: ReferencePage<CatalogCategory>;
 }
@@ -137,6 +152,7 @@ declare module "emdash" {
     jobs: Job;
     store: Store;
     site_pages: SitePage;
+    posts: Post;
   }
   interface EmDashCollectionReferences {
     catalog_flavors: CatalogFlavorReferences;

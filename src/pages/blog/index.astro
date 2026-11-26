@@ -1,0 +1,22 @@
+---
+import { getEmDashCollection } from 'emdash';
+import Base from '../../layouts/Base.astro';
+import { cacheContentPage } from '../../lib/cache';
+cacheContentPage(Astro);
+const { entries } = await getEmDashCollection('posts', { limit: 100 });
+const posts = [...entries].sort((a, b) => (b.data.publishedAt?.getTime() ?? 0) - (a.data.publishedAt?.getTime() ?? 0));
+const day = (date?: Date | null) => date?.toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'long', day: 'numeric', year: 'numeric' });
+---
+<Base title="Blog" description="Notes from Hayward’s Family Ice Cream in Milford, New Hampshire.">
+  <section class="page-heading wrap"><h1>Blog</h1></section>
+  <section class="post-list wrap">
+    {posts.length === 0 && <p>Nothing here yet.</p>}
+    {posts.map((post) => (
+      <article>
+        <h2><a href={`/blog/${post.id}`} {...post.edit.title}>{post.data.title}</a></h2>
+        <p class="post-meta">{post.data.byline && <>By {post.data.byline.displayName}, </>}{day(post.data.publishedAt)}</p>
+        {post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
+      </article>
+    ))}
+  </section>
+</Base>

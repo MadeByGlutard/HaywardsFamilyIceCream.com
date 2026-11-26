@@ -1,0 +1,20 @@
+---
+import { getEmDashEntry, getSeoMeta } from 'emdash';
+import { PortableText } from 'emdash/ui';
+import Base from '../../layouts/Base.astro';
+import { cacheContentPage } from '../../lib/cache';
+cacheContentPage(Astro);
+const { entry: post } = await getEmDashEntry('posts', Astro.params.slug!);
+if (!post) return Astro.rewrite('/404');
+const seo = getSeoMeta(post, { defaultTitle: post.data.title, defaultDescription: post.data.excerpt });
+const day = post.data.publishedAt?.toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'long', day: 'numeric', year: 'numeric' });
+---
+<Base title={seo.title} description={seo.description || post.data.excerpt} content={{ collection: 'posts', id: post.data.id, slug: post.id }}>
+  <section class="page-heading story-heading wrap">
+    <p class="eyebrow"><a href="/blog">Blog</a></p>
+    <h1 {...post.edit.title}>{post.data.title}</h1>
+    {post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
+    <p class="post-meta">{post.data.byline && <>By {post.data.byline.displayName}, </>}{day}</p>
+  </section>
+  <article class="story-body wrap"><div class="story-prose" {...post.edit.content}><PortableText value={post.data.content || []} /></div></article>
+</Base>

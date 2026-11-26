@@ -1947,3 +1947,39 @@ main:has(> .end-band:last-child) + .footer {
 		border-top: 0;
 	}
 }
+
+/* Blog: ruled rows of posts, like Join our team; a post reads like History. */
+.post-list {
+	margin-bottom: var(--s5);
+	border-top: var(--rule-section);
+}
+
+.post-list article {
+	max-width: 720px;
+	padding: var(--s3) 0;
+}
+
+.post-list article + article {
+	border-top: var(--rule-row);
+}
+
+.post-list h2 {
+	margin: 0 0 .3em;
+}
+
+.post-list h2 a {
+	color: inherit;
+}
+
+.post-list p {
+	margin: 0;
+}
+
+.post-meta {
+	color: var(--muted);
+	font-size: var(--small);
+}
+
+.post-list .post-meta {
+	margin-bottom: .4em;
+}
