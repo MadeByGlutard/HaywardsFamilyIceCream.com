@@ -1929,7 +1929,7 @@ main:has(> .end-band:last-child) + .footer {
 	}
 }
 
-/* Blog: ruled rows of posts, like Join our team; a post reads like History, without the drop cap. */
+/* Blog: ruled rows of posts, like Join our team; a post reads like History, drop cap and all. */
 .post-list {
 	margin-bottom: var(--s5);
 	border-top: var(--rule-section);
@@ -2006,13 +2006,6 @@ main:has(> .end-band:last-child) + .footer {
 	line-height: 1;
 }
 
-.post-prose > div > p:first-child::first-letter,
-.post-prose > p:first-child::first-letter {
-	float: none;
-	margin: 0;
-	font: inherit;
-	color: inherit;
-}
 
 .post-meta-compact {
 	gap: 8px;

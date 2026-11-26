@@ -32,13 +32,14 @@ const lot = schedule.treesOpen ? schedule.status.line : schedule.nextTrees?.data
 const hoursLine = lot && sentence(lot);
 const askClosing = schedule.treesOpen && !!lot && /\bfrom \d/i.test(lot);
 const lead = photos.treesOnRacks;
+// The photos speak for themselves: alt text, no captions.
 const gallery = [
-  { ...photos.wreathWall, caption: 'Wreaths along the windows.' },
-  { ...photos.treesRows, caption: 'Fresh-cut trees on the racks.' },
-  { ...photos.treesNetted, caption: 'Netted trees stacked by the stand.' },
-  { ...photos.kissingBalls, caption: 'Kissing balls with velvet ribbon.' },
-  { ...photos.wreathCloseup, caption: 'Bows, ornaments and gold pinecones.' },
-  { ...photos.snowmen, caption: 'Snowmen made of greens.' },
+  photos.wreathWall,
+  photos.treesRows,
+  photos.treesNetted,
+  photos.kissingBalls,
+  photos.wreathCloseup,
+  photos.snowmen,
 ];
 ---
 <Base title={title} description="Christmas trees, 24-inch wreaths and kissing balls at Hayward’s on Elm Street in Milford, from Thanksgiving weekend until just before Christmas." content={{ collection: 'site_pages', id: page.data.id, slug: 'trees' }} image={lead.src} strip={!schedule.treesOpen}>
@@ -57,7 +58,7 @@ const gallery = [
 
   {schedule.treesListed && categories.length > 0 && (
     <div class="trees-layout wrap">
-      <figure class="trees-lead"><div class="crop"><img src={lead.src} alt={lead.alt} srcset={lead.srcset} sizes="(max-width: 1000px) 100vw, 400px" width={lead.width} height={lead.height} style={`object-position: ${lead.position}`} fetchpriority="high" /></div><figcaption>At the stand, {location.data.address}.</figcaption></figure>
+      <figure class="trees-lead"><div class="crop"><img src={lead.src} alt={lead.alt} srcset={lead.srcset} sizes="(max-width: 1000px) 100vw, 400px" width={lead.width} height={lead.height} style={`object-position: ${lead.position}`} fetchpriority="high" /></div></figure>
       <div class="trees-list">
         <MenuGroups categories={categories} />
       </div>
@@ -65,7 +66,7 @@ const gallery = [
   )}
 
   <section class="photo-row wrap" aria-label="Photos from the tree lot">
-    {gallery.map((photo) => <figure><div class="crop"><img src={photo.src} alt={photo.alt} srcset={photo.srcset} sizes="(max-width: 740px) 50vw, 400px" width={photo.width} height={photo.height} style={photo.position ? `object-position: ${photo.position}` : undefined} loading="lazy" /></div><figcaption>{photo.caption}</figcaption></figure>)}
+    {gallery.map((photo) => <figure><div class="crop"><img src={photo.src} alt={photo.alt} srcset={photo.srcset} sizes="(max-width: 740px) 50vw, 400px" width={photo.width} height={photo.height} style={photo.position ? `object-position: ${photo.position}` : undefined} loading="lazy" /></div></figure>)}
   </section>
 
   {schedule.treesOpen
