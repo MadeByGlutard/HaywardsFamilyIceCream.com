@@ -24,7 +24,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 18;
+export const CONTENT_VERSION = 19;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -123,6 +123,7 @@ async function addMissing(db: any, options: OptionsRepository) {
   await linkSquareItems(db);
   await renameUnedited(db);
   await splitFirstPost(db);
+  await historyEnding(db);
   await footerOnlyPages(db);
   // EmDash's stock Categories and Tags, which are for blog posts.
   await sql`DELETE FROM _emdash_taxonomy_defs WHERE id IN ('taxdef_category', 'taxdef_tag')
@@ -176,12 +177,27 @@ async function renameUnedited(db: any) {
   await sql`UPDATE _emdash_menus SET label = 'Sundaes & frappes' WHERE name = 'sundaes' AND label = 'Sundaes & shakes'`.execute(db);
   await sql`UPDATE _emdash_menu_items SET label = 'Sundaes & frappes' WHERE label = 'Sundaes & shakes'`.execute(db);
   await sql`UPDATE _emdash_menu_items SET label = 'Frappes and floats' WHERE label = 'Shakes and floats'`.execute(db);
-  // History's last paragraph, as Hayward's told it (Nov 2026), if it still has the old sentence.
-  const before = 'Hayward’s in Nashua and Merrimack grew out of the same family. Today they are a separate business.';
-  const after =
-    'Hayward’s is still in the family. Four siblings each run a stand: Sharon Robinson here in Milford, Chris in Nashua, Mike at Mike’s Ice Cream, and Diane at Hayward’s in Merrimack, which Chris owns.';
-  await sql`UPDATE ec_site_pages SET content = REPLACE(content, ${before}, ${after})
-    WHERE slug = 'history' AND instr(content, ${before}) > 0`.execute(db);
+}
+
+/**
+ * History ends on the family (Nov 2026, as Hayward's told it). Its last paragraph is swapped for
+ * the seed's new section only while it still reads one of the two earlier ways; edits stay.
+ */
+async function historyEnding(db: any) {
+  const earlier = [
+    'Hayward’s in Nashua and Merrimack grew out of the same family. Today they are a separate business.',
+    'Hayward’s is still in the family. Four siblings each run a stand: Sharon Robinson here in Milford, Chris in Nashua, Mike at Mike’s Ice Cream, and Diane at Hayward’s in Merrimack, which Chris owns.',
+  ];
+  const page = (seed.content as any).site_pages?.find((entry: any) => entry.slug === 'history');
+  const ending = page?.data.content.slice(-3);
+  const { rows } = await sql<{ content: string | null }>`SELECT content FROM ec_site_pages WHERE slug = 'history'`.execute(db);
+  if (!ending || !rows[0]?.content) return;
+  const blocks = JSON.parse(rows[0].content) as any[];
+  const text = (block: any) => block?.children?.map((child: any) => child.text ?? '').join('');
+  const at = blocks.findIndex((block) => earlier.includes(text(block)));
+  if (at < 0) return;
+  blocks.splice(at, 1, ...ending);
+  await sql`UPDATE ec_site_pages SET content = ${JSON.stringify(blocks)} WHERE slug = 'history'`.execute(db);
 }
 
 /**

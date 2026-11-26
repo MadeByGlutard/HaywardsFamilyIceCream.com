@@ -2041,14 +2041,42 @@
             },
             {
               "_type": "block",
-              "_key": "h10",
+              "_key": "h11",
+              "style": "h2",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "h11s",
+                  "text": "Still in the family",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "h12",
               "style": "normal",
               "markDefs": [],
               "children": [
                 {
                   "_type": "span",
-                  "_key": "h10s",
-                  "text": "Hayward’s is still in the family. Four siblings each run a stand: Sharon Robinson here in Milford, Chris in Nashua, Mike at Mike’s Ice Cream, and Diane at Hayward’s in Merrimack, which Chris owns.",
+                  "_key": "h12s",
+                  "text": "Sharon Robinson runs the stand on Elm Street today, and the ice cream in the case is made right here. Chris runs Hayward’s in Nashua, and Diane runs Hayward’s in Merrimack. Mike runs Mike’s Ice Cream.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "h13",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "h13s",
+                  "text": "They’re all of the grandchildren, and every one of them stayed in ice cream.",
                   "marks": []
                 }
               ]
