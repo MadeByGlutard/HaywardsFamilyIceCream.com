@@ -2163,6 +2163,15 @@
         "data": {
           "title": "Home"
         }
+      },
+      {
+        "id": "page-blog",
+        "slug": "blog",
+        "status": "published",
+        "data": {
+          "title": "Blog",
+          "excerpt": "Notes from the stand on Elm Street."
+        }
       }
     ],
     "jobs": [
@@ -2243,7 +2252,7 @@
                 {
                   "_type": "span",
                   "_key": "m3s",
-                  "text": "In much of New England, a milkshake is the old-fashioned kind: milk and flavored syrup, blended until it’s frothy. No ice cream. Order one in Boston expecting something thick and you’ll get a lesson in regional vocabulary instead.",
+                  "text": "In New England, a milkshake is the old-fashioned kind: milk and flavored syrup, blended until it’s frothy. No ice cream. Order one expecting something thick and you might get a lesson in regional vocabulary instead.",
                   "marks": []
                 }
               ]
@@ -2257,7 +2266,7 @@
                 {
                   "_type": "span",
                   "_key": "m4s",
-                  "text": "A frappe is milk, syrup and ice cream blended together. Thick, cold and exactly what most people elsewhere would call a milkshake. Plenty of us say it “frap,” with a quiet e.",
+                  "text": "A frappe is the one with ice cream: ice cream, milk and syrup, blended thick. It’s what most of the country would call a milkshake. Around here it’s usually said “frap,” with a quiet e.",
                   "marks": []
                 }
               ]
@@ -2285,7 +2294,7 @@
                 {
                   "_type": "span",
                   "_key": "m6s",
-                  "text": "Cross into Rhode Island and the same drink is called a cabinet. We don’t make the rules.",
+                  "text": "In parts of Rhode Island and southeastern Massachusetts, the same drink is a cabinet, usually coffee-flavored. The story goes that it’s named for the cabinet the blender was kept in. We don’t make the rules.",
                   "marks": []
                 }
               ]
@@ -2314,6 +2323,122 @@
                   "_type": "span",
                   "_key": "m8s",
                   "text": "We have both on the menu. If you want it thick, get a frappe, regular or extra thick. If you’re not sure which you’re after, ask at the window.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "m9",
+              "style": "h2",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "m9s",
+                  "text": "Sources",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "m10",
+              "style": "normal",
+              "listItem": "bullet",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "m10l",
+                  "href": "https://newengland.com/today/food/new-england-made/milk-shakes-frappes-cabinets/"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "m10a",
+                  "text": "Aimee Tucker, ",
+                  "marks": []
+                },
+                {
+                  "_type": "span",
+                  "_key": "m10b",
+                  "text": "“The Difference Between a Milkshake and a Frappe,”",
+                  "marks": [
+                    "m10l"
+                  ]
+                },
+                {
+                  "_type": "span",
+                  "_key": "m10c",
+                  "text": " Yankee Magazine, 2022: milkshakes, frappes and cabinets",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "m11",
+              "style": "normal",
+              "listItem": "bullet",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "m11l",
+                  "href": "https://www.dictionary.com/browse/frappe"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "m11b",
+                  "text": "“frappe,” Dictionary.com",
+                  "marks": [
+                    "m11l"
+                  ]
+                },
+                {
+                  "_type": "span",
+                  "_key": "m11c",
+                  "text": ": said “frap,” chiefly in eastern New England",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "m12",
+              "style": "normal",
+              "listItem": "bullet",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "m12l",
+                  "href": "/sundaes"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "m12a",
+                  "text": "Hayward’s menu, ",
+                  "marks": []
+                },
+                {
+                  "_type": "span",
+                  "_key": "m12b",
+                  "text": "Sundaes & frappes",
+                  "marks": [
+                    "m12l"
+                  ]
+                },
+                {
+                  "_type": "span",
+                  "_key": "m12c",
+                  "text": ": the milkshake, and the frappe in regular or extra thick",
                   "marks": []
                 }
               ]

@@ -165,7 +165,8 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the
 - Allergens, half gallons and photos are tracked but not shown. Never show an allergen as
   absent: unchecked doesn't mean "free of".
 - **Blog** (`posts`, `/blog` and `/blog/<slug>`): title, introduction and text; the author is the
-  post's EmDash byline (Jennifer on the first post). The Bylines panel is hidden in everyone's editor
+  post's EmDash byline (Jennifer on the first post), shown with the byline's avatar or, without one,
+  its initial. The landing page's title and introduction are the Blog entry in Pages. The Bylines panel is hidden in everyone's editor
   sidebar by default; turn it back on under Settings, Sidebars to change a post's author. The footer
   links to the blog after Join our team.
 - Staff can preview another date with `?today=2026-12-01` or a period with `?period=trees` (or `summer`;

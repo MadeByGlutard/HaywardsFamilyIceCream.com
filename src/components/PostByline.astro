@@ -1,0 +1,14 @@
+---
+import type { BylineSummary } from 'emdash';
+// A post's author and date. The avatar is the byline's own (Bylines in the admin); without one, an initial.
+interface Props { byline?: BylineSummary | null; date?: Date | null }
+const { byline, date } = Astro.props;
+const day = date?.toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'long', day: 'numeric', year: 'numeric' });
+const avatar = byline?.avatarStorageKey ? `/_emdash/api/media/file/${byline.avatarStorageKey}` : undefined;
+---
+<p class="post-meta">
+  {byline && (avatar
+    ? <img class="post-avatar" src={avatar} alt="" width="40" height="40" loading="lazy" />
+    : <span class="post-avatar" aria-hidden="true">{byline.displayName.charAt(0)}</span>)}
+  <span>{byline && <>By {byline.displayName}<br /></>}{day && <time datetime={date!.toISOString()}>{day}</time>}</span>
+</p>

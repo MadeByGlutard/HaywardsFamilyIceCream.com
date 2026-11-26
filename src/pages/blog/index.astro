@@ -1,21 +1,23 @@
 ---
 import { getEmDashCollection } from 'emdash';
 import Base from '../../layouts/Base.astro';
+import PostByline from '../../components/PostByline.astro';
 import { cacheContentPage } from '../../lib/cache';
+import { getPage } from '../../lib/site';
 cacheContentPage(Astro);
-const { entries } = await getEmDashCollection('posts', { limit: 100 });
+const [page, { entries }] = await Promise.all([getPage('blog'), getEmDashCollection('posts', { limit: 100 })]);
+if (!page) return Astro.rewrite('/404');
 const posts = [...entries].sort((a, b) => (b.data.publishedAt?.getTime() ?? 0) - (a.data.publishedAt?.getTime() ?? 0));
-const day = (date?: Date | null) => date?.toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'long', day: 'numeric', year: 'numeric' });
 ---
-<Base title="Blog" description="Notes from Hayward’s Family Ice Cream in Milford, New Hampshire.">
-  <section class="page-heading wrap"><h1>Blog</h1></section>
+<Base title={page.data.title} description={page.data.excerpt} content={{ collection: 'site_pages', id: page.data.id, slug: 'blog' }}>
+  <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1>{page.data.excerpt && <p {...page.edit.excerpt}>{page.data.excerpt}</p>}</section>
   <section class="post-list wrap">
     {posts.length === 0 && <p>Nothing here yet.</p>}
     {posts.map((post) => (
       <article>
         <h2><a href={`/blog/${post.id}`} {...post.edit.title}>{post.data.title}</a></h2>
-        <p class="post-meta">{post.data.byline && <>By {post.data.byline.displayName}, </>}{day(post.data.publishedAt)}</p>
         {post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
+        <PostByline byline={post.data.byline} date={post.data.publishedAt} />
       </article>
     ))}
   </section>
