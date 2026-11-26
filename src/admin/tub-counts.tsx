@@ -133,6 +133,7 @@ const css = `
 .tc-grip { width: 36px; height: 5px; border-radius: 3px; background: var(--tc-edge); justify-self: center; }
 .tc-sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .tc-sheet h2 { margin: 0; font-size: 1.125rem; font-weight: 700; outline: none; }
+.tc .tc-sheet h2:focus-visible { outline: none; }
 .tc-sheet-sub { margin: -8px 0 0; font-size: .875rem; color: var(--tc-muted); }
 .tc-field { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 12px; min-height: 68px; border-bottom: 1px solid var(--tc-line); }
 .tc-field:last-child { border-bottom: 0; }
@@ -153,6 +154,19 @@ const css = `
 @media (prefers-reduced-motion: reduce) { .tc-switch::after { transition: none; } }
 .tc-err { color: var(--tc-stop); font-size: .8125rem; font-weight: 600; margin: -6px 0 0; }
 .tc-acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+/* Phones: a bottom sheet, Made a batch's Cancel at the top. From 768px: a centered dialog, Cancel beside the main button. */
+.tc-batch-acts { grid-template-columns: 1fr; }
+.tc-wide-only { display: none; }
+@keyframes tc-fade { from { opacity: 0; } }
+@keyframes tc-pop { from { opacity: 0; transform: translateY(8px) scale(.97); } }
+@media (min-width: 768px) {
+  .tc-scrim { align-items: center; padding: 24px; box-sizing: border-box; animation: tc-fade .16s ease-out; }
+  .tc-sheet { max-width: 420px; max-height: calc(100dvh - 48px); border-radius: 16px; padding: 20px; gap: 16px; box-shadow: 0 16px 48px rgba(0,0,0,.3); animation: tc-pop .18s ease-out; }
+  .tc-grip, .tc-phone-only { display: none; }
+  .tc .tc-wide-only { display: block; }
+  .tc-batch-acts { grid-template-columns: 1fr 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .tc-scrim, .tc-sheet { animation: none; } }
 .tc .tc-ghost { appearance: none; border: 1px solid var(--tc-line); min-height: 48px; border-radius: 12px; background: var(--tc-raised); font-weight: 600; cursor: pointer; padding: 0 14px; }
 .tc-picks { display: grid; gap: 4px; max-height: 220px; overflow-y: auto; }
 .tc .tc-picks button { appearance: none; border: 1px solid transparent; background: var(--tc-raised); min-height: 48px; border-radius: 10px; text-align: left; padding: 0 12px; cursor: pointer; font-weight: 500; }
@@ -575,7 +589,7 @@ function SheetFrame({ title, titleId, dirty, onClose, head, sub, children }: { t
 	}, []);
 	const onKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key !== "Tab" || !ref.current) return;
-		const f = [...ref.current.querySelectorAll<HTMLElement>("button:not(:disabled), input")];
+		const f = [...ref.current.querySelectorAll<HTMLElement>("button:not(:disabled), input")].filter((el) => el.offsetParent !== null);
 		if (!f.length) return;
 		if (e.shiftKey && (document.activeElement === f[0] || !f.includes(document.activeElement as HTMLElement))) {
 			e.preventDefault();
@@ -704,7 +718,7 @@ function BatchSheet({ rows, label, onClose, onAdd }: { rows: Row[]; label: (r: R
 			dirty={dirty}
 			onClose={onClose}
 			head={
-				<button type="button" className="tc-ghost" onClick={() => onClose(true)}>
+				<button type="button" className="tc-ghost tc-phone-only" onClick={() => onClose(true)}>
 					Cancel
 				</button>
 			}
@@ -755,9 +769,14 @@ function BatchSheet({ rows, label, onClose, onAdd }: { rows: Row[]; label: (r: R
 					setDirty(true);
 				}}
 			/>
-			<button type="button" className="tc-primary" disabled={!chosen || n === null} onClick={() => chosen && n !== null && onAdd(chosen, n)}>
-				{chosen ? "Add to Hardening" : "Pick a flavor first"}
-			</button>
+			<div className="tc-acts tc-batch-acts">
+				<button type="button" className="tc-ghost tc-wide-only" onClick={() => onClose(true)}>
+					Cancel
+				</button>
+				<button type="button" className="tc-primary" disabled={!chosen || n === null} onClick={() => chosen && n !== null && onAdd(chosen, n)}>
+					{chosen ? "Add to Hardening" : "Pick a flavor first"}
+				</button>
+			</div>
 		</SheetFrame>
 	);
 }
