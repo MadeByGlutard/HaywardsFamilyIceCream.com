@@ -10,7 +10,7 @@
  * schedule period and its social links to Settings. Replaced collections are then hidden from the
  * admin but kept, so going back loses nothing.
  */
-import { SchemaRegistry, setSiteSettings } from 'emdash';
+import { SchemaRegistry, setSiteSettings, ulid } from 'emdash';
 import { applySeed, type SeedFile } from 'emdash/seed';
 import { OptionsRepository } from 'emdash/api/route-utils';
 import { getDb } from 'emdash/runtime';
@@ -23,7 +23,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 15;
+export const CONTENT_VERSION = 16;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -115,6 +115,7 @@ async function addMissing(db: any, options: OptionsRepository) {
   await linkSquareItems(db);
   await renameUnedited(db);
   await splitFirstPost(db);
+  await footerOnlyPages(db);
   // EmDash's stock Categories and Tags, which are for blog posts.
   await sql`DELETE FROM _emdash_taxonomy_defs WHERE id IN ('taxdef_category', 'taxdef_tag')
     AND name NOT IN (SELECT name FROM taxonomies)`.execute(db);
@@ -183,4 +184,32 @@ async function splitFirstPost(db: any) {
   if (!content || !content.includes('"Sources"')) return;
   await sql`UPDATE ec_posts SET content = ${JSON.stringify(post.data.content)}, sources = ${JSON.stringify(post.data.sources)},
     photo = ${post.data.photo ? JSON.stringify(post.data.photo) : null} WHERE slug = 'milkshake-vs-frappe' AND sources IS NULL`.execute(db);
+}
+
+/**
+ * Pages are footer-only unless ticked "Show in the top menu". Pages already in Main navigation
+ * keep their place in the top menu (once, while no page is ticked yet), and Join our team and
+ * Blog, which the footer used to add by itself, join Main navigation.
+ */
+async function footerOnlyPages(db: any) {
+  const { rows: menus } = await sql<{ id: string }>`SELECT id FROM _emdash_menus WHERE name = 'primary'`.execute(db);
+  const menu = menus[0]?.id;
+  if (!menu) return;
+  const { rows: ticked } = await sql<{ n: number }>`SELECT count(*) AS n FROM ec_site_pages WHERE top_menu = 1`.execute(db);
+  if (!Number(ticked[0]?.n)) {
+    await sql`UPDATE ec_site_pages SET top_menu = 1 WHERE slug NOT IN ('jobs', 'blog') AND id IN (
+      SELECT reference_id FROM _emdash_menu_items WHERE menu_id = ${menu} AND reference_collection = 'site_pages')`.execute(db);
+  }
+  const { rows: last } = await sql<{ n: number | null }>`SELECT max(sort_order) AS n FROM _emdash_menu_items WHERE menu_id = ${menu}`.execute(db);
+  let order = Number(last[0]?.n ?? -1);
+  for (const [slug, label] of [['jobs', 'Join our team'], ['blog', 'Blog']]) {
+    const { rows } = await sql<{ id: string; listed: number }>`
+      SELECT p.id, (SELECT count(*) FROM _emdash_menu_items i WHERE i.menu_id = ${menu} AND i.reference_id = p.id) AS listed
+      FROM ec_site_pages p WHERE p.slug = ${slug} AND p.deleted_at IS NULL`.execute(db);
+    if (!rows[0] || Number(rows[0].listed)) continue;
+    const id = ulid();
+    order += 1;
+    await sql`INSERT INTO _emdash_menu_items (id, menu_id, parent_id, sort_order, type, reference_collection, reference_id, label, created_at, locale, translation_group)
+      VALUES (${id}, ${menu}, NULL, ${order}, 'collection', 'site_pages', ${rows[0].id}, ${label}, ${new Date().toISOString()}, 'en', ${id})`.execute(db);
+  }
 }

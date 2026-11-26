@@ -4,9 +4,9 @@ import { milfordDay } from '../lib/schedule';
 // Design review: one page in every published schedule period, side by side at a chosen width.
 // Dev server, preview builds (behind Cloudflare Access) and signed-in EmDash staff; 404 for everyone else.
 if (!import.meta.env.DEV && !__ACCESS_SIGN_IN__ && !Astro.locals.user) return new Response(null, { status: 404 });
-// The main navigation menu in its order (Trees included in every period), then the footer's Join our team and Blog.
+// Every page in Main navigation, in its order (Trees included in every period).
 const menu = await getMenu('primary');
-const pages = [...(menu?.items ?? []).map((item) => [item.url === '/home' ? '/' : item.url, item.label] as const), ['/jobs', 'Join our team'] as const, ['/blog', 'Blog'] as const];
+const pages = (menu?.items ?? []).map((item) => [item.url === '/home' ? '/' : item.url, item.label] as const);
 // Every published period from the one in force now onward (earlier ones come round again after),
 // then ones with no first day yet.
 const { entries } = await getEmDashCollection('schedule', { limit: 200 });

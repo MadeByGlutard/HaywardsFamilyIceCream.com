@@ -142,7 +142,7 @@ moves it along whenever someone opens the admin.
 | Jobs         | `jobs`               | `name`, `description`, `hiring`                               |
 | Pages        | `site_pages`         | One per page: `title`, `headline`, `excerpt`, `content`       |
 
-EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the four menus of categories (`flavors`,
+EmDash's own Menus hold the navigation (`primary`, which links to Pages: all of them are in the footer, and those ticked "Show in the top menu" in Pages are in the top menu too) and the four menus of categories (`flavors`,
 `sundaes`, `food`, `trees`). Facebook and Instagram are Settings, Social links.
 
 - **Pages:** every page has an entry, and its slug is its address (`home` is `/`). Unpublishing
@@ -169,7 +169,7 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the
   post's EmDash byline (Jennifer on the first post), shown with the byline's avatar or, without one,
   its initial. Bylines (and their avatars) are under Bylines in the admin, and the editor's Bylines
   panel sets a post's author. The landing page's title and introduction are the Blog entry in Pages.
-  The footer links to the blog after Join our team.
+  Join our team and Blog are footer-only pages in Main navigation (see Pages, "Show in the top menu").
 - Staff can preview another date with `?today=2026-12-01` or a period with `?period=trees` (or `summer`;
   a published period with no start date yet is shown as of today). `/design-preview` shows one page
   in every published period side by side.

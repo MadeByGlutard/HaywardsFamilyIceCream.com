@@ -370,10 +370,15 @@
           "slug": "content",
           "label": "Text",
           "type": "portableText"
+        },
+        {
+          "slug": "top_menu",
+          "label": "Show in the top menu",
+          "type": "boolean"
         }
       ],
       "urlPattern": "/{slug}",
-      "description": "One for every page of the site. Home’s headline comes from the Schedule."
+      "description": "One for every page of the site. Every page in Main navigation is in the footer; tick “Show in the top menu” to put it in the top menu too. Home’s headline comes from the Schedule."
     },
     {
       "slug": "posts",
@@ -2048,7 +2053,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "top_menu": true
         }
       },
       {
@@ -2057,7 +2063,8 @@
         "status": "published",
         "data": {
           "title": "Hours & directions",
-          "excerpt": "Look for the white stand with the curved roof and the red Hayward’s sign."
+          "excerpt": "Look for the white stand with the curved roof and the red Hayward’s sign.",
+          "top_menu": true
         }
       },
       {
@@ -2083,7 +2090,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "top_menu": true
         }
       },
       {
@@ -2092,7 +2100,8 @@
         "status": "published",
         "data": {
           "title": "Food & drinks",
-          "excerpt": "Not everything is on every day."
+          "excerpt": "Not everything is on every day.",
+          "top_menu": true
         }
       },
       {
@@ -2101,7 +2110,8 @@
         "status": "published",
         "data": {
           "title": "Sundaes & frappes",
-          "excerpt": "Not everything is on every day."
+          "excerpt": "Not everything is on every day.",
+          "top_menu": true
         }
       },
       {
@@ -2110,7 +2120,8 @@
         "status": "published",
         "data": {
           "title": "Flavors",
-          "excerpt": "Flavors come and go."
+          "excerpt": "Flavors come and go.",
+          "top_menu": true
         }
       },
       {
@@ -2163,7 +2174,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "top_menu": false
         }
       },
       {
@@ -2171,7 +2183,8 @@
         "slug": "home",
         "status": "published",
         "data": {
-          "title": "Home"
+          "title": "Home",
+          "top_menu": true
         }
       },
       {
@@ -2180,7 +2193,8 @@
         "status": "published",
         "data": {
           "title": "Blog",
-          "excerpt": "Notes from the stand on Elm Street."
+          "excerpt": "Notes from the stand on Elm Street.",
+          "top_menu": false
         }
       }
     ],
@@ -2497,6 +2511,18 @@
           "collection": "site_pages",
           "ref": "page-history",
           "label": "History"
+        },
+        {
+          "type": "collection",
+          "collection": "site_pages",
+          "ref": "page-jobs",
+          "label": "Join our team"
+        },
+        {
+          "type": "collection",
+          "collection": "site_pages",
+          "ref": "page-blog",
+          "label": "Blog"
         }
       ]
     },

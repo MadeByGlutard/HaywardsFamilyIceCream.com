@@ -1,5 +1,5 @@
 ---
-import { getMenu, getSiteSettings } from 'emdash';
+import { getEmDashCollection, getMenu, getSiteSettings } from 'emdash';
 import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from 'emdash/ui';
 import { createPublicPageContext } from 'emdash/page';
 import { getLocation, telephone } from '../lib/site';
@@ -14,7 +14,7 @@ import '@phosphor-icons/web/regular';
 import '../styles/theme.css';
 interface Props { title: string; strip?: boolean; description?: string; content?: { collection: string; id: string; slug?: string | null }; image?: string; }
 const { strip: showStripProp = true, title, description = 'Homemade ice cream at 383 Elm Street in Milford, New Hampshire. Explore the flavors, read our story, and plan your visit.', content, image = '/images/milford-stand.jpg' } = Astro.props;
-const [settings, menu, location] = await Promise.all([getSiteSettings(), getMenu('primary'), getLocation()]);
+const [settings, menu, location, { entries: sitePages }] = await Promise.all([getSiteSettings(), getMenu('primary'), getLocation(), getEmDashCollection('site_pages', { limit: 100 })]);
 const place = location.data;
 const schedule = await getScheduleContext(Astro);
 const status = schedule.status;
@@ -29,11 +29,14 @@ const canonical = new URL(path, Astro.site).href;
 const page = createPublicPageContext({ Astro, kind: content ? 'content' : 'custom', pageType: 'website', title: fullTitle, description, canonical, image: new URL(image, Astro.site).href, content, siteName: siteTitle });
 const structured = { '@context':'https://schema.org', '@type':'IceCreamShop', name:siteTitle, url:Astro.site?.href, telephone:telephone(place.phone).slice(4), image:new URL('/images/milford-stand.jpg',Astro.site).href, address:{'@type':'PostalAddress',streetAddress:place.address,addressLocality:'Milford',addressRegion:'NH',postalCode:'03055',addressCountry:'US'}, sameAs:[place.facebook, place.instagram].filter(Boolean) };
 
-// Main navigation in Menus links to entries in Pages. Trees & wreaths shows while the tree
-// lot is open, for six weeks before, and for a few days after.
+// Main navigation in Menus links to entries in Pages. Every one is in the footer; the top menu
+// (and the phone Menu) has only the pages ticked "Show in the top menu". Trees & wreaths shows
+// while the tree lot is open, for six weeks before, and for a few days after.
+const promoted = new Set(sitePages.filter((entry) => entry.data.top_menu).map((entry) => entry.id));
 const navItems = (menu?.items ?? [])
-  .map((item) => ({ label: item.label, url: item.url === '/home' ? '/' : item.url }))
+  .map((item) => ({ label: item.label, url: item.url === '/home' ? '/' : item.url, top: promoted.has(item.url.replace(/^\//, '').split('/')[0]) }))
   .filter((item) => item.url !== '/trees' || schedule.treesNav);
+const topItems = navItems.filter((item) => item.top);
 const showStrip = showStripProp && !!status.strip;
 const stripHtml = linkSocial(withSentences(status.strip));
 const themeColor = schedule.accent === 'green' ? '#2e5a3c' : '#a71d2a';
@@ -62,19 +65,19 @@ const themeColor = schedule.accent === 'green' ? '#2e5a3c' : '#a71d2a';
         <a class="call-link" href={telephone(place.phone)} aria-label={`Call ${place.phone}`}><i class="ph ph-phone" aria-hidden="true"></i>Call</a>
       </div>
       <div class="nav-bar"><div class="nav-wrap wrap">
-        <nav class="main-nav" aria-label="Main navigation">{navItems.map(item => <a href={item.url} aria-current={path === item.url ? 'page' : undefined}>{item.label}</a>)}</nav>
+        <nav class="main-nav" aria-label="Main navigation">{topItems.map(item => <a href={item.url} aria-current={path === item.url ? 'page' : undefined}>{item.label}</a>)}</nav>
         <div class="status-row"><span class="opening-cell"><a class="opening" href="/visit"><span class="status-text" {...statusEdit} set:html={withSentences(status.line)} /><span class="status-alt">Hours &amp; directions</span><span class="sr-only">, hours and directions</span></a></span><a class="directions-link" href={place.directions}><i class="ph ph-map-pin" aria-hidden="true"></i><span>{place.address}</span><span class="sr-only">, directions</span></a></div>
       </div></div>
     </header>
     {/* The Menu button's dialog on phones and tablets. Without script, Menu jumps to the page list in the footer. */}
     <dialog class="menu-sheet" id="site-menu" aria-label="Menu"><div class="menu-panel">
       <div class="menu-top"><button class="menu-button" type="button" data-close><i class="ph ph-x" aria-hidden="true"></i>Close</button></div>
-      <nav aria-label="Pages">{navItems.map(item => <a href={item.url} aria-current={path === item.url ? 'page' : undefined}>{item.label}</a>)}</nav>
+      <nav aria-label="Pages">{topItems.map(item => <a href={item.url} aria-current={path === item.url ? 'page' : undefined}>{item.label}</a>)}</nav>
       <p class="menu-actions"><a class="button" href={place.directions}><i class="ph ph-map-pin" aria-hidden="true"></i>Directions</a><a class="button button-line" href={telephone(place.phone)}><i class="ph ph-phone" aria-hidden="true"></i>Call</a></p>
     </div></dialog>
     <main id="main"><slot /></main>
     <footer class="footer wrap">
-      <nav class="footer-col footer-menu" id="pages" aria-label="All pages"><h2>Pages</h2>{navItems.filter(item => item.url !== '/').map(item => <a href={item.url}>{item.label}</a>)}<a href="/jobs">Join our team</a><a href="/blog">Blog</a></nav>
+      <nav class="footer-col footer-menu" id="pages" aria-label="All pages"><h2>Pages</h2>{navItems.filter(item => item.url !== '/').map(item => <a href={item.url}>{item.label}</a>)}</nav>
       <div class="footer-col"><h2>Find us</h2><p>{place.address}<br />{place.locality}</p><a href={place.directions}>Get directions</a></div>
       <div class="footer-col"><h2>Hours &amp; contact</h2><p set:html={withSentences(status.line)} /><a href={telephone(place.phone)}>{place.phone}</a><p class="footer-links">{place.facebook && <a href={place.facebook}>Facebook</a>}{place.instagram && <a href={place.instagram}>Instagram</a>}{place.email && <a href={`mailto:${place.email}`}>Email</a>}</p></div>
       <div class="footer-fine"><span>© {new Date().getFullYear()} Hayward’s Family Ice Cream</span><a href="/admin">Login</a></div>

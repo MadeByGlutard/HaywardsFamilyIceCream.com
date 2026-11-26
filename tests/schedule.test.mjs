@@ -64,7 +64,7 @@ test('seed content invents no closing times, prices or dates', () => {
 });
 
 test('the forms stay short, with no prices', () => {
-	const most = { schedule: 7, catalog_flavors: 6, catalog_items: 3, catalog_categories: 3, store: 4, jobs: 3, site_pages: 4, posts: 5 };
+	const most = { schedule: 7, catalog_flavors: 6, catalog_items: 3, catalog_categories: 3, store: 4, jobs: 3, site_pages: 5, posts: 5 };
 	assert.deepEqual(seed.collections.map((c) => c.slug), Object.keys(most));
 	for (const c of seed.collections) {
 		assert.ok(c.fields.length <= most[c.slug], `${c.slug} has ${c.fields.length} fields`);
@@ -95,7 +95,9 @@ test('every flavor and menu item is in a category, and categories are on a menu'
 
 test('the navigation links to every page', () => {
 	const primary = seed.menus.find((menu) => menu.name === 'primary');
-	assert.deepEqual(primary.items.map((item) => item.ref).sort(), seed.content.site_pages.filter((p) => !['jobs', 'blog'].includes(p.slug)).map((p) => p.id).sort(), 'Join our team and Blog are linked from the footer');
+	assert.deepEqual(primary.items.map((item) => item.ref).sort(), seed.content.site_pages.map((p) => p.id).sort(), 'every page is in Main navigation');
+	const footerOnly = seed.content.site_pages.filter((p) => !p.data.top_menu).map((p) => p.slug).sort();
+	assert.deepEqual(footerOnly, ['blog', 'jobs'], 'Join our team and Blog are in the footer only');
 	for (const item of primary.items) assert.equal(item.collection, 'site_pages');
 });
 
