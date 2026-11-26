@@ -374,7 +374,18 @@ mark.placeholder {
 }
 
 .masthead-contact a {
-	font-weight: 600;
+	text-decoration: none;
+}
+
+/* Mirrors the note on the left: the address plain, the phone in the tagline's italic. */
+.masthead-contact a:last-child {
+	font-family: var(--italic);
+	font-size: 1.1875rem;
+	font-variant-numeric: proportional-nums;
+}
+
+.masthead-contact a:hover {
+	text-decoration: underline;
 }
 
 .brand img {
