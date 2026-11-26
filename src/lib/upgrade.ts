@@ -24,7 +24,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 20;
+export const CONTENT_VERSION = 21;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -201,6 +201,8 @@ async function historyEnding(db: any) {
     'Sharon Robinson runs the stand on Elm Street today, and the ice cream in the case is made right here. Chris runs Hayward’s in Nashua, and Diane runs Hayward’s in Merrimack. Mike runs Mike’s Ice Cream.',
     'They’re all of the grandchildren, and every one of them stayed in ice cream.',
   ];
+  // The last line as first published with the grandparents' names, before Frederika's spelling.
+  const lastLines = ['They’re all four of Charles and Fredericka Hayward’s grandchildren, and every one of them stayed in ice cream.'];
   let changed = at >= 0;
   firstDraft.forEach((old, i) => {
     const found = blocks.findIndex((block) => text(block) === old);
@@ -209,6 +211,11 @@ async function historyEnding(db: any) {
       changed = true;
     }
   });
+  const last = blocks.findIndex((block) => lastLines.includes(text(block)));
+  if (last >= 0) {
+    blocks[last] = ending[2];
+    changed = true;
+  }
   if (changed) await sql`UPDATE ec_site_pages SET content = ${JSON.stringify(blocks)} WHERE slug = 'history'`.execute(db);
 }
 

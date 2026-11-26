@@ -28,7 +28,7 @@ Redone November 23, 2026, replacing the November 16 version. One researcher star
 | The farm closed; building 2001; former Hayward Farms land | Assessor; Hayward’s site, 2009 | Yes |
 | Made elsewhere, then January 2008 | Hayward’s site, 2008 | Yes |
 | Ice Cream Trail, 2022 | Granite State News Collaborative | Yes |
-| Sharon Robinson, Chris Ordway, Mike Ordway and Dianne O’Donnell are all of Charles and Fredericka Hayward’s grandchildren; who runs which stand | Hayward’s (owner, November 26, 2026); Visiting New England, 2018 (Charles P. and Fredericka founded Nashua; daughter Trudy and husband Mike Ordway; grandson Chris) | Owner confirmed; article read |
+| Sharon Robinson, Chris Ordway, Mike Ordway and Dianne O’Donnell are all of Charles and Frederika (Gallup) Hayward’s grandchildren, through their daughter Trudy (Hayward) LeGrice (obituary, the Cabinet, 2026; Dee Chase, also listed, is her husband Rick’s daughter); who runs which stand | Hayward’s (owner, November 26, 2026); Visiting New England, 2018 (Charles P. and Fredericka founded Nashua; daughter Trudy and husband Mike Ordway; grandson Chris) | Owner confirmed; article read |
 | Nashua and Merrimack separate (no longer on the page) | Hayward’s site 2012 and 2013, assessor (separate corporation) | Yes; **owner should confirm** |
 
 ## Postcards
@@ -41,6 +41,10 @@ Both cards are in the Boston Public Library’s Tichnor Brothers Collection, mar
 - Is all the ice cream still made at Elm Street? (Last explicit sources: 2008 and 2022.)
 - ~~Do they want the current family named?~~ Yes (November 26, 2026): the four grandchildren close the page. Ownership stays off it.
 - Is “a separate business” how they describe Nashua and Merrimack?
+
+## Open: which Charles
+
+Trudy, born 1940, was the daughter of Charles P. and Frederika Hayward, who opened the Nashua stand. The milk-cart Charles of the 1920s already had three sons working the routes, and Stanley’s son Arthur was born in 1935, so Charles P. may be one of those sons rather than the same man. The page doesn’t say either way (“the Nashua stand’s founders”). Ask the family.
 
 ## Leads, not used
 
