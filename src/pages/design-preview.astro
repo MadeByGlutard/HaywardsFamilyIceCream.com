@@ -5,10 +5,15 @@ import { milfordDay } from '../lib/schedule';
 // Dev server, preview builds (behind Cloudflare Access) and signed-in EmDash staff; 404 for everyone else.
 if (!import.meta.env.DEV && !__ACCESS_SIGN_IN__ && !Astro.locals.user) return new Response(null, { status: 404 });
 const pages = [['/', 'Home'], ['/flavors', 'Flavors'], ['/sundaes', 'Sundaes'], ['/trees', 'Trees'], ['/food', 'Food'], ['/history', 'History'], ['/visit', 'Hours']] as const;
-// Every published period, in calendar order; ones with no first day yet go last.
+// Every published period from the one in force now onward (earlier ones come round again after),
+// then ones with no first day yet.
 const { entries } = await getEmDashCollection('schedule', { limit: 200 });
-const dayOf = (e: (typeof entries)[number]) => milfordDay(e.data.start_date) ?? '9999';
-const periods = [...entries].sort((a, b) => dayOf(a).localeCompare(dayOf(b)) || a.id.localeCompare(b.id)).map((e) => [e.id, `${e.data.title}${dayOf(e) === '9999' ? ' (no start date yet)' : ''}`] as const);
+const today = milfordDay(new Date())!;
+const dated = entries.flatMap((e) => { const day = milfordDay(e.data.start_date); return day ? [{ e, day }] : []; })
+  .sort((a, b) => a.day.localeCompare(b.day) || a.e.id.localeCompare(b.e.id));
+const now = Math.max(0, dated.findLastIndex((p) => p.day <= today));
+const periods = [...dated.slice(now), ...dated.slice(0, now), ...entries.filter((e) => !milfordDay(e.data.start_date)).map((e) => ({ e, day: '' }))]
+  .map(({ e, day }) => [e.id, `${e.data.title}${day ? '' : ' (no start date yet)'}`] as const);
 const widths = [['390', 'Phone'], ['820', 'iPad'], ['1440', 'Desktop']] as const;
 const q = Astro.url.searchParams;
 const page = pages.find(([p]) => p === q.get('page'))?.[0] ?? '/';
