@@ -32,10 +32,13 @@ export const fromStored = (s: StoredTubs): Tubs => ({ hard: s.hard, back: s.back
 export const EMPTY: Tubs = { hard: 0, back: 0, front: 0, cab: false };
 export const tubsInAll = (t: Tubs) => t.hard + t.back + t.front + (t.cab ? 1 : 0);
 
-/** One change, as the page sends it. `swap` and `before` are filled in by the server so it can be undone. */
+/**
+ * One change, as the page sends it. `swap` and `before` are filled in by the server so it can be
+ * undone. `count` is for repeated moves the page adds up under one Undo ("Moved 3 Chocolate…").
+ */
 export type Change =
-	| { action: "move"; from: MoveFrom }
-	| { action: "into"; swap?: boolean }
+	| { action: "move"; from: MoveFrom; count?: number }
+	| { action: "into"; swap?: boolean; count?: number }
 	| { action: "usedUp" }
 	| { action: "batch"; count: number }
 	| { action: "save"; to: Tubs; before?: Tubs };
@@ -48,11 +51,13 @@ const parseTubs = (t: unknown): Tubs | null => {
 /** Checks a change from the page, keeping only the fields that belong to it. */
 export function parseChange(input: unknown): Change | null {
 	const c = input as Record<string, unknown> | null;
+	if (c?.count !== undefined && !(isCount(c.count) && c.count >= 1)) return null;
+	const count = c?.count !== undefined && c.count !== 1 ? { count: c.count as number } : {};
 	switch (c?.action) {
 		case "move":
-			return c.from === "hard" || c.from === "back" ? { action: "move", from: c.from } : null;
+			return c.from === "hard" || c.from === "back" ? { action: "move", from: c.from, ...count } : null;
 		case "into":
-			return { action: "into", ...(typeof c.swap === "boolean" && { swap: c.swap }) };
+			return { action: "into", ...(typeof c.swap === "boolean" && { swap: c.swap }), ...(c.swap === true && count) };
 		case "usedUp":
 			return { action: "usedUp" };
 		case "batch":
@@ -67,6 +72,8 @@ export function parseChange(input: unknown): Change | null {
 }
 
 /** The change applied to counts, or null when there's nothing to take. Same rules as the guarded updates in tubs.ts. */
+const times = (change: Change) => ("count" in change && change.count) || 1;
+
 export function applyChange(t: Tubs, change: Change): Tubs | null {
 	switch (change.action) {
 		case "move":
@@ -86,10 +93,11 @@ export function undoChange(t: Tubs, change: Change): Tubs | null {
 	switch (change.action) {
 		case "move": {
 			const to = NEXT[change.from];
-			return t[to] >= 1 ? { ...t, [to]: t[to] - 1, [change.from]: t[change.from] + 1 } : null;
+			const n = times(change);
+			return t[to] >= n ? { ...t, [to]: t[to] - n, [change.from]: t[change.from] + n } : null;
 		}
 		case "into":
-			return { ...t, front: t.front + 1, cab: change.swap ? t.cab : false };
+			return { ...t, front: t.front + times(change), cab: change.swap ? t.cab : false };
 		case "usedUp":
 			return { ...t, cab: true };
 		case "batch":
@@ -107,17 +115,24 @@ export const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" :
 export function changeText(change: Change, name: string) {
 	switch (change.action) {
 		case "move":
-			return `Moved 1 ${name} to ${WHERE[NEXT[change.from]]}`;
+			return `Moved ${times(change)} ${name} to ${WHERE[NEXT[change.from]]}`;
 		case "into":
-			return change.swap ? `Fresh ${name} into the cabinets` : `${name} is in the cabinets`;
+			if (!change.swap) return `${name} is in the cabinets`;
+			return times(change) > 1 ? `Swapped ${times(change)} fresh ${name} into the cabinets` : `Fresh ${name} into the cabinets`;
 		case "usedUp":
-			return `${name} used up, the slot is empty`;
+			return `${name} used up, its slot is empty`;
 		case "batch":
 			return `Made ${change.count} ${name}, into Hardening`;
 		case "save":
 			return `Updated ${name}`;
 	}
 }
+/** Changes that add up when repeated: the same move of the same flavor, or another swap. */
+export const repeatKey = (change: Change) =>
+	change.action === "move" ? `move:${change.from}` : change.action === "into" && change.swap ? "swap" : null;
+/** How long repeats add up, and how long Undo stays on screen. */
+export const UNDO_MS = 8000;
+
 /** The change log keeps what a saved sheet set the counts to. */
 export function logText(change: Change, name: string) {
 	if (change.action !== "save") return changeText(change, name);

@@ -1,6 +1,6 @@
 import { getEmDashCollection } from "emdash";
 import { categoryLinks } from "../lib/catalog-links";
-import { type Change, fromStored, isCurrent, logText, migrateNow, NEXT, type StoredTubs, toStored } from "./tub-flow";
+import { type Change, fromStored, isCurrent, logText, migrateNow, NEXT, repeatKey, type StoredTubs, toStored, UNDO_MS } from "./tub-flow";
 
 /**
  * Freezer tub counts, staff only. Stored in the plugin's own storage, keyed by flavor, so a
@@ -11,6 +11,9 @@ export interface TubChange {
 	at: string;
 	text: string;
 	by: string;
+	/** Repeats of the same change add up in one line: which flavor and move, and how many. */
+	key?: string;
+	n?: number;
 }
 
 type Update = { where: Record<string, unknown>; set?: Partial<StoredTubs>; delta?: Record<string, { inc: number } | { dec: number }> };
@@ -65,8 +68,8 @@ export async function readTubs(storage: Storage) {
 			...migrateNow(counts.get(flavor.data.id)),
 		}))
 		.sort((a, b) => a.name.localeCompare(b.name, "en", { ignorePunctuation: true }) || a.category.localeCompare(b.category));
-	const { items } = await storage.tubLog.query({ orderBy: { at: "desc" }, limit: 10 });
-	return { rows, changes: items.map((item) => item.data) };
+	const { items } = await storage.tubLog.query({ orderBy: { at: "desc" }, limit: 5 });
+	return { rows, changes: items.map(({ data: { at, text, by } }) => ({ at, text, by })) };
 }
 
 const inc = (n: number) => ({ inc: n });
@@ -109,10 +112,11 @@ async function undo(storage: Storage, id: string, change: Change): Promise<boole
 	switch (change.action) {
 		case "move": {
 			const to = NEXT[change.from];
-			return update({ where: { [to]: { gte: 1 } }, delta: { [to]: dec(1), [change.from]: inc(1) } });
+			const n = change.count ?? 1;
+			return update({ where: { [to]: { gte: n } }, delta: { [to]: dec(n), [change.from]: inc(n) } });
 		}
 		case "into":
-			return change.swap ? update({ where: {}, delta: { front: inc(1) } }) : update({ where: {}, delta: { front: inc(1) }, set: { cab: 0 } });
+			return change.swap ? update({ where: {}, delta: { front: inc(change.count ?? 1) } }) : update({ where: {}, delta: { front: inc(1) }, set: { cab: 0 } });
 		case "usedUp":
 			return update({ where: {}, set: { cab: 1 } });
 		case "batch":
@@ -127,6 +131,24 @@ async function log(storage: Storage, text: string, by: string) {
 	await storage.tubLog.put(`${at}-${Math.random().toString(36).slice(2, 8)}`, { at, text, by });
 }
 
+/** Logs a change, adding it to the line before when it's a quick repeat by the same person ("Moved 3 …"). */
+async function logChange(storage: Storage, flavor: { id: string; name: string }, change: Change, by: string) {
+	const repeat = repeatKey(change);
+	const key = repeat && `${flavor.id}:${repeat}`;
+	if (key) {
+		const { items } = await storage.tubLog.query({ orderBy: { at: "desc" }, limit: 1 });
+		const last = items[0];
+		if (last && last.data.key === key && last.data.by === by && Date.now() - Date.parse(last.data.at) < UNDO_MS) {
+			const n = (last.data.n ?? 1) + 1;
+			const at = new Date().toISOString();
+			await storage.tubLog.put(last.id, { at, text: logText({ ...change, count: n } as Change, flavor.name), by, key, n });
+			return;
+		}
+	}
+	const at = new Date().toISOString();
+	await storage.tubLog.put(`${at}-${Math.random().toString(36).slice(2, 8)}`, { at, text: logText(change, flavor.name), by, ...(key && { key, n: 1 }) });
+}
+
 /**
  * Applies one change, or undoes one. Returns the change as it went through, so the page can
  * offer Undo, or null when there was nothing to take.
@@ -138,7 +160,9 @@ export async function changeTubs(storage: Storage, flavor: { id: string; name: s
 		await log(storage, `Undid: ${logText(change, flavor.name)}`, by);
 		return change;
 	}
-	const done = await apply(storage, flavor.id, change);
-	if (done) await log(storage, logText(done, flavor.name), by);
+	// One tap is one tub; only an undo can take back several at once.
+	const one = change.action === "move" || change.action === "into" ? ({ ...change, count: undefined } as Change) : change;
+	const done = await apply(storage, flavor.id, one);
+	if (done) await logChange(storage, flavor, done, by);
 	return done;
 }

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { migrate, isCurrent, applyChange, undoChange, parseChange, changeText, logText, toStored, NEXT } from '../src/admin/tub-flow.ts';
+import { migrate, isCurrent, applyChange, undoChange, parseChange, changeText, logText, toStored, NEXT, repeatKey } from '../src/admin/tub-flow.ts';
 
 const tubs = (hard, back, front, cab) => ({ hard, back, front, cab });
 
@@ -58,8 +58,22 @@ test('the snackbar and log read in plain words', () => {
 	assert.equal(changeText({ action: 'move', from: 'hard' }, 'Coffee'), 'Moved 1 Coffee to the back freezer');
 	assert.equal(changeText({ action: 'into', swap: true }, 'Coffee'), 'Fresh Coffee into the cabinets');
 	assert.equal(changeText({ action: 'into', swap: false }, 'Coffee'), 'Coffee is in the cabinets');
-	assert.equal(changeText({ action: 'usedUp' }, 'Coffee'), 'Coffee used up, the slot is empty');
+	assert.equal(changeText({ action: 'usedUp' }, 'Coffee'), 'Coffee used up, its slot is empty');
 	assert.equal(changeText({ action: 'batch', count: 3 }, 'Coffee'), 'Made 3 Coffee, into Hardening');
 	assert.equal(changeText({ action: 'save', to: tubs(1, 2, 0, true) }, 'Coffee'), 'Updated Coffee');
 	assert.equal(logText({ action: 'save', to: tubs(1, 2, 0, true) }, 'Coffee'), 'Updated Coffee: 1 hardening, 2 back, 0 front, in the cabinets');
+});
+
+test('repeated moves add up under one Undo', () => {
+	assert.equal(changeText({ action: 'move', from: 'back', count: 3 }, 'Chocolate'), 'Moved 3 Chocolate to the front freezer');
+	assert.equal(changeText({ action: 'into', swap: true, count: 2 }, 'Coffee'), 'Swapped 2 fresh Coffee into the cabinets');
+	assert.deepEqual(undoChange(tubs(0, 1, 3, true), { action: 'move', from: 'back', count: 3 }), tubs(0, 4, 0, true));
+	assert.equal(undoChange(tubs(0, 1, 2, true), { action: 'move', from: 'back', count: 3 }), null);
+	assert.deepEqual(undoChange(tubs(0, 0, 0, true), { action: 'into', swap: true, count: 2 }), tubs(0, 0, 2, true));
+	assert.equal(repeatKey({ action: 'move', from: 'hard' }), 'move:hard');
+	assert.equal(repeatKey({ action: 'into', swap: true }), 'swap');
+	assert.equal(repeatKey({ action: 'into', swap: false }), null);
+	assert.equal(repeatKey({ action: 'usedUp' }), null);
+	assert.deepEqual(parseChange({ action: 'move', from: 'back', count: 3 }), { action: 'move', from: 'back', count: 3 });
+	assert.equal(parseChange({ action: 'move', from: 'back', count: 0 }), null);
 });
