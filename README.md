@@ -174,17 +174,15 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages: all of 
   a published period with no start date yet is shown as of today). `/design-preview` shows one page
   in every published period side by side.
 - **Tub counts** (Plugins → Tub counts, `src/admin/tubs.ts`, `tub-flow.ts` and `tub-counts.tsx`):
-  tubs move made → back freezer → front freezer → dipping case. "Made a batch" at the top picks a
-  flavor (type to search; twins show their category) and a number of tubs, and puts them in the
-  back with the Milford (America/New_York) day they went in. Tubs are ready to move to the front
-  from the next calendar day in Milford (made any time on the 26th, ready from midnight starting
-  the 27th). Below, flavors are listed by what needs doing: Move from the back (ready tubs, oldest
-  first), Last one in front, In front ("Into the case"), and In the back, ready tomorrow. Each line
-  reads "Back 5 (2 ready) → Front 3" with only its next action; empty lists don't show. Flavors
-  that are out are folded up at the bottom, where a batch can be added too. "Fix count" on a line
-  opens − / + for corrections (− on the back takes the newest tubs). Counts live in the plugin's
-  storage with a short change log; each tap is a versioned compare-and-set, so simultaneous taps
-  can't go below zero or get lost. Counts never change the website.
+  a staff-only sheet with four counts per flavor, in the order tubs move: Freezing (just made,
+  hardening) → Back freezer → Front freezer → Cabinets (the dipping cabinets). Tap a number to type
+  it, use − / +, or → to move one tub to the next spot; staff move Freezing on by hand. A totals
+  row sits at the bottom and a search box finds a flavor; on phones the sheet scrolls inside its
+  box with the flavor column pinned. Counts live in the plugin's storage with a short change log
+  ("Moved 1 Maple Walnut from Back freezer to Front freezer"). Each tap is one guarded update, so
+  simultaneous taps can't go below zero. Counts from the earlier version are converted on first
+  load: back tubs added that day become Freezing, older ones stay in the Back freezer, Cabinets
+  starts at 0. Counts never change the website.
 - `src/admin/`: the Category column and the Square panel (the "Hayward's admin" plugin), and the sidebars everyone starts with (no ownership or URL panels).
 
 `content/flavors.json` and `content/settings/settings.yaml` are the original data from
