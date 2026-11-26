@@ -1,6 +1,6 @@
 import { definePlugin } from "emdash";
 import { categoryLinks } from "../lib/catalog-links";
-import { ACTIONS, isStage, type TubAction } from "./tub-flow";
+import { changeText, parseChange } from "./tub-flow";
 import { changeTubs, readTubs } from "./tubs";
 
 export const createPlugin = () =>
@@ -10,7 +10,7 @@ export const createPlugin = () =>
 		description: "Made for this site (src/admin): tub counts, the Category column and the Square panel.",
 		version: "1.0.0",
 		// Written by code only. No route or form changes it.
-		storage: { square: { indexes: [] }, tubs: { indexes: ["freezing", "back", "front", "cabinets"] }, tubLog: { indexes: ["at"] } },
+		storage: { square: { indexes: [] }, tubs: { indexes: ["hard", "back", "front", "cab"] }, tubLog: { indexes: ["at"] } },
 		admin: { pages: [{ path: "/tubs", label: "Tub counts", icon: "snowflake" }] },
 		routes: {
 			// Tub counts: staff only (contributors and up), never shown on the site.
@@ -19,13 +19,19 @@ export const createPlugin = () =>
 				handler: async (ctx) => {
 					const storage = ctx.storage as any;
 					if (ctx.request.method === "POST") {
-						const { flavor, action, stage, value } = (ctx.input ?? {}) as { flavor?: string; action?: TubAction; stage?: string; value?: number };
+						// { flavor, change } makes a change; { flavor, undo } takes back one the page was told about.
+						const input = (ctx.input ?? {}) as { flavor?: string; change?: unknown; undo?: unknown };
+						const change = parseChange(input.undo ?? input.change);
 						const { rows } = await readTubs(storage);
-						const row = rows.find((r) => r.id === flavor);
-						if (!row || !action || !ACTIONS.includes(action) || !isStage(stage)) throw new Error("Unknown flavor, count or action");
+						const row = rows.find((r) => r.id === input.flavor);
+						if (!row || !change) throw new Error("Unknown flavor or change");
 						const name = row.category && rows.filter((r) => r.name === row.name).length > 1 ? `${row.name} (${row.category})` : row.name;
-						await changeTubs(storage, { id: row.id, name }, action, stage, ctx.user?.name || ctx.user?.email || "", value);
-						return readTubs(storage);
+						const isUndo = input.undo !== undefined;
+						const done = await changeTubs(storage, { id: row.id, name }, change, ctx.user?.name || ctx.user?.email || "", isUndo);
+						const result = done
+							? { done: isUndo ? null : { text: changeText(done, name), change: done } }
+							: { failed: isUndo ? "Couldn’t undo: those tubs have moved on since." : "Nothing to move: someone may have just done it." };
+						return { ...(await readTubs(storage)), ...result };
 					}
 					return readTubs(storage);
 				},

@@ -1,56 +1,149 @@
 /**
- * Tub counts as four plain numbers per flavor, in the order tubs move:
- * Freezing (just made, hardening) → Back freezer → Front freezer → Cabinets (the dipping case).
- * Staff move tubs on by hand; nothing here is timed. Pure functions (no EmDash imports) so
- * tests/tubs.test.mjs can run them with plain Node.
+ * Tub counts follow the tub: Hardening (just made) → Back freezer → Front freezer → Cabinets.
+ * The first three are counts; Cabinets is yes or no, one tub per flavor in its slot. Pure
+ * functions (no EmDash imports), so tests/tubs.test.mjs runs them with plain Node and the admin
+ * page uses the same rules to show a tap before the server answers.
  */
 import { milfordDay } from "../lib/schedule-dates.ts";
 
-export const STAGES = ["freezing", "back", "front", "cabinets"] as const;
-export type Stage = (typeof STAGES)[number];
-export const STAGE_NAMES: Record<Stage, string> = { freezing: "Freezing", back: "Back freezer", front: "Front freezer", cabinets: "Cabinets" };
-export type Tubs = Record<Stage, number>;
-export type TubAction = "add" | "remove" | "move" | "set";
-export const ACTIONS: TubAction[] = ["add", "remove", "move", "set"];
-/** Highest count anyone can type in. */
+export const COUNTS = ["hard", "back", "front"] as const;
+export type Count = (typeof COUNTS)[number];
+/** A tub only moves one way; "Into cabinets" covers the last step. */
+export type MoveFrom = "hard" | "back";
+export const NEXT: Record<MoveFrom, Count> = { hard: "back", back: "front" };
+/** Highest count anyone can set. */
 export const MAX_COUNT = 999;
 
-export const nextStage = (stage: Stage): Stage | undefined => STAGES[STAGES.indexOf(stage) + 1];
-export const isStage = (value: unknown): value is Stage => STAGES.includes(value as Stage);
-
-/** Records from before the four counts: { front, back, batches?: [{ day, tubs }] }. */
-interface OldTubs {
-	front?: number;
-	back?: number;
-	batches?: Array<{ day: string; tubs: number }>;
+/** What a flavor has. Stored with `cab` as 1 or 0 so guarded updates can compare it as a number. */
+export interface Tubs {
+	hard: number;
+	back: number;
+	front: number;
+	cab: boolean;
 }
-export const isCurrent = (stored: unknown): stored is Tubs => typeof (stored as Tubs | null)?.freezing === "number";
-
-/**
- * Brings a stored record up to the four counts. Old back-freezer tubs that went in on `today`
- * (a Milford day, YYYY-MM-DD) become Freezing, older ones stay in the Back freezer, the front
- * stays the Front freezer and Cabinets starts at 0.
- */
-export function migrate(stored: unknown, today: string): Tubs {
-	if (isCurrent(stored)) return { freezing: stored.freezing, back: stored.back ?? 0, front: stored.front ?? 0, cabinets: stored.cabinets ?? 0 };
-	const old = (stored ?? {}) as OldTubs;
-	const back = Math.max(0, old.back ?? 0);
-	const freezing = Math.min(back, (old.batches ?? []).filter((b) => b.day === today).reduce((sum, b) => sum + Math.max(0, b.tubs), 0));
-	return { freezing, back: back - freezing, front: Math.max(0, old.front ?? 0), cabinets: 0 };
+export interface StoredTubs {
+	hard: number;
+	back: number;
+	front: number;
+	cab: 0 | 1;
 }
-export const migrateNow = (stored: unknown, now = new Date()) => migrate(stored, milfordDay(now)!);
+export const toStored = (t: Tubs): StoredTubs => ({ hard: t.hard, back: t.back, front: t.front, cab: t.cab ? 1 : 0 });
+export const fromStored = (s: StoredTubs): Tubs => ({ hard: s.hard, back: s.back, front: s.front, cab: !!s.cab });
+export const EMPTY: Tubs = { hard: 0, back: 0, front: 0, cab: false };
+export const tubsInAll = (t: Tubs) => t.hard + t.back + t.front + (t.cab ? 1 : 0);
 
-/** The change log's line for a tap that went through. */
-export function logLine(action: TubAction, name: string, stage: Stage, value?: number) {
-	const where = STAGE_NAMES[stage];
-	switch (action) {
-		case "add":
-			return `Added 1 ${name} to ${where}`;
-		case "remove":
-			return `Removed 1 ${name} from ${where}`;
+/** One change, as the page sends it. `swap` and `before` are filled in by the server so it can be undone. */
+export type Change =
+	| { action: "move"; from: MoveFrom }
+	| { action: "into"; swap?: boolean }
+	| { action: "usedUp" }
+	| { action: "batch"; count: number }
+	| { action: "save"; to: Tubs; before?: Tubs };
+
+const isCount = (n: unknown): n is number => Number.isInteger(n) && (n as number) >= 0 && (n as number) <= MAX_COUNT;
+const parseTubs = (t: unknown): Tubs | null => {
+	const v = t as Tubs | null;
+	return v && isCount(v.hard) && isCount(v.back) && isCount(v.front) && typeof v.cab === "boolean" ? { hard: v.hard, back: v.back, front: v.front, cab: v.cab } : null;
+};
+/** Checks a change from the page, keeping only the fields that belong to it. */
+export function parseChange(input: unknown): Change | null {
+	const c = input as Record<string, unknown> | null;
+	switch (c?.action) {
 		case "move":
-			return `Moved 1 ${name} from ${where} to ${STAGE_NAMES[nextStage(stage)!]}`;
-		case "set":
-			return `Set ${name} ${where} to ${value}`;
+			return c.from === "hard" || c.from === "back" ? { action: "move", from: c.from } : null;
+		case "into":
+			return { action: "into", ...(typeof c.swap === "boolean" && { swap: c.swap }) };
+		case "usedUp":
+			return { action: "usedUp" };
+		case "batch":
+			return isCount(c.count) && c.count >= 1 ? { action: "batch", count: c.count } : null;
+		case "save": {
+			const to = parseTubs(c.to);
+			const before = c.before === undefined ? undefined : parseTubs(c.before);
+			return to && before !== null ? { action: "save", to, ...(before && { before }) } : null;
+		}
+	}
+	return null;
+}
+
+/** The change applied to counts, or null when there's nothing to take. Same rules as the guarded updates in tubs.ts. */
+export function applyChange(t: Tubs, change: Change): Tubs | null {
+	switch (change.action) {
+		case "move":
+			return t[change.from] >= 1 ? { ...t, [change.from]: t[change.from] - 1, [NEXT[change.from]]: t[NEXT[change.from]] + 1 } : null;
+		case "into":
+			return t.front >= 1 ? { ...t, front: t.front - 1, cab: true } : null;
+		case "usedUp":
+			return t.cab ? { ...t, cab: false } : null;
+		case "batch":
+			return { ...t, hard: t.hard + change.count };
+		case "save":
+			return { ...change.to };
 	}
 }
+/** Undoing a change applied to counts, or null when the tubs have moved on since. */
+export function undoChange(t: Tubs, change: Change): Tubs | null {
+	switch (change.action) {
+		case "move": {
+			const to = NEXT[change.from];
+			return t[to] >= 1 ? { ...t, [to]: t[to] - 1, [change.from]: t[change.from] + 1 } : null;
+		}
+		case "into":
+			return { ...t, front: t.front + 1, cab: change.swap ? t.cab : false };
+		case "usedUp":
+			return { ...t, cab: true };
+		case "batch":
+			return t.hard >= change.count ? { ...t, hard: t.hard - change.count } : null;
+		case "save":
+			return change.before ? { ...change.before } : null;
+	}
+}
+
+const WHERE: Record<Count, string> = { hard: "Hardening", back: "the back freezer", front: "the front freezer" };
+export const placeWords = (count: Count) => WHERE[count];
+export const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+/** What the snackbar and the change log say. */
+export function changeText(change: Change, name: string) {
+	switch (change.action) {
+		case "move":
+			return `Moved 1 ${name} to ${WHERE[NEXT[change.from]]}`;
+		case "into":
+			return change.swap ? `Fresh ${name} into the cabinets` : `${name} is in the cabinets`;
+		case "usedUp":
+			return `${name} used up, the slot is empty`;
+		case "batch":
+			return `Made ${change.count} ${name}, into Hardening`;
+		case "save":
+			return `Updated ${name}`;
+	}
+}
+/** The change log keeps what a saved sheet set the counts to. */
+export function logText(change: Change, name: string) {
+	if (change.action !== "save") return changeText(change, name);
+	const t = change.to;
+	return `Updated ${name}: ${t.hard} hardening, ${t.back} back, ${t.front} front, ${t.cab ? "in the cabinets" : "not in the cabinets"}`;
+}
+
+/**
+ * Brings any stored record up to today's shape:
+ * - { freezing, back, front, cabinets } (the four-count sheet): freezing → Hardening, any cabinets → in.
+ * - { front, back, batches? } (before that): back-freezer tubs that went in on `today` (a Milford
+ *   day, YYYY-MM-DD) are still Hardening, older ones stay in the back.
+ */
+export function migrate(stored: unknown, today: string): Tubs {
+	const s = (stored ?? {}) as Record<string, unknown>;
+	const n = (v: unknown) => (typeof v === "number" && v > 0 ? Math.trunc(v) : 0);
+	if (typeof s.hard === "number") return { hard: n(s.hard), back: n(s.back), front: n(s.front), cab: !!s.cab };
+	if (typeof s.freezing === "number") return { hard: n(s.freezing), back: n(s.back), front: n(s.front), cab: n(s.cabinets) > 0 };
+	const back = n(s.back);
+	const batches = Array.isArray(s.batches) ? (s.batches as Array<{ day?: string; tubs?: number }>) : [];
+	const hard = Math.min(back, batches.filter((b) => b.day === today).reduce((sum, b) => sum + n(b.tubs), 0));
+	return { hard, back: back - hard, front: n(s.front), cab: false };
+}
+/** Stored exactly as today's shape, with nothing extra. */
+export const isCurrent = (stored: unknown): stored is StoredTubs => {
+	const s = stored as Record<string, unknown> | null;
+	return !!s && Object.keys(s).length === 4 && typeof s.hard === "number" && typeof s.back === "number" && typeof s.front === "number" && (s.cab === 0 || s.cab === 1);
+};
+export const migrateNow = (stored: unknown, now = new Date()) => migrate(stored, milfordDay(now)!);
