@@ -1866,7 +1866,7 @@
         "data": {
           "title": "History",
           "headline": "It started with a milk cart.",
-          "excerpt": "A farm on Elm Street, an ice cream stand in 1939, and the one you know today.",
+          "excerpt": "A farm on Elm Street. An ice cream stand in 1939. The stand you know today.",
           "content": [
             {
               "_type": "block",
@@ -1905,7 +1905,7 @@
                 {
                   "_type": "span",
                   "_key": "h2s",
-                  "text": "His son Stanley built the family’s roadside ice cream stand in 1939. It opened that summer with 18 flavors and sold 11,000 gallons before the season was out, according to Milford History Online. The town’s 1942 tax list still has it in plain type: six acres of the Smith farm, and an ice cream stand.",
+                  "text": "His son Stanley built the family’s roadside ice cream stand in 1939. It opened that summer with 18 flavors and sold 11,000 gallons before the season was out, according to Milford History Online. The town’s 1942 tax list records six acres of the Smith farm and an ice cream stand.",
                   "marks": []
                 }
               ]
@@ -1919,7 +1919,7 @@
                 {
                   "_type": "span",
                   "_key": "h3s",
-                  "text": "A second stand opened in Nashua in June 1940, the year printed on Hayward’s cups. The postcard above calls the one in Milford “the original Hayward Farms Stand,” the place where ice cream for all the others was made.",
+                  "text": "A second stand opened in Nashua in June 1940, the year printed on Hayward’s cups. The postcard above calls the Milford stand “the original Hayward Farms Stand,” the place where ice cream for all the others was made.",
                   "marks": []
                 }
               ]
@@ -1933,7 +1933,7 @@
                 {
                   "_type": "span",
                   "_key": "h4s",
-                  "text": "A town’s first job",
+                  "text": "In the yearbooks",
                   "marks": []
                 }
               ]
@@ -1961,7 +1961,7 @@
                 "url": "/images/postcard-frozen-foods.jpg"
               },
               "alt": "Color postcard of the same stand with a green roof, an orange car out front and “Frozen Foods” on the Hayward Farms sign",
-              "caption": "Another undated card. The back offers steaks, vegetables and “even a frosted stuffed lobster.” Boston Public Library, Tichnor Brothers Collection.",
+              "caption": "An undated postcard. The back offers steaks, vegetables and “even a frosted stuffed lobster.” Boston Public Library, Tichnor Brothers Collection.",
               "width": 1222,
               "height": 750
             },
@@ -2029,7 +2029,7 @@
                 {
                   "_type": "span",
                   "_key": "h9s",
-                  "text": "For years the ice cream itself was made elsewhere, from Hayward’s recipes. In January 2008 the batch freezers started up again, in Milford. Hayward’s joined the New Hampshire Ice Cream Trail in 2022.",
+                  "text": "For years the ice cream itself was made elsewhere, from Hayward’s recipes. In January 2008, ice cream making started up again in Milford. Hayward’s joined the New Hampshire Ice Cream Trail in 2022.",
                   "marks": []
                 }
               ]
@@ -2223,7 +2223,7 @@
         "status": "published",
         "data": {
           "title": "Milkshake vs. frappe: what’s the difference?",
-          "excerpt": "If you grew up in New England, you already know. If you didn’t, here’s why there are two lines on our menu.",
+          "excerpt": "You may already know if you grew up in New England. If you didn’t, here’s why there are two lines on our menu.",
           "content": [
             {
               "_type": "block",
@@ -2276,7 +2276,7 @@
                 {
                   "_type": "span",
                   "_key": "m4s",
-                  "text": "A frappe is the one with ice cream: ice cream, milk and syrup, blended thick. It’s what most of the country would call a milkshake. Around here it’s usually said “frap,” with a quiet e.",
+                  "text": "A frappe has ice cream, milk and syrup, blended thick. It’s what most of the country would call a milkshake. Around here it’s usually said “frap,” with a quiet e.",
                   "marks": []
                 }
               ]
@@ -2332,7 +2332,7 @@
                 {
                   "_type": "span",
                   "_key": "m8s",
-                  "text": "We have both on the menu. If you want it thick, get a frappe, regular or extra thick. If you’re not sure which you’re after, ask at the window.",
+                  "text": "We have both on the menu. If you want it thick, get a frappe. Choose regular or extra thick. If you’re not sure which you’re after, ask at the window.",
                   "marks": []
                 }
               ]

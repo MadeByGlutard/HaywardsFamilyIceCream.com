@@ -1077,7 +1077,7 @@ html:has(.menu-sheet[open]) {
    Visit
    ========================================================================== */
 
-/* The stand photo is 720px wide: never shown much larger than half the page. */
+/* Hours, address and phone beside a map of the stand. */
 .visit-layout {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1125,25 +1125,11 @@ html:has(.menu-sheet[open]) {
 	margin-top: var(--s3);
 }
 
-.coming-up {
-	margin-top: var(--s3);
-}
-
-.coming-up h3 {
-	font-size: 1.0625rem;
-}
-
-.coming-up li {
-	padding-block: 6px;
-}
-
-.coming-up strong {
-	font-weight: 650;
-}
-
-.coming-hours {
+.visit-map iframe {
 	display: block;
-	color: var(--muted);
+	width: 100%;
+	height: 100%;
+	border: var(--rule-row);
 }
 
 /* ==========================================================================
@@ -1413,9 +1399,6 @@ main:has(> .end-band:last-child) + .footer {
 		color: var(--accent);
 	}
 
-	.photo-set-trees.visit-layout img {
-		object-position: 50% 8%;
-	}
 
 	.menu-groups {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1457,12 +1440,6 @@ main:has(> .end-band:last-child) + .footer {
 
 	.visit-hours {
 		grid-column: 1 / -1;
-	}
-
-	.coming-up ul {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 0 var(--gutter);
 	}
 
 	.footer-menu {
@@ -1677,12 +1654,9 @@ main:has(> .end-band:last-child) + .footer {
 	.visit-layout .crop {
 		flex: none;
 		min-height: 0;
-		height: 220px;
+		height: 280px;
 	}
 
-	.photo-set-trees.visit-layout img {
-		object-position: 50% 30%;
-	}
 
 	.visit-contact .text-link {
 		font-size: var(--text);
@@ -1699,16 +1673,6 @@ main:has(> .end-band:last-child) + .footer {
 		display: inline-flex;
 		align-items: center;
 		min-height: 44px;
-	}
-
-	.coming-up ul {
-		display: block;
-	}
-
-	.coming-up a {
-		display: inline-block;
-		margin-block: -10px;
-		padding-block: 10px;
 	}
 
 	.flavor-side .menu-photo img {

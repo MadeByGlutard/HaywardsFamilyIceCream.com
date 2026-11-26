@@ -27,7 +27,7 @@ export const photos = {
   wreathCloseup: { src: '/images/trees-wreath-closeup-crop.jpg', srcset: '/images/trees-wreath-closeup-crop-800.jpg 800w, /images/trees-wreath-closeup-crop.jpg 1160w', width: 1160, height: 1350, alt: 'Close-up of a wreath with a red bow, red ornaments and gold-dusted pinecones', position: '78% 45%' },
 } satisfies Record<string, Photo>;
 
-/** The home page’s three photos and the Visit page photo, per set. */
+/** The home page’s three photos, and the Visit page’s share image, per set. */
 export const photoSets = {
   stand: { home: [photos.sundae, photos.caramel], visit: { ...photos.stand, alt: 'The entrance and serving windows at Hayward’s Milford', position: '49% center' } },
   trees: { home: [photos.treesStorefront, photos.kissingBalls], visit: photos.treesStorefront },
