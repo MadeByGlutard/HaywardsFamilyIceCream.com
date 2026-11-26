@@ -174,16 +174,17 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the
   a published period with no start date yet is shown as of today). `/design-preview` shows one page
   in every published period side by side.
 - **Tub counts** (Plugins → Tub counts, `src/admin/tubs.ts`, `tub-flow.ts` and `tub-counts.tsx`):
-  staff track tubs the way they move: made → back freezer → front freezer → dipping case. "+" or
-  "+5" in the back freezer records tubs just made, with the Milford (America/New_York) day they
-  went in. Tubs are ready to move to the front from the next calendar day in Milford (made any
-  time on the 26th, ready from midnight starting the 27th); each flavor shows how many back tubs
-  are ready now and how many tomorrow. "Back to front" moves one ready tub, oldest first, and says
-  so if none are ready yet. "Into the case" takes one from the front only. "Last one out of front"
-  sets the front to 0 when its last tub is gone, so the flavor shows "Move from back" (or "Out").
-  − on the back takes off the newest tubs, for corrections. Counts live in the plugin's storage
-  with a short change log; each tap is a versioned compare-and-set, so simultaneous taps can't
-  go below zero or get lost. Counts never change the website.
+  tubs move made → back freezer → front freezer → dipping case. "Made a batch" at the top picks a
+  flavor (type to search; twins show their category) and a number of tubs, and puts them in the
+  back with the Milford (America/New_York) day they went in. Tubs are ready to move to the front
+  from the next calendar day in Milford (made any time on the 26th, ready from midnight starting
+  the 27th). Below, flavors are listed by what needs doing: Move from the back (ready tubs, oldest
+  first), Last one in front, In front ("Into the case"), and In the back, ready tomorrow. Each line
+  reads "Back 5 (2 ready) → Front 3" with only its next action; empty lists don't show. Flavors
+  that are out are folded up at the bottom, where a batch can be added too. "Fix count" on a line
+  opens − / + for corrections (− on the back takes the newest tubs). Counts live in the plugin's
+  storage with a short change log; each tap is a versioned compare-and-set, so simultaneous taps
+  can't go below zero or get lost. Counts never change the website.
 - `src/admin/`: the Category column and the Square panel (the "Hayward's admin" plugin), and the sidebars everyone starts with (no ownership or URL panels).
 
 `content/flavors.json` and `content/settings/settings.yaml` are the original data from
