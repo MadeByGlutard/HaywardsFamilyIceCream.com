@@ -95,7 +95,7 @@ test('every flavor and menu item is in a category, and categories are on a menu'
 
 test('the navigation links to every page', () => {
 	const primary = seed.menus.find((menu) => menu.name === 'primary');
-	assert.deepEqual(primary.items.map((item) => item.ref).sort(), seed.content.site_pages.filter((p) => p.slug !== 'jobs').map((p) => p.id).sort(), 'Join our team is linked from the footer');
+	assert.deepEqual(primary.items.map((item) => item.ref).sort(), seed.content.site_pages.filter((p) => !['jobs', 'blog'].includes(p.slug)).map((p) => p.id).sort(), 'Join our team and Blog are linked from the footer');
 	for (const item of primary.items) assert.equal(item.collection, 'site_pages');
 });
 
