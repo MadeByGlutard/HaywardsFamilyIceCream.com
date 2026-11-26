@@ -3,23 +3,32 @@ import { getEmDashCollection } from 'emdash';
 import { PortableText } from 'emdash/ui';
 import Base from '../layouts/Base.astro';
 import { getLocation, getPage, telephone } from '../lib/site';
+import { photos } from '../lib/photos';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
 const [page, { entries }, { data: place }] = await Promise.all([getPage('jobs'), getEmDashCollection('jobs', { orderBy: { name: 'asc' }, limit: 50 }), getLocation()]);
 if (!page) return Astro.rewrite('/404');
-const hiring = entries.some((job) => job.data.hiring);
+// Open positions first, then A to Z.
+const jobs = [...entries].sort((a, b) => Number(!!b.data.hiring) - Number(!!a.data.hiring));
+const hiring = jobs.some((job) => job.data.hiring);
+const photo = photos.stand;
 ---
 <Base title={page.data.title} description={`Jobs at Hayward’s Family Ice Cream on ${place.address} in Milford, New Hampshire.`} content={{ collection: 'site_pages', id: page.data.id, slug: 'jobs' }}>
   <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1>{page.data.excerpt && <p {...page.edit.excerpt}>{page.data.excerpt}</p>}</section>
-  {entries.length > 0 && <section class="job-list wrap" aria-label="Positions">
-    {entries.map((job) => <article>
-      <h2 {...job.edit.name}>{job.data.name}{job.data.hiring && <span class="job-hiring">Hiring now</span>}</h2>
+  {jobs.length > 0 && <section class="job-list wrap" aria-label="Positions">
+    {jobs.map((job) => <article>
+      {job.data.hiring && <p class="eyebrow job-hiring">Hiring now</p>}
+      <h2 {...job.edit.name}>{job.data.name}</h2>
       <p {...job.edit.description}>{job.data.description}</p>
     </article>)}
   </section>}
   <section class="job-apply wrap">
-    <h2>{hiring ? 'Want the job?' : 'Want to work here?'}</h2>
-    <p>Call <a href={telephone(place.phone)}>{place.phone}</a>{place.email && <> or email <a href={`mailto:${place.email}?subject=${encodeURIComponent('Working at Hayward’s')}`}>{place.email}</a></>}, and tell us which job and when you can work.</p>
-    {!!page.data.content?.length && <div class="job-rules" {...page.edit.content}><PortableText value={page.data.content} /></div>}
+    <div class="job-apply-text">
+      <h2>{hiring ? 'Want the job?' : 'Want to work here?'}</h2>
+      <p>Call or email us, and tell us which job and when you can work.</p>
+      <p class="job-actions"><a class="button" href={telephone(place.phone)}><i class="ph ph-phone" aria-hidden="true"></i>Call {place.phone}</a>{place.email && <a class="button button-line" href={`mailto:${place.email}?subject=${encodeURIComponent('Working at Hayward’s')}`}><i class="ph ph-envelope-simple" aria-hidden="true"></i>Email us</a>}</p>
+      {!!page.data.content?.length && <div class="job-rules" {...page.edit.content}><PortableText value={page.data.content} /></div>}
+    </div>
+    <figure class="job-photo"><img src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} sizes="(max-width: 739px) 100vw, 448px" loading="lazy" style={photo.position ? `object-position: ${photo.position}` : undefined} /></figure>
   </section>
 </Base>

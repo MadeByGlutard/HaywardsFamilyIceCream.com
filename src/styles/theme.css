@@ -1844,21 +1844,24 @@ main:has(> .end-band:last-child) + .footer {
 	}
 }
 
-/* Join our team: positions in ruled columns, stacked on phones. */
+/* Join our team: one column on phones, three from tablets up. */
 .job-list {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-	gap: var(--s3) var(--gutter);
+	grid-template-columns: minmax(0, 1fr);
 	margin-bottom: var(--s4);
-	padding-top: var(--s3);
 	border-top: var(--rule-section);
 }
 
+.job-list article {
+	padding: var(--s3) 0;
+}
+
+/* Phones: ruled rows, like the menu. */
+.job-list article + article {
+	border-top: var(--rule-row);
+}
+
 .job-list h2 {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: baseline;
-	gap: .25em .6em;
 	margin: 0 0 .4em;
 }
 
@@ -1867,19 +1870,80 @@ main:has(> .end-band:last-child) + .footer {
 }
 
 .job-hiring {
-	font-family: var(--italic);
-	font-size: 1.1875rem;
-	font-weight: 400;
-	color: var(--accent);
+	margin-bottom: .2em;
+}
+
+.job-apply {
+	display: grid;
+	gap: var(--s4);
+	margin-bottom: var(--s5);
+	padding-top: var(--s4);
+	border-top: var(--rule-row);
+}
+
+.job-apply h2 {
+	margin: 0 0 .5em;
+}
+
+.job-apply p {
+	margin: 0;
+}
+
+.job-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 18px !important;
+}
+
+.job-actions .button {
+	gap: 10px;
 }
 
 .job-rules {
 	max-width: 42rem;
-	color: var(--muted, inherit);
+	margin-top: var(--s4);
+	font-size: .9375rem;
+	color: var(--muted);
 }
 
-.job-apply {
-	margin-bottom: var(--s4);
-	padding-top: var(--s3);
-	border-top: var(--rule-row);
+.job-photo {
+	margin: 0;
+}
+
+.job-photo img {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 3 / 2;
+	object-fit: cover;
+}
+
+/* Equal buttons when they stack on a phone. */
+.job-actions .button {
+	flex: 1 1 12em;
+}
+
+@media (min-width: 740px) {
+	.job-actions .button {
+		flex: 0 0 auto;
+	}
+
+	/* The photo beside the text; it's 720px wide, so it never grows past that. */
+	.job-apply {
+		grid-template-columns: minmax(0, 1fr) minmax(0, min(40%, 28rem));
+		column-gap: var(--gutter);
+		align-items: start;
+	}
+}
+
+@media (min-width: 1001px) {
+	.job-list {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		column-gap: var(--gutter);
+	}
+
+	.job-list article + article {
+		border-top: 0;
+	}
 }
