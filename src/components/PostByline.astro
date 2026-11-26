@@ -1,14 +1,16 @@
 ---
 import type { BylineSummary } from 'emdash';
 // A post's author and date. The avatar is the byline's own (Bylines in the admin); without one, an initial.
-interface Props { byline?: BylineSummary | null; date?: Date | null }
-const { byline, date } = Astro.props;
+// `compact`: one line and a smaller avatar, for the list of posts.
+interface Props { byline?: BylineSummary | null; date?: Date | null; compact?: boolean }
+const { byline, date, compact = false } = Astro.props;
 const day = date?.toLocaleDateString('en-US', { timeZone: 'America/New_York', month: 'long', day: 'numeric', year: 'numeric' });
 const avatar = byline?.avatarStorageKey ? `/_emdash/api/media/file/${byline.avatarStorageKey}` : undefined;
+const size = compact ? 28 : 40;
 ---
-<p class="post-meta">
+<p class:list={['post-meta', { 'post-meta-compact': compact }]}>
   {byline && (avatar
-    ? <img class="post-avatar" src={avatar} alt="" width="40" height="40" loading="lazy" />
+    ? <img class="post-avatar" src={avatar} alt="" width={size} height={size} loading="lazy" />
     : <span class="post-avatar" aria-hidden="true">{byline.displayName.charAt(0)}</span>)}
-  <span>{byline && <>By {byline.displayName}<br /></>}{day && <time datetime={date!.toISOString()}>{day}</time>}</span>
+  <span>{byline && <>By {byline.displayName}{compact ? ', ' : <br />}</>}{day && <time datetime={date!.toISOString()}>{day}</time>}</span>
 </p>

@@ -15,9 +15,12 @@ const posts = [...entries].sort((a, b) => (b.data.publishedAt?.getTime() ?? 0) -
     {posts.length === 0 && <p>Nothing here yet.</p>}
     {posts.map((post) => (
       <article>
-        <h2><a href={`/blog/${post.id}`} {...post.edit.title}>{post.data.title}</a></h2>
-        {post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
-        <PostByline byline={post.data.byline} date={post.data.publishedAt} />
+        <div>
+          <h2><a href={`/blog/${post.id}`} {...post.edit.title}>{post.data.title}</a></h2>
+          {post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
+          <PostByline byline={post.data.byline} date={post.data.publishedAt} compact />
+        </div>
+        {post.data.photo?.src && <img class="post-thumb" src={post.data.photo.src} alt="" width="160" height="160" loading="lazy" />}
       </article>
     ))}
   </section>

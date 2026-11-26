@@ -8,6 +8,7 @@ cacheContentPage(Astro);
 const { entry: post } = await getEmDashEntry('posts', Astro.params.slug!);
 if (!post) return Astro.rewrite('/404');
 const seo = getSeoMeta(post, { defaultTitle: post.data.title, defaultDescription: post.data.excerpt });
+const photo = post.data.photo?.src ? post.data.photo : undefined;
 ---
 <Base title={seo.title} description={seo.description || post.data.excerpt} content={{ collection: 'posts', id: post.data.id, slug: post.id }}>
   <section class="page-heading story-heading wrap">
@@ -16,5 +17,8 @@ const seo = getSeoMeta(post, { defaultTitle: post.data.title, defaultDescription
     {post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
     <PostByline byline={post.data.byline} date={post.data.publishedAt} />
   </section>
+  {photo && <figure class="story-banner post-photo wrap" {...post.edit.photo}><img src={photo.src} alt={photo.alt ?? ''} width={photo.width} height={photo.height} /></figure>}
   <article class="story-body wrap"><div class="story-prose post-prose" {...post.edit.content}><PortableText value={post.data.content || []} /></div></article>
+  {!!post.data.sources?.length && <section class="sources wrap" id="sources"><details><summary>Sources <i class="ph ph-plus" aria-hidden="true"></i></summary><div class="sources-list" {...post.edit.sources}><PortableText value={post.data.sources} /></div></details></section>}
+  <p class="post-end wrap"><a class="text-link" href="/blog">All posts</a></p>
 </Base>

@@ -406,8 +406,18 @@
           }
         },
         {
+          "slug": "photo",
+          "label": "Photo",
+          "type": "image"
+        },
+        {
           "slug": "content",
           "label": "Text",
+          "type": "portableText"
+        },
+        {
+          "slug": "sources",
+          "label": "Sources",
           "type": "portableText"
         }
       ]
@@ -2326,21 +2336,9 @@
                   "marks": []
                 }
               ]
-            },
-            {
-              "_type": "block",
-              "_key": "m9",
-              "style": "h2",
-              "markDefs": [],
-              "children": [
-                {
-                  "_type": "span",
-                  "_key": "m9s",
-                  "text": "Sources",
-                  "marks": []
-                }
-              ]
-            },
+            }
+          ],
+          "sources": [
             {
               "_type": "block",
               "_key": "m10",
@@ -2443,7 +2441,14 @@
                 }
               ]
             }
-          ]
+          ],
+          "photo": {
+            "id": "two-scoops",
+            "src": "/images/two-scoops.jpg",
+            "width": 1080,
+            "height": 1080,
+            "alt": "Two cups of ice cream on an outdoor table at Hayward’s, one piled with caramel pieces and one green"
+          }
         },
         "bylines": [
           {

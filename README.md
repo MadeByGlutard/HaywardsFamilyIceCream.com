@@ -164,7 +164,8 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the
   (`src/lib/square.ts`), and the editor's sidebar shows them read-only.
 - Allergens, half gallons and photos are tracked but not shown. Never show an allergen as
   absent: unchecked doesn't mean "free of".
-- **Blog** (`posts`, `/blog` and `/blog/<slug>`): title, introduction and text; the author is the
+- **Blog** (`posts`, `/blog` and `/blog/<slug>`): title, introduction, photo, text and sources (shown
+  folded up at the end, like History's); the author is the
   post's EmDash byline (Jennifer on the first post), shown with the byline's avatar or, without one,
   its initial. The landing page's title and introduction are the Blog entry in Pages. The Bylines panel is hidden in everyone's editor
   sidebar by default; turn it back on under Settings, Sidebars to change a post's author. The footer

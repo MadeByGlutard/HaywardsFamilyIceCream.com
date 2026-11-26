@@ -23,7 +23,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 14;
+export const CONTENT_VERSION = 15;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -114,6 +114,7 @@ async function addMissing(db: any, options: OptionsRepository) {
   for (const slug of REPLACED) if (had.has(slug)) await registry.updateCollection(slug, { hidden: true });
   await linkSquareItems(db);
   await renameUnedited(db);
+  await splitFirstPost(db);
   // EmDash's stock Categories and Tags, which are for blog posts.
   await sql`DELETE FROM _emdash_taxonomy_defs WHERE id IN ('taxdef_category', 'taxdef_tag')
     AND name NOT IN (SELECT name FROM taxonomies)`.execute(db);
@@ -167,4 +168,19 @@ async function renameUnedited(db: any) {
   await sql`UPDATE _emdash_menus SET label = 'Sundaes & frappes' WHERE name = 'sundaes' AND label = 'Sundaes & shakes'`.execute(db);
   await sql`UPDATE _emdash_menu_items SET label = 'Sundaes & frappes' WHERE label = 'Sundaes & shakes'`.execute(db);
   await sql`UPDATE _emdash_menu_items SET label = 'Frappes and floats' WHERE label = 'Shakes and floats'`.execute(db);
+}
+
+/**
+ * The first post had its sources at the end of its text; posts now have Sources and Photo fields.
+ * Moves them over, only while the post still has its sources in the text and none of its own.
+ */
+async function splitFirstPost(db: any) {
+  const post = (seed.content as any).posts?.find((entry: any) => entry.slug === 'milkshake-vs-frappe');
+  if (!post) return;
+  const { rows } = await sql<{ content: string | null }>`
+    SELECT content FROM ec_posts WHERE slug = 'milkshake-vs-frappe' AND sources IS NULL AND photo IS NULL`.execute(db);
+  const content = rows[0]?.content;
+  if (!content || !content.includes('"Sources"')) return;
+  await sql`UPDATE ec_posts SET content = ${JSON.stringify(post.data.content)}, sources = ${JSON.stringify(post.data.sources)},
+    photo = ${JSON.stringify(post.data.photo)} WHERE slug = 'milkshake-vs-frappe' AND sources IS NULL`.execute(db);
 }
