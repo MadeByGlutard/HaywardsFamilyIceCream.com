@@ -108,6 +108,10 @@ and KV namespace (sign-in sessions), named `haywardsfamilyicecream-com-<branch>`
   `main`, and `preview:delete` when a branch is deleted (GitHub only runs that from the default
   branch, so cleanup starts once the workflow is on `main`). It needs the
   `CLOUDFLARE_API_TOKEN` secret and the `CLOUDFLARE_ACCOUNT_ID` variable.
+- After deploying, `preview:deploy` loads the preview once so the content upgrade runs then,
+  not for the first person to open it. It gets past Access with a service token
+  ("Previews deploy: content upgrade", allowed by the previews' Access app, expires November 2027)
+  in the `PREVIEW_ACCESS_CLIENT_ID` and `PREVIEW_ACCESS_CLIENT_SECRET` secrets.
 - Previews don't inherit production's secrets. `EMDASH_ENCRYPTION_KEY` is set in the Worker's
   Previews Base config (same value as production, since preview databases are copies) with
   `npx wrangler preview base-config secret put EMDASH_ENCRYPTION_KEY --worker-name haywardsfamilyicecream-com`,
@@ -197,8 +201,9 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages: all of 
 ### Databases already set up
 
 EmDash applies the seed during setup only, so `src/lib/upgrade.ts` adds what a database is
-missing once per `CONTENT_VERSION`, on the first request after a deploy. That takes about two
-minutes on D1, so open the site yourself right after deploying. The port's flavors
+missing once per `CONTENT_VERSION`, on the first request after a deploy, and other requests wait
+for it (several seconds on D1). Preview deploys make that request themselves (see Previews); after a
+production deploy, open the site yourself right away. The port's flavors
 (with allergens and half gallons), banner and social links carry over, staff's changes included.
 Menus already there are left alone. Its `settings`, `categories`
 and `flavors` collections, and the redesign's first ones on older previews, are then hidden from the admin but kept, with their data (allergens

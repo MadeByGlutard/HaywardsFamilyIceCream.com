@@ -6,6 +6,9 @@
 #                                 Workers Scripts Edit, Workers KV Storage Edit,
 #                                 Workers R2 Storage Edit and D1 Edit
 #   vars.CLOUDFLARE_ACCOUNT_ID
+#   secrets.PREVIEW_ACCESS_CLIENT_ID / PREVIEW_ACCESS_CLIENT_SECRET (optional)
+#                                 Cloudflare Access service token the previews' Access app
+#                                 lets in, so the deploy runs the content upgrade itself
 #
 # GitHub only runs `delete` workflows from the default branch, so cleanup on
 # branch deletion starts working once this file is on main.
@@ -44,6 +47,8 @@ jobs:
       - run: npm run preview:deploy -- --branch "$BRANCH"
         env:
           BRANCH: ${{ github.ref_name }}
+          PREVIEW_ACCESS_CLIENT_ID: ${{ secrets.PREVIEW_ACCESS_CLIENT_ID }}
+          PREVIEW_ACCESS_CLIENT_SECRET: ${{ secrets.PREVIEW_ACCESS_CLIENT_SECRET }}
 
   cleanup:
     if: github.event_name == 'delete' && github.event.ref_type == 'branch'

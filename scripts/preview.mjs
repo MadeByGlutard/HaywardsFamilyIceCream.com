@@ -13,6 +13,11 @@
 // Auth: CLOUDFLARE_API_TOKEN, with D1 Edit and Workers R2 Storage Edit as well as the
 // Workers permissions. Account: CLOUDFLARE_ACCOUNT_ID, otherwise the only account the
 // token can see.
+//
+// After deploying, it loads the preview once so the content upgrade (src/lib/upgrade.ts)
+// runs here instead of holding up the first person to open it. That request gets past
+// Cloudflare Access with a service token: PREVIEW_ACCESS_CLIENT_ID and
+// PREVIEW_ACCESS_CLIENT_SECRET (optional; without them the first visitor runs it).
 
 import { spawnSync } from "node:child_process";
 
@@ -242,6 +247,30 @@ async function findNamespace() {
 
 // ---------------------------------------------------------------- commands
 
+// Load the new preview once, so the content upgrade happens now and not for a visitor.
+async function upgradeContent() {
+	const id = process.env.PREVIEW_ACCESS_CLIENT_ID;
+	const secret = process.env.PREVIEW_ACCESS_CLIENT_SECRET;
+	if (!id || !secret) return log("No Access service token; the first visitor will run the content upgrade");
+	const url = `https://${slug}.previews.haywardsfamilyicecream.com/`;
+	const started = Date.now();
+	for (let attempt = 1; attempt <= 6; attempt++) {
+		try {
+			const response = await fetch(url, {
+				headers: { "CF-Access-Client-Id": id, "CF-Access-Client-Secret": secret },
+				redirect: "manual",
+				signal: AbortSignal.timeout(600_000),
+			});
+			if (response.ok) return log(`Content is up to date (${((Date.now() - started) / 1000).toFixed(1)}s, ${url})`);
+			log(`${url} answered ${response.status}; trying again`);
+		} catch (error) {
+			log(`${url}: ${error.message}; trying again`);
+		}
+		await sleep(10_000);
+	}
+	log("Couldn't load the preview; the first visitor will run the content upgrade");
+}
+
 function cf(cfArgs, { env = {}, fatal = true } = {}) {
 	const run = spawnSync("npx", ["cf", ...cfArgs], { stdio: "inherit", env: { ...process.env, ...env } });
 	if (run.status !== 0 && fatal) process.exit(run.status ?? 1);
@@ -284,6 +313,7 @@ if (command === "deploy") {
 	cf(["previews", "deploy", "--preview-name", branch], {
 		env: { PREVIEW_D1_NAME: name, PREVIEW_D1_ID: database.uuid, PREVIEW_R2_BUCKET: name, PREVIEW_KV_ID: sessions.id },
 	});
+	await upgradeContent();
 } else {
 	log(`Deleting the ${branch} preview`);
 	// Keep going if the Worker Preview is already gone, so its storage still gets removed.
