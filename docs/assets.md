@@ -19,14 +19,7 @@ The building source is 720 × 480. It works as a concept reference but is visibl
 
 `public/favicon.ico`, `public/apple-touch-icon.png`, `public/brand/icons/*` and `public/site.webmanifest` are generated from `public/brand/icon.png` (64 × 92), padded to square on the paper colour. The 512 px sizes are upscaled and slightly soft; replace them if the owner supplies a vector or high-resolution cone mark. The old Gatsby build output (`*.LICENSE.txt`, webpack stats, `_redirects`, `icons/`) was removed; `tests/public-assets.test.mjs` fails if `public/index.html` or `public/*.js` reappears.
 
-## Tree-lot photos (owner, November 2026)
-
-| File | Use |
-| --- | --- |
-| `public/images/trees-wreath-wall.jpg` | `/trees` photo row |
-| `public/images/trees-kissing-balls.jpg` | `/trees` photo row |
-| `public/images/trees-wreath-closeup.jpg` | Original only, not linked: it shows a readable price sticker. |
-| `public/images/trees-wreath-closeup-crop.jpg` (1160 × 1350) | Derived crop of the above without the price sticker; `/trees` photo row. |
+## Tree-lot photos
 
 From the family's shared iCloud album "Haywards Tree Season" (2015–2022, Milford stand only), downloaded at the album's 2048px size and cropped. Album positions (oldest first) in brackets.
 
@@ -36,9 +29,12 @@ From the family's shared iCloud album "Haywards Tree Season" (2015–2022, Milfo
 | `public/images/trees-single.jpg` (1350 × 1800) [#36, Dec 2015] | Tree-lot home secondary photo |
 | `public/images/trees-stand-day.jpg` (1800 × 900) [#72, Dec 2016] | Visit share image in the tree period |
 | `public/images/trees-on-racks.jpg` (1760 × 1420) [#229, Nov 2022] | `/trees` lead and share image. Cropped to drop two small tree tags. |
-| `public/images/trees-rows.jpg` (1800 × 1350) [#231, Nov 2022] | `/trees` photo row. The white tag on one tree is blank. |
 | `public/images/trees-netted.jpg` (1350 × 1800) [#107, Nov 2017] | `/trees` photo row |
 | `public/images/trees-snowmen.jpg` (1800 × 1486) [#155, Nov 2017] | `/trees` photo row |
+| `public/images/trees-porch.jpg` (1350 × 1800) [#206, Dec 2019] | `/trees` photo row. The green lattice sign reads "Christmas", no price. |
+| `public/images/trees-wreaths-dusk.jpg` (1010 × 640) [#10, Nov 2015] | `/trees` photo row. The album only keeps 1136 × 640; cropped to drop a newspaper box. |
+| `public/images/trees-bows.jpg` (1536 × 1800) [#208, Nov 2020] | `/trees` photo row |
+| `public/images/trees-pinecone.jpg` (1800 × 1200) [#211, Jan 2021] | `/trees` photo row. The white tips look painted, not snow; taken after the season, place unknown, so nothing claims it is at the stand. |
 
 Photo sets, alt text and captions are defined in `src/lib/photos.ts`.
 
