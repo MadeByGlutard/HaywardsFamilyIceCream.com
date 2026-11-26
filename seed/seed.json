@@ -289,6 +289,48 @@
       ]
     },
     {
+      "slug": "jobs",
+      "label": "Jobs",
+      "labelSingular": "Job",
+      "description": "The positions on Join our team. Turn on Hiring now when you’re looking.",
+      "icon": "briefcase",
+      "supports": [
+        "drafts",
+        "revisions"
+      ],
+      "routable": false,
+      "hasSeo": false,
+      "sortOrder": 5,
+      "titleField": "name",
+      "admin": {
+        "listColumns": [
+          "hiring"
+        ]
+      },
+      "fields": [
+        {
+          "slug": "name",
+          "label": "Position",
+          "type": "string",
+          "required": true
+        },
+        {
+          "slug": "description",
+          "label": "What the work is",
+          "type": "text",
+          "required": true,
+          "options": {
+            "rows": 3
+          }
+        },
+        {
+          "slug": "hiring",
+          "label": "Hiring now",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
       "slug": "site_pages",
       "label": "Pages",
       "labelSingular": "Page",
@@ -2013,11 +2055,52 @@
         }
       },
       {
+        "id": "page-jobs",
+        "slug": "jobs",
+        "status": "published",
+        "data": {
+          "title": "Join our team",
+          "excerpt": "Scoop ice cream, run the kitchen, or help out at the tree lot."
+        }
+      },
+      {
         "id": "page-home",
         "slug": "home",
         "status": "published",
         "data": {
           "title": "Home"
+        }
+      }
+    ],
+    "jobs": [
+      {
+        "id": "job-tree-lot",
+        "slug": "tree-lot",
+        "status": "published",
+        "data": {
+          "name": "Tree lot",
+          "description": "From Thanksgiving weekend until just before Christmas: help people find a tree, a wreath or a kissing ball and get it home.",
+          "hiring": false
+        }
+      },
+      {
+        "id": "job-back-of-house",
+        "slug": "back-of-house",
+        "status": "published",
+        "data": {
+          "name": "Back of house",
+          "description": "Work the kitchen: hot dogs, grilled cheese and melts, rolls, wraps and subs, mac and cheese and chili.",
+          "hiring": false
+        }
+      },
+      {
+        "id": "job-ice-cream-scooper",
+        "slug": "ice-cream-scooper",
+        "status": "published",
+        "data": {
+          "name": "Ice cream scooper",
+          "description": "Work the window: scoop cones and cups, make sundaes, frappes and floats, and keep the line moving on busy summer nights.",
+          "hiring": false
         }
       }
     ]

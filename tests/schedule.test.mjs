@@ -60,7 +60,7 @@ test('seed content invents no closing times, prices or dates', () => {
 });
 
 test('the forms stay short, with no prices', () => {
-	const most = { schedule: 7, catalog_flavors: 6, catalog_items: 3, catalog_categories: 3, store: 4, site_pages: 4 };
+	const most = { schedule: 7, catalog_flavors: 6, catalog_items: 3, catalog_categories: 3, store: 4, jobs: 3, site_pages: 4 };
 	assert.deepEqual(seed.collections.map((c) => c.slug), Object.keys(most));
 	for (const c of seed.collections) {
 		assert.ok(c.fields.length <= most[c.slug], `${c.slug} has ${c.fields.length} fields`);
@@ -91,8 +91,14 @@ test('every flavor and menu item is in a category, and categories are on a menu'
 
 test('the navigation links to every page', () => {
 	const primary = seed.menus.find((menu) => menu.name === 'primary');
-	assert.deepEqual(primary.items.map((item) => item.ref).sort(), seed.content.site_pages.map((p) => p.id).sort());
+	assert.deepEqual(primary.items.map((item) => item.ref).sort(), seed.content.site_pages.filter((p) => p.slug !== 'jobs').map((p) => p.id).sort(), 'Join our team is linked from the footer');
 	for (const item of primary.items) assert.equal(item.collection, 'site_pages');
+});
+
+test('jobs make no claims about pay, ages or hours', () => {
+	const text = JSON.stringify(seed.content.jobs);
+	assert.doesNotMatch(text, /\$|\bper hour\b|\bage\b|\b1[4-8]\b|\b\d{1,2}(am|pm)\b/i);
+	for (const job of seed.content.jobs) assert.equal(job.data.hiring, false, `${job.slug}: only staff say when they're hiring`);
 });
 
 test('menu helpers', () => {

@@ -2,6 +2,7 @@
 // EmDash's Live View for non-routable entries points to collection/slug.
 // Those entries are shown together on their public landing pages.
 const { collection, slug } = Astro.params;
+if (collection === 'jobs') return Astro.redirect('/jobs', 302);
 if (collection === 'store') return Astro.redirect('/visit', 302);
 if (collection === 'catalog_flavors') return Astro.redirect('/flavors', 302);
 if (collection === 'catalog_items' || collection === 'catalog_categories') return Astro.redirect('/food', 302);

@@ -32,5 +32,5 @@ test('contact details and social links carry over', () => {
 });
 
 test('pages exist', () => {
-  for (const slug of ['home', 'flavors', 'sundaes', 'food', 'trees', 'visit', 'history']) assert.ok(seed.content.site_pages.find(p => p.slug === slug && p.status === 'published'), slug);
+  for (const slug of ['home', 'flavors', 'sundaes', 'food', 'trees', 'visit', 'history', 'jobs']) assert.ok(seed.content.site_pages.find(p => p.slug === slug && p.status === 'published'), slug);
 });

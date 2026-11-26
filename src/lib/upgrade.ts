@@ -23,7 +23,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field. */
-export const CONTENT_VERSION = 10;
+export const CONTENT_VERSION = 11;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -102,6 +102,12 @@ async function addMissing(db: any, options: OptionsRepository) {
   // EmDash replaces the items of a menu it finds in the seed; staff's menus stay theirs.
   const { rows: menus } = await sql<{ name: string }>`SELECT name FROM _emdash_menus`.execute(db);
   const newMenus = file.menus?.filter((menu) => !menus.some((row) => row.name === menu.name));
+  // Pages added to the seed later, unless a page with that address was ever made (even if trashed).
+  if (had.has('site_pages') && !adding.includes('site_pages')) {
+    const { rows: pages } = await sql<{ slug: string }>`SELECT slug FROM ec_site_pages`.execute(db);
+    const missing = (file.content?.site_pages ?? []).filter((page) => !pages.some((row) => row.slug === page.slug));
+    if (missing.length) added.site_pages = missing;
+  }
   await applySeed(db, { ...file, settings: undefined, menus: newMenus, content: added }, { onConflict: 'skip', includeContent: true });
   const { rows: social } = await sql`SELECT name FROM options WHERE name = 'site:social'`.execute(db);
   if (!social.length) await setSiteSettings({ social: file.settings?.social }, db);

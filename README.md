@@ -134,6 +134,7 @@ moves it along whenever someone opens the admin.
 | Menu items   | `catalog_items`      | `name`, `category`, `options`                                 |
 | Categories   | `catalog_categories` | `name`, `flavors`, `items`                                    |
 | Store info   | `store`              | One entry: `phone`, `email`, `address`, `locality`            |
+| Jobs         | `jobs`               | `name`, `description`, `hiring`                               |
 | Pages        | `site_pages`         | One per page: `title`, `headline`, `excerpt`, `content`       |
 
 EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the four menus of categories (`flavors`,
@@ -141,6 +142,8 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the
 
 - **Pages:** every page has an entry, and its slug is its address (`home` is `/`). Unpublishing
   one takes the page down and out of the navigation. Home's headline comes from the Schedule.
+- **Jobs:** the positions on `/jobs` (Join our team, linked from the footer), A to Z. "Hiring
+  now" marks the ones open. No pay, ages or hours unless Hayward's gives them.
 - **Schedule:** there is always a period, and it is the only source of the hours, the banner
   and the home page headline. A period runs until the next one starts, so there is no end
   date: a winter break lasts until staff schedule what comes after. `kind` sets the color,

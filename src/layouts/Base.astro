@@ -74,7 +74,7 @@ const themeColor = schedule.accent === 'green' ? '#2e5a3c' : '#a71d2a';
     </div></dialog>
     <main id="main"><slot /></main>
     <footer class="footer wrap">
-      <nav class="footer-col footer-menu" id="pages" aria-label="All pages"><h2>Pages</h2>{navItems.filter(item => item.url !== '/').map(item => <a href={item.url}>{item.label}</a>)}</nav>
+      <nav class="footer-col footer-menu" id="pages" aria-label="All pages"><h2>Pages</h2>{navItems.filter(item => item.url !== '/').map(item => <a href={item.url}>{item.label}</a>)}<a href="/jobs">Join our team</a></nav>
       <div class="footer-col"><h2>Find us</h2><p>{place.address}<br />{place.locality}</p><a href={place.directions}>Get directions</a></div>
       <div class="footer-col"><h2>Hours &amp; contact</h2><p set:html={withSentences(status.line)} /><a href={telephone(place.phone)}>{place.phone}</a><p class="footer-links">{place.facebook && <a href={place.facebook}>Facebook</a>}{place.instagram && <a href={place.instagram}>Instagram</a>}{place.email && <a href={`mailto:${place.email}`}>Email</a>}</p></div>
       <div class="footer-fine"><span>© {new Date().getFullYear()} Hayward’s Family Ice Cream</span><a href="/admin">Login</a></div>

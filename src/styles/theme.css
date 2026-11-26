@@ -1843,3 +1843,38 @@ main:has(> .end-band:last-child) + .footer {
 		border-bottom: 3px solid;
 	}
 }
+
+/* Join our team: positions in ruled columns, stacked on phones. */
+.job-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+	gap: var(--s3) var(--gutter);
+	margin-bottom: var(--s4);
+	padding-top: var(--s3);
+	border-top: var(--rule-section);
+}
+
+.job-list h2 {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: .25em .6em;
+	margin: 0 0 .4em;
+}
+
+.job-list p {
+	margin: 0;
+}
+
+.job-hiring {
+	font-family: var(--italic);
+	font-size: 1.1875rem;
+	font-weight: 400;
+	color: var(--accent);
+}
+
+.job-apply {
+	margin-bottom: var(--s4);
+	padding-top: var(--s3);
+	border-top: var(--rule-row);
+}

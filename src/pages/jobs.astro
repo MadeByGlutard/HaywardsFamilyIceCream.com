@@ -1,0 +1,23 @@
+---
+import { getEmDashCollection } from 'emdash';
+import Base from '../layouts/Base.astro';
+import { getLocation, getPage, telephone } from '../lib/site';
+import { cacheContentPage } from '../lib/cache';
+cacheContentPage(Astro);
+const [page, { entries }, { data: place }] = await Promise.all([getPage('jobs'), getEmDashCollection('jobs', { orderBy: { name: 'asc' }, limit: 50 }), getLocation()]);
+if (!page) return Astro.rewrite('/404');
+const hiring = entries.some((job) => job.data.hiring);
+---
+<Base title={page.data.title} description={`Jobs at Hayward’s Family Ice Cream on ${place.address} in Milford, New Hampshire.`} content={{ collection: 'site_pages', id: page.data.id, slug: 'jobs' }}>
+  <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1>{page.data.excerpt && <p {...page.edit.excerpt}>{page.data.excerpt}</p>}</section>
+  {entries.length > 0 && <section class="job-list wrap" aria-label="Positions">
+    {entries.map((job) => <article>
+      <h2 {...job.edit.name}>{job.data.name}{job.data.hiring && <span class="job-hiring">Hiring now</span>}</h2>
+      <p {...job.edit.description}>{job.data.description}</p>
+    </article>)}
+  </section>}
+  <section class="job-apply wrap">
+    <h2>{hiring ? 'Want the job?' : 'Want to work here?'}</h2>
+    <p>Call <a href={telephone(place.phone)}>{place.phone}</a>{place.email && <> or email <a href={`mailto:${place.email}?subject=${encodeURIComponent('Working at Hayward’s')}`}>{place.email}</a></>}, and tell us which job and when you can work.</p>
+  </section>
+</Base>
