@@ -43,6 +43,10 @@ export default defineConfig(({ isPreview }) => {
 			// this Worker's previews, so the custom domain stays public after cutover.
 			workersDev: true,
 			previewUrls: true,
+			// Previews also answer at <branch>.previews.haywardsfamilyicecream.com (behind the same
+			// Access app). Preview-only: this hostname never serves production, and the live site's
+			// apex and www records are untouched.
+			domains: [{ hostname: "previews.haywardsfamilyicecream.com", production: false, previews: true }],
 			compatibilityDate: "2026-11-22",
 			compatibilityFlags: ["nodejs_compat"],
 			entrypoint: "./src/worker.ts",

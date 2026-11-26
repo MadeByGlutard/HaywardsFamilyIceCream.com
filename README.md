@@ -91,8 +91,13 @@ and KV namespace (sign-in sessions), named `haywardsfamilyicecream-com-<branch>`
   tables, which EmDash uses for search.
 - `npm run preview:delete` deletes the preview, its database and its bucket. Nothing deletes
   them automatically when a branch is deleted.
-- Preview URLs (`https://<branch>-haywardsfamilyicecream-com.tuckerwhitehouse.workers.dev`)
-  are behind the same Access application.
+- Preview URLs are `https://<branch>.previews.haywardsfamilyicecream.com` and
+  `https://<branch>-haywardsfamilyicecream-com.tuckerwhitehouse.workers.dev`, both behind the
+  same Access application (it lists `*.previews.haywardsfamilyicecream.com`). The custom domain
+  is preview-only (`domains` in `cloudflare.config.ts`) and doesn't touch the live site's apex
+  and `www` records. It was applied with `cf workers triggers deploy`, which sets routes and
+  domains without uploading code; a full deploy applies it too. Previews send
+  `X-Robots-Tag: noindex`.
 - The admin needs no second login on previews: Access's signed token signs people in
   (`accessSignIn` in `astro.config.mjs`). New people become admins; existing accounts keep their
   role. Every page shows EmDash's Edit button, so there is no need to open the admin first.

@@ -26,5 +26,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	if (to) return redirect(to + url.search);
 	if (!isPrerendered) await ensureContentModel();
 	const response = await next();
+	// Previews on the custom domain don't get workers.dev's automatic no-index header.
+	if (__ACCESS_SIGN_IN__) response.headers.set("X-Robots-Tag", "noindex");
 	return request.method === "GET" ? withSharedAdmin(context, response) : response;
 });
