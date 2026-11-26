@@ -5,7 +5,7 @@ import { milfordDay, pickPeriod, scheduleOrder, datesLabel, lastDay, accentOf, i
 import { byName, sharedOptions } from '../src/lib/catalog-text.ts';
 
 const seed = JSON.parse(await readFile(new URL('../seed/seed.json', import.meta.url), 'utf8'));
-const periods = seed.content.schedule.map((e) => ({ slug: e.slug, data: e.data, edit: {}, start: milfordDay(e.data.start_date) }));
+const periods = seed.content.schedule.filter((e) => e.status === 'published').map((e) => ({ slug: e.slug, data: e.data, edit: {}, start: milfordDay(e.data.start_date) }));
 const at = (day) => pickPeriod(scheduleOrder(periods), day)?.slug;
 
 test('seeded periods are dated on Milford’s calendar', () => {
@@ -33,7 +33,7 @@ test('a period is complete: nothing else supplies its hours or headline', () => 
 	const fields = seed.collections.find((c) => c.slug === 'schedule').fields;
 	const required = fields.filter((f) => f.required).map((f) => f.slug);
 	assert.deepEqual(fields.filter((f) => !f.required).map((f) => f.slug), ['banner_text']);
-	for (const p of seed.content.schedule) for (const slug of required) assert.ok(p.data[slug], `${p.slug}.${slug}`);
+	for (const p of seed.content.schedule) for (const slug of required) assert.ok(p.data[slug] || (p.status === 'draft' && slug === 'start_date'), `${p.slug}.${slug}`);
 	assert.ok(!seed.collections.find((c) => c.slug === 'store').fields.some((f) => /hours|banner/.test(f.slug)));
 	assert.ok(!seed.content.site_pages.find((p) => p.slug === 'home').data.headline);
 });
@@ -56,7 +56,11 @@ test('seed content invents no closing times, prices or dates', () => {
 	const closings = [...text.matchAll(/\b(1[0-2]|[1-9])(:\d\d)?\s?pm\b/gi)].map((m) => m[0].toLowerCase());
 	assert.deepEqual([...new Set(closings)].filter((t) => !['8pm', '9pm'].includes(t)), [], 'only confirmed closing times (8pm, 9pm); leave others out');
 	assert.doesNotMatch(text, /\[[^\]"]*(confirm|time|date)[^\]"]*\]/, 'no draft placeholders in public copy');
-	assert.equal(seed.content.schedule.find((p) => p.slug === 'ice-cream-2026').data.status_text, 'Open daily, 11am to 8pm. Until 9pm in summer');
+	assert.equal(seed.content.schedule.find((p) => p.slug === 'ice-cream-2026').data.status_text, 'Open daily, 11am to 8pm');
+	const summer = seed.content.schedule.find((p) => p.slug === 'summer-2027');
+	assert.equal(summer.status, 'draft', 'summer hours have no set dates: staff date and publish them');
+	assert.ok(!summer.data.start_date);
+	assert.equal(summer.data.status_text, 'Open daily, 11am to 9pm');
 });
 
 test('the forms stay short, with no prices', () => {

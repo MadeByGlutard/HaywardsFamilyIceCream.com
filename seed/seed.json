@@ -1738,7 +1738,7 @@
           "title": "Ice cream season 2026",
           "kind": "Open",
           "start_date": "2026-01-10T00:00:00-05:00",
-          "status_text": "Open daily, 11am to 8pm. Until 9pm in summer",
+          "status_text": "Open daily, 11am to 8pm",
           "hero_headline": "A Milford tradition.\nOne scoop at a time.",
           "hero_deck": "Good ice cream. Good company. Right here on Elm Street."
         }
@@ -1783,6 +1783,18 @@
           "banner_text": "We’re on winter break. We’ll post our reopening day on Facebook and Instagram.",
           "hero_headline": "See you soon,\nMilford.",
           "hero_deck": "Thank you for another year on Elm Street."
+        }
+      },
+      {
+        "id": "summer-2027",
+        "slug": "summer-2027",
+        "status": "draft",
+        "data": {
+          "title": "Summer hours 2027",
+          "kind": "Open",
+          "status_text": "Open daily, 11am to 9pm",
+          "hero_headline": "A Milford tradition.\nOne scoop at a time.",
+          "hero_deck": "Good ice cream. Good company. Right here on Elm Street."
         }
       }
     ],

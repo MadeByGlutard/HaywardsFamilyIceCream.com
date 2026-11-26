@@ -147,7 +147,9 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the
 - **Schedule:** there is always a period, and it is the only source of the hours, the banner
   and the home page headline. A period runs until the next one starts, so there is no end
   date: a winter break lasts until staff schedule what comes after. `kind` sets the color,
-  photos, Trees & wreaths link and home page button.
+  photos, Trees & wreaths link and home page button. Summer hours (until 9pm) are their own
+  period, a draft with no date: summer has no set dates, so staff give it one and publish it,
+  then add a period back to 8pm when summer hours end.
 - **Catalog:** shaped like Square's. Flavors and menu items are records that reference a
   category, and a menu lists categories in order. A category's item order is set on the
   category, and flavors sort themselves. A category on no menu isn't shown. `sizes` and `cones-and-toppings` are set apart on the
