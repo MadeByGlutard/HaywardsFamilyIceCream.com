@@ -167,9 +167,9 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the
 - **Blog** (`posts`, `/blog` and `/blog/<slug>`): title, introduction, photo, text and sources (shown
   folded up at the end, like History's); the author is the
   post's EmDash byline (Jennifer on the first post), shown with the byline's avatar or, without one,
-  its initial. The landing page's title and introduction are the Blog entry in Pages. The Bylines panel is hidden in everyone's editor
-  sidebar by default; turn it back on under Settings, Sidebars to change a post's author. The footer
-  links to the blog after Join our team.
+  its initial. Bylines (and their avatars) are under Bylines in the admin, and the editor's Bylines
+  panel sets a post's author. The landing page's title and introduction are the Blog entry in Pages.
+  The footer links to the blog after Join our team.
 - Staff can preview another date with `?today=2026-12-01` or a period with `?period=trees` (or `summer`;
   a published period with no start date yet is shown as of today). `/design-preview` shows one page
   in every published period side by side.
@@ -184,7 +184,7 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the
   − on the back takes off the newest tubs, for corrections. Counts live in the plugin's storage
   with a short change log; each tap is a versioned compare-and-set, so simultaneous taps can't
   go below zero or get lost. Counts never change the website.
-- `src/admin/`: the Category column and the Square panel (the "Hayward's admin" plugin), the sidebars everyone starts with (no bylines, ownership or URL) and admin CSS.
+- `src/admin/`: the Category column and the Square panel (the "Hayward's admin" plugin), and the sidebars everyone starts with (no ownership or URL panels).
 
 `content/flavors.json` and `content/settings/settings.yaml` are the original data from
 `main`. They are kept only so `tests/migration.test.mjs` can prove the seed matches them.

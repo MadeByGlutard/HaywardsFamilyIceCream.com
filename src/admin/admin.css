@@ -1,4 +1,0 @@
-/* Added to every admin page (src/admin/shared.ts). Only for what Settings, Sidebars can't hide. */
-.emdash-byline-filter-trigger {
-	display: none !important;
-}

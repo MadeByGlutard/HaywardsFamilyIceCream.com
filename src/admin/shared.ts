@@ -1,7 +1,6 @@
 import type { APIContext } from "astro";
 import { waitUntil } from "cloudflare:workers";
 import { POST as indexMedia } from "emdash/internal/routes/api/admin/media-usage/progress";
-import css from "./admin.css?raw";
 
 /**
  * What Settings, Sidebars starts out hiding. EmDash keeps that choice per person and has no
@@ -10,7 +9,8 @@ import css from "./admin.css?raw";
 const SIDEBARS = {
 	version: 1,
 	nav: { order: [], hidden: ["/byline-schema"] },
-	editor: { order: [], hidden: ["url-language", "ownership", "bylines"] },
+	// Bylines stay: blog posts credit their author.
+	editor: { order: [], hidden: ["url-language", "ownership"] },
 };
 
 const INDEXING_MS = 20_000;
@@ -29,7 +29,7 @@ async function continueIndexing(context: APIContext) {
 	}
 }
 
-/** Shared admin settings: default sidebars in EmDash's answer to "who am I", and our CSS in its pages. */
+/** Shared admin settings: default sidebars in EmDash's answer to "who am I". */
 export async function withSharedAdmin(context: APIContext, response: Response): Promise<Response> {
 	const path = context.url.pathname;
 	if (path === "/_emdash/api/auth/me" && response.ok) {
@@ -37,9 +37,6 @@ export async function withSharedAdmin(context: APIContext, response: Response): 
 		const body = (await response.json()) as { data?: { adminLayout?: unknown } };
 		if (body.data && !body.data.adminLayout) body.data.adminLayout = SIDEBARS;
 		return new Response(JSON.stringify(body), response);
-	}
-	if (/^\/_emdash\/admin(\/|$)/.test(path) && response.headers.get("content-type")?.includes("text/html")) {
-		return new Response((await response.text()).replace("</head>", `<style>${css}</style></head>`), response);
 	}
 	return response;
 }

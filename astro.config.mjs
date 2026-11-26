@@ -60,7 +60,7 @@ export default defineConfig({
 				logo: "/brand/icons/icon-192.png",
 				favicon: "/brand/icons/favicon-32.png",
 				// Features this site doesn't use. Their pages stay reachable by URL.
-				hiddenNavItems: ["calendar", "comments", "redirects", "widgets", "sections", "bylines", "import"],
+				hiddenNavItems: ["calendar", "comments", "redirects", "widgets", "sections", "import"],
 			},
 		}),
 	],
