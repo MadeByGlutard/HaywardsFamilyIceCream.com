@@ -1,5 +1,6 @@
 import type { ContentEditorPanelExtension, ContentListColumnExtension } from "@emdash-cms/admin";
 import * as React from "react";
+import { TubCounts } from "./tub-counts";
 
 const read = async (path: string) => ((await (await fetch(path, { headers: { "X-EmDash-Request": "1" } })).json()) as { data: any }).data;
 
@@ -52,3 +53,6 @@ function SquarePanel({ entry }: { entry: { id: string } }) {
 export const contentEditorPanels: ContentEditorPanelExtension[] = [
 	{ id: "square", title: "Square ID", collections: ["catalog_flavors", "catalog_items", "catalog_categories"], component: SquarePanel as ContentEditorPanelExtension["component"] },
 ];
+
+// Sidebar pages (declared in index.mjs and plugin.ts).
+export const pages = { "/tubs": TubCounts };

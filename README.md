@@ -165,6 +165,10 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages) and the
 - Allergens, half gallons and photos are tracked but not shown. Never show an allergen as
   absent: unchecked doesn't mean "free of".
 - Staff can preview another date with `?today=2026-12-01` or a period with `?period=trees`.
+- **Tub counts** (Plugins → Tub counts, `src/admin/tubs.ts` and `tub-counts.tsx`): staff count
+  tubs in the front and back freezers per flavor. "Into the case" takes from the front (or the
+  back if the front is out); "Back to front" moves one up. Counts live in the plugin's storage
+  with a short change log, are guarded so two taps can't go below zero, and never change the website.
 - `src/admin/`: the Category column and the Square panel (the "Hayward's admin" plugin), the sidebars everyone starts with (no bylines, ownership or URL) and admin CSS.
 
 `content/flavors.json` and `content/settings/settings.yaml` are the original data from

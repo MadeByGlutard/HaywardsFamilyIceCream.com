@@ -68,6 +68,21 @@ export interface CatalogCategory {
   terms?: Record<string, TaxonomyTerm[]>;
 }
 
+export interface Job {
+  id: string;
+  slug: string | null;
+  status: string;
+  name: string;
+  description: string;
+  hiring?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  byline?: BylineSummary | null;
+  bylines?: ContentBylineCredit[];
+  terms?: Record<string, TaxonomyTerm[]>;
+}
+
 export interface Store {
   id: string;
   slug: string | null;
@@ -119,6 +134,7 @@ declare module "emdash" {
     catalog_flavors: CatalogFlavor;
     catalog_items: CatalogItem;
     catalog_categories: CatalogCategory;
+    jobs: Job;
     store: Store;
     site_pages: SitePage;
   }
