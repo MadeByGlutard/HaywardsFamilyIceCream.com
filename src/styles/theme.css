@@ -1873,6 +1873,11 @@ main:has(> .end-band:last-child) + .footer {
 	color: var(--accent);
 }
 
+.job-rules {
+	max-width: 42rem;
+	color: var(--muted, inherit);
+}
+
 .job-apply {
 	margin-bottom: var(--s4);
 	padding-top: var(--s3);

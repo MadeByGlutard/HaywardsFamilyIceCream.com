@@ -1,5 +1,6 @@
 ---
 import { getEmDashCollection } from 'emdash';
+import { PortableText } from 'emdash/ui';
 import Base from '../layouts/Base.astro';
 import { getLocation, getPage, telephone } from '../lib/site';
 import { cacheContentPage } from '../lib/cache';
@@ -19,5 +20,6 @@ const hiring = entries.some((job) => job.data.hiring);
   <section class="job-apply wrap">
     <h2>{hiring ? 'Want the job?' : 'Want to work here?'}</h2>
     <p>Call <a href={telephone(place.phone)}>{place.phone}</a>{place.email && <> or email <a href={`mailto:${place.email}?subject=${encodeURIComponent('Working at Hayward’s')}`}>{place.email}</a></>}, and tell us which job and when you can work.</p>
+    {page.data.content?.length > 0 && <div class="job-rules" {...page.edit.content}><PortableText value={page.data.content} /></div>}
   </section>
 </Base>

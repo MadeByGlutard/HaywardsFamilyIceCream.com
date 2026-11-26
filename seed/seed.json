@@ -2060,7 +2060,51 @@
         "status": "published",
         "data": {
           "title": "Join our team",
-          "excerpt": "Work for a family-owned stand on Elm Street: scoop ice cream, run the kitchen, or help out at the tree lot."
+          "excerpt": "Work for a family-owned stand on Elm Street: scoop ice cream, run the kitchen, or help out at the tree lot.",
+          "content": [
+            {
+              "_type": "block",
+              "_key": "y0",
+              "style": "normal",
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "law",
+                  "href": "https://gc.nh.gov/rsa/html/XXIII/276-A/276-A-mrg.htm"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "y0a",
+                  "text": "Under 18?",
+                  "marks": [
+                    "strong"
+                  ]
+                },
+                {
+                  "_type": "span",
+                  "_key": "y0b",
+                  "text": " We follow ",
+                  "marks": []
+                },
+                {
+                  "_type": "span",
+                  "_key": "y0c",
+                  "text": "New Hampshire’s youth employment law",
+                  "marks": [
+                    "law"
+                  ]
+                },
+                {
+                  "_type": "span",
+                  "_key": "y0d",
+                  "text": ". If you’re under 16, you’ll need a youth employment certificate, which your school or a parent can give you, and the law limits when and how long you can work. If you’re 16 or 17, a parent or guardian signs a permission form, unless you’ve finished high school.",
+                  "marks": []
+                }
+              ]
+            }
+          ]
         }
       },
       {
