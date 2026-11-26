@@ -64,3 +64,15 @@ export const publicTitle = (title: string) => title.replace(/\s+20\d\d$/, '');
 /** "From Nov 27". */
 export const datesLabel = (period: PeriodEntry<any>) =>
   `From ${new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' }).format(new Date(`${period.start}T12:00:00Z`))}`;
+
+/**
+ * Of seed-style entries ({ status, data.start_date }), the one in force on a Milford day:
+ * published, dated, started on or before it. Drafts and undated periods are skipped.
+ */
+export function seedPeriodInForce<E extends { status?: string; data: { start_date?: unknown } }>(entries: E[], today: string): E | undefined {
+  const day = (entry: E) => (entry.status === 'published' ? milfordDay(entry.data.start_date as string | undefined) : undefined);
+  return entries
+    .filter((entry) => { const d = day(entry); return !!d && d <= today; })
+    .sort((x, y) => day(x)!.localeCompare(day(y)!))
+    .at(-1);
+}

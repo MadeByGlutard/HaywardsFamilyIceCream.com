@@ -12,6 +12,17 @@ const PRODUCTION_R2 = "haywardsfamilyicecream-com";
 const PRODUCTION_KV = "1527cf00766d419599a8ef696b19dac9";
 
 /**
+ * Going live (README, "Going live"): set to true in the commit that moves the domain. Until then
+ * haywardsfamilyicecream.com and www stay on Cloudflare Pages and this Worker serves neither.
+ * Moving back is setting it to false and deploying, then reattaching the Pages project's domains.
+ */
+const SERVE_LIVE_DOMAIN = false;
+const LIVE_DOMAINS = [
+	{ hostname: "haywardsfamilyicecream.com", production: true, previews: false },
+	{ hostname: "www.haywardsfamilyicecream.com", production: true, previews: false },
+];
+
+/**
  * Each preview gets its own D1 database and R2 bucket, seeded from production, and
  * its own KV namespace for sign-in sessions. They are created by `scripts/preview.mjs`, which passes them in through these
  * environment variables before running `cf previews deploy`.
@@ -46,7 +57,10 @@ export default defineConfig(({ isPreview }) => {
 			// Previews also answer at <branch>.previews.haywardsfamilyicecream.com (behind the same
 			// Access app). Preview-only: this hostname never serves production, and the live site's
 			// apex and www records are untouched.
-			domains: [{ hostname: "previews.haywardsfamilyicecream.com", production: false, previews: true }],
+			domains: [
+				{ hostname: "previews.haywardsfamilyicecream.com", production: false, previews: true },
+				...(SERVE_LIVE_DOMAIN ? LIVE_DOMAINS : []),
+			],
 			compatibilityDate: "2026-11-22",
 			compatibilityFlags: ["nodejs_compat"],
 			entrypoint: "./src/worker.ts",
@@ -67,7 +81,10 @@ export default defineConfig(({ isPreview }) => {
 				// Runs plugins installed from the admin in their own isolates.
 				LOADER: bindings.workerLoader(),
 				// Invites and other admin mail (astro.config.mjs). Can only send as the admin.
-				EMAIL: bindings.sendEmail({ allowedSenderAddresses: ["cms@mail.haywardsfamilyicecream.com"] }),
+				// Production only: previews have no way to send email.
+				...(isPreview
+					? {}
+					: { EMAIL: bindings.sendEmail({ allowedSenderAddresses: ["cms@mail.haywardsfamilyicecream.com"] }) }),
 			},
 		},
 	};

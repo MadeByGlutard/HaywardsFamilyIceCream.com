@@ -70,7 +70,10 @@ EmDash's passkey-first login and invite screens to it:
 - **Storage:** scrypt hashes (OWASP's 16 MiB setting) in EmDash's `_plugin_storage` table.
   Reset tokens are stored hashed.
 - **Limits:** per 15 minutes, 10 sign-in attempts per email and 30 per IP address.
-- Changing or resetting a password does not sign out other devices that are already signed in.
+- Changing or resetting a password signs out every other device: a session remembers which
+  password it signed in under (`src/auth/password/current.ts`), and `src/middleware.ts` ends
+  sessions from an older one. Only the newest reset link for a person works, and none works
+  once their password has changed since it was made.
 
 Cloudflare Access (Zero Trust team `misty-night-ed60`) separately guards the `workers.dev`
 address and previews, for developers only. The real domain has no Access in front of it, so
@@ -82,8 +85,9 @@ Every branch other than `main` can have a Worker Preview with its own D1 databas
 and KV namespace (sign-in sessions), named `haywardsfamilyicecream-com-<branch>`:
 
 - `npm run preview:deploy` creates them on the first run and copies production into them:
-  schema, rows (including users and their password hashes, so the same people can sign in) and
-  media. Later runs
+  schema, rows and media, except sign-in data: passwords, reset links, API and OAuth tokens and
+  passkeys stay in production (`SIGN_IN_TABLES` in `scripts/preview.mjs`). Users are copied, and
+  people sign in through Access, so they keep their accounts and roles. Later runs
   reuse them; pass `-- --reseed` to copy production again. It then runs `cf previews deploy`,
   which builds with `isPreview` so `cloudflare.config.ts` binds the preview's own D1/R2 and
   leaves out the cron trigger.
@@ -112,10 +116,13 @@ and KV namespace (sign-in sessions), named `haywardsfamilyicecream-com-<branch>`
   not for the first person to open it. It gets past Access with a service token
   ("Previews deploy: content upgrade", allowed by the previews' Access app, expires November 2027)
   in the `PREVIEW_ACCESS_CLIENT_ID` and `PREVIEW_ACCESS_CLIENT_SECRET` secrets.
+- Previews send no email: `cloudflareEmail` and the `EMAIL` binding are production only.
 - Previews don't inherit production's secrets. `EMDASH_ENCRYPTION_KEY` is set in the Worker's
-  Previews Base config (same value as production, since preview databases are copies) with
+  Previews Base config with
   `npx wrangler preview base-config secret put EMDASH_ENCRYPTION_KEY --worker-name haywardsfamilyicecream-com`,
-  and every new preview starts with it.
+  and every new preview starts with it. It should be a key of its own (`npx emdash secrets generate`),
+  not production's: as of 2026-11-26 neither database holds encrypted settings, so changing it
+  loses nothing. If production ever stores encrypted settings, previews can't read their copies.
 
 ## Email
 
@@ -248,6 +255,33 @@ Limits:
 - A version address (`<version>-haywardsfamilyicecream-com...workers.dev`) has its own cache,
   which publishing in production does not purge, and its requests don't show in the logs.
 - The adapter ignores the result of a purge, so a refused one (over the rate limit) is silent.
+
+## Going live
+
+The live domain is on Cloudflare Pages (`main`, Gatsby) until this is done. Nothing below has
+been run. Rollback at any step: set `SERVE_LIVE_DOMAIN` back to `false`, deploy, and reattach
+the domains to the Pages project.
+
+1. **Resources:** confirm production D1, R2 and KV (`cloudflare.config.ts`) and the
+   `EMDASH_ENCRYPTION_KEY` secret exist.
+2. **Admin first:** deploy (`npm run deploy`) and finish setup on the `workers.dev` address
+   (behind Access) before the domain points here. Otherwise whoever opens the wizard first
+   becomes admin. Invite staff; check the invite email arrives.
+3. **Content upgrade:** load the `workers.dev` address once and wait for the page, so the upgrade
+   runs then and not for a visitor. A failed upgrade shows "We're updating the website" (503,
+   not cached) instead of a broken page; the Worker logs say why.
+4. **Pause Pages:** turn off automatic deployments on the Pages project, so a push to `main`
+   doesn't redeploy Gatsby, then remove `haywardsfamilyicecream.com` and `www` from its custom domains.
+5. **Move the domain:** set `SERVE_LIVE_DOMAIN = true`, commit, then
+   `npx cf workers triggers deploy` (routes and domains only) or a full `npm run deploy`.
+6. **Check:**
+   - `https://haywardsfamilyicecream.com/` and `www` load; `www` should redirect or serve the same page.
+   - `curl -sI https://haywardsfamilyicecream.com/` twice: `cf-cache-status: HIT` the second time.
+   - Publish a banner change in the admin and see it at once (purge on publish).
+   - `/login` works with a password; `/admin` asks for it.
+   - The cron trigger runs (Worker logs, every minute).
+7. **Afterwards:** rotate the Google Maps key that `main` committed, and delete the port's
+   hidden collections once going back is off the table (Databases already set up).
 
 ## Guardrails
 

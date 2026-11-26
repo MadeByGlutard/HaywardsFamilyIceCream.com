@@ -17,6 +17,7 @@ import { getDb } from 'emdash/runtime';
 import { sql } from 'kysely';
 import seed from '../../seed/seed.json';
 import { linkSquareItems } from './square';
+import { milfordDay, seedPeriodInForce } from './schedule-dates';
 
 /** The port's collections and the redesign's first ones: replaced, hidden from the admin, kept. */
 const PORT = ['settings', 'categories', 'flavors'];
@@ -28,18 +29,23 @@ const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
 const LOCK_MS = 600_000;
-const WAIT_MS = 60_000;
+// Other requests wait this long for it; longer than an upgrade, shorter than the lock.
+const WAIT_MS = 180_000;
 /** Collections this upgrade is adding, kept until it finishes so a retry can resume. */
 const ADDING = 'haywards:content_upgrade_adding';
 
 let done: Promise<void> | undefined;
 
-/** Once per Worker isolate; a failure is retried on the next request. */
+/**
+ * Once per Worker isolate. A failure rejects, so the middleware can hold pages back instead of
+ * serving them from a half-upgraded database, and is retried on the next request.
+ */
 export function ensureContentModel(): Promise<void> {
   // getDb, not locals.emdash.db: EmDash leaves the database off signed-out requests.
   done ??= getDb().then(upgrade).catch((error) => {
     done = undefined;
     console.error('[content-upgrade] failed:', error);
+    throw error;
   });
   return done;
 }
@@ -157,9 +163,8 @@ async function carryOver(db: any, added: Record<string, any[]>, file: SeedFile) 
   const { rows: site } = await sql<{ banner: string | null }>`SELECT banner FROM ec_settings WHERE slug = 'site' AND deleted_at IS NULL`.execute(db);
   const banner = site[0]?.banner?.trim();
   if (!banner || !added.schedule) return;
-  const now = new Date().toISOString();
-  const started = added.schedule.filter((entry) => new Date(entry.data.start_date).toISOString() <= now);
-  const current = started.sort((x, y) => Date.parse(x.data.start_date) - Date.parse(y.data.start_date)).at(-1);
+  // The period in force today in Milford; drafts and periods with no start date yet are skipped.
+  const current = seedPeriodInForce(added.schedule, milfordDay(new Date())!);
   if (current) current.data.banner_text = banner;
 }
 

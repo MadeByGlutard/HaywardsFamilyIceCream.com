@@ -131,6 +131,21 @@ async function rows(databaseId, sql, params = []) {
 const FTS_SHADOW_SUFFIXES = ["_config", "_content", "_data", "_docsize", "_idx"];
 const quote = (identifier) => `"${identifier.replaceAll('"', '""')}"`;
 
+// Sign-in data stays in production: a preview gets the tables, not their rows. People sign in to
+// previews through Cloudflare Access, so these would only be copies of passwords and tokens.
+const SIGN_IN_TABLES = new Set([
+	"_emdash_api_tokens",
+	"_emdash_authorization_codes",
+	"_emdash_oauth_clients",
+	"_emdash_oauth_tokens",
+	"auth_challenges",
+	"auth_tokens",
+	"credentials",
+	"oauth_accounts",
+]);
+// The password provider keeps its hashes and reset links in plugin storage under "auth:password".
+const rowFilter = (table) => (table === "_plugin_storage" ? " WHERE plugin_id NOT LIKE 'auth:%'" : "");
+
 async function copyProduction(targetId) {
 	const schema = await rows(
 		PRODUCTION_D1_ID,
@@ -154,14 +169,14 @@ async function copyProduction(targetId) {
 		const columns = (await rows(PRODUCTION_D1_ID, `SELECT name FROM pragma_table_info(?)`, [table.name])).map(
 			(column) => column.name,
 		);
-		if (!columns.length) continue;
+		if (!columns.length || SIGN_IN_TABLES.has(table.name)) continue;
 		const insert = `INSERT INTO ${quote(table.name)} (${columns.map(quote).join(", ")}) VALUES (${columns.map(() => "?").join(", ")})`;
 		// D1 allows 100 bound parameters per statement and ~100 KB per request.
 		const perBatch = Math.max(1, Math.min(50, Math.floor(1000 / columns.length)));
 		for (let offset = 0; ; offset += 500) {
 			const page = await rows(
 				PRODUCTION_D1_ID,
-				`SELECT ${columns.map(quote).join(", ")} FROM ${quote(table.name)} ORDER BY rowid LIMIT 500 OFFSET ${offset}`,
+				`SELECT ${columns.map(quote).join(", ")} FROM ${quote(table.name)}${rowFilter(table.name)} ORDER BY rowid LIMIT 500 OFFSET ${offset}`,
 			);
 			for (let i = 0; i < page.length; i += perBatch) {
 				const batch = page.slice(i, i + perBatch).map((row) => ({
@@ -182,6 +197,16 @@ async function copyProduction(targetId) {
 	await run(ofType("index"));
 	await run([...ofType("trigger"), ...ofType("view")]);
 	return copied;
+}
+
+// Previews copied before sign-in data was left out still hold it; clear it on every deploy.
+async function clearSignIn(databaseId) {
+	const present = new Set(
+		(await rows(databaseId, "SELECT name FROM sqlite_master WHERE type = 'table'")).map((entry) => entry.name),
+	);
+	const statements = [...SIGN_IN_TABLES].filter((table) => present.has(table)).map((table) => `DELETE FROM ${quote(table)}`);
+	if (present.has("_plugin_storage")) statements.push("DELETE FROM _plugin_storage WHERE plugin_id LIKE 'auth:%'");
+	if (statements.length) await query(databaseId, { sql: statements.join(";\n") });
 }
 
 async function deleteDatabase(databaseId) {
@@ -294,6 +319,7 @@ if (command === "deploy") {
 		log(`Copied ${await copyProduction(database.uuid)} rows`);
 	} else {
 		log(`Using existing ${name} (D1); pass --reseed to copy production again`);
+		await clearSignIn(database.uuid);
 	}
 
 	if (!(await bucketExists())) {

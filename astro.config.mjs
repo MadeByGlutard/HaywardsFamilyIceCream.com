@@ -45,10 +45,15 @@ export default defineConfig({
 			sandboxRunner: sandbox(),
 			plugins: [
 				// mail.haywardsfamilyicecream.com is set up in Cloudflare's Email Service.
-				cloudflareEmail({
-					from: { email: "cms@mail.haywardsfamilyicecream.com", name: "Hayward's website" },
-					replyTo: "haywardsofmilford@gmail.com",
-				}),
+				// Production only: a preview never sends real email.
+				...(isPreview
+					? []
+					: [
+							cloudflareEmail({
+								from: { email: "cms@mail.haywardsfamilyicecream.com", name: "Hayward's website" },
+								replyTo: "haywardsofmilford@gmail.com",
+							}),
+						]),
 				haywardsAdmin(),
 			],
 			...(isPreview ? accessSignIn : {}),

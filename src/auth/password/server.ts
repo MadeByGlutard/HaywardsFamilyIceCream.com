@@ -3,15 +3,13 @@ import { createKyselyAdapter } from "@emdash-cms/auth/adapters/kysely";
 import { apiError, getAuthProviderStorage } from "emdash/api/route-utils";
 import { sql } from "kysely";
 import { hashPassword } from "./hash";
+import { sessionIsCurrent, type ResetLink, type SessionUser } from "./current";
 
 interface Credential {
 	hash: string;
 	updatedAt: string;
 }
-interface Reset {
-	userId: string;
-	expiresAt: number;
-}
+type Reset = ResetLink;
 
 export function database(context: Pick<APIContext, "locals">) {
 	return (context.locals as any).emdash?.db;
@@ -48,12 +46,28 @@ export async function setPassword(db: any, userId: string, password: string) {
 	});
 }
 
-/** Starts a session under a fresh session ID, so one planted before sign-in is useless. */
+/** The newest reset link made for a user is recorded under this key in `resets`. */
+export const newestResetKey = (userId: string) => `newest:${userId}`;
+
+/**
+ * Starts a session under a fresh session ID, so one planted before sign-in is useless.
+ * The session remembers which password it began under; changing the password ends the others.
+ */
 export async function startSession(context: APIContext, db: any, userId: string) {
 	await db.updateTable("users").set({ last_login_at: new Date().toISOString() }).where("id", "=", userId).execute();
+	const credential = await storage(db).credentials.get(userId);
 	const session = context.session as any;
 	await session.regenerate();
-	session.set("user", { id: userId });
+	session.set("user", { id: userId, since: credential?.updatedAt ?? null } satisfies SessionUser);
+}
+
+/** False when the signed-in session began under a password that has since been changed or reset. */
+export async function signedInUnderCurrentPassword(context: Pick<APIContext, "locals" | "session">): Promise<boolean> {
+	const db = database(context);
+	const user = (await (context.session as any)?.get("user")) as SessionUser | undefined;
+	if (!db || !user?.id) return true;
+	const credential = await storage(db).credentials.get(user.id);
+	return sessionIsCurrent(user, credential?.updatedAt);
 }
 
 /** Counts an attempt in EmDash's rate-limit table. Returns false once over the limit. */
