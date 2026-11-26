@@ -24,7 +24,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 17;
+export const CONTENT_VERSION = 18;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -176,6 +176,12 @@ async function renameUnedited(db: any) {
   await sql`UPDATE _emdash_menus SET label = 'Sundaes & frappes' WHERE name = 'sundaes' AND label = 'Sundaes & shakes'`.execute(db);
   await sql`UPDATE _emdash_menu_items SET label = 'Sundaes & frappes' WHERE label = 'Sundaes & shakes'`.execute(db);
   await sql`UPDATE _emdash_menu_items SET label = 'Frappes and floats' WHERE label = 'Shakes and floats'`.execute(db);
+  // History's last paragraph, as Hayward's told it (Nov 2026), if it still has the old sentence.
+  const before = 'Hayward’s in Nashua and Merrimack grew out of the same family. Today they are a separate business.';
+  const after =
+    'Hayward’s is still in the family. Four siblings each run a stand: Sharon Robinson here in Milford, Chris in Nashua, Mike at Mike’s Ice Cream, and Diane at Hayward’s in Merrimack, which Chris owns.';
+  await sql`UPDATE ec_site_pages SET content = REPLACE(content, ${before}, ${after})
+    WHERE slug = 'history' AND instr(content, ${before}) > 0`.execute(db);
 }
 
 /**
