@@ -28,7 +28,7 @@ Redone November 23, 2026, replacing the November 16 version. One researcher star
 | The farm closed; building 2001; former Hayward Farms land | Assessor; Hayward’s site, 2009 | Yes |
 | Made elsewhere, then January 2008 | Hayward’s site, 2008 | Yes |
 | Ice Cream Trail, 2022 | Granite State News Collaborative | Yes |
-| Sharon Robinson, Chris Ordway, Mike Ordway and Dianne O’Donnell are all of Charles P. and Fredericka (Gallup) Hayward’s grandchildren and Charles A. Hayward’s great-grandchildren, through their daughter Trudy (Hayward) LeGrice (obituary, the Cabinet, 2026; Dee Chase, also listed, is her husband Rick’s daughter); who runs which stand | Hayward’s (owner, November 26, 2026); Visiting New England, 2018 (Charles P. and Fredericka founded Nashua; daughter Trudy and husband Mike Ordway; grandson Chris) | Owner confirmed; article read |
+| Sharon Robinson, Chris Ordway, Mike Ordway and Dianne O’Donnell are all of Charles P. and Fredericka (Gallup) Hayward’s grandchildren and Charles A. Hayward’s great-grandchildren, through their daughter Trudy (Hayward) LeGrice (obituary, the Cabinet, 2026; Dee Chase, also listed, is her husband Rick’s daughter); who runs which stand (Mike’s Ice Cream is at 466 Nashua Road, Dracut, Massachusetts, per its listing) | Hayward’s (owner, November 26, 2026); Visiting New England, 2018 (Charles P. and Fredericka founded Nashua; daughter Trudy and husband Mike Ordway; grandson Chris) | Owner confirmed; article read |
 | Nashua and Merrimack separate (no longer on the page) | Hayward’s site 2012 and 2013, assessor (separate corporation) | Yes; **owner should confirm** |
 
 ## Postcards

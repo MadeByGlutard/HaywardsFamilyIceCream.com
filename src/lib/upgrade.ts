@@ -24,7 +24,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 22;
+export const CONTENT_VERSION = 23;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -214,6 +214,12 @@ async function historyEnding(db: any) {
       changed = true;
     }
   });
+  // The stores paragraph before Mike's Ice Cream had its town.
+  const stores = blocks.findIndex((block) => text(block) === 'Sharon Robinson runs the stand on Elm Street today, and the ice cream in the case is made right here. Chris Ordway runs Hayward’s in Nashua, and Dianne O’Donnell runs Hayward’s in Merrimack. Mike Ordway runs Mike’s Ice Cream.');
+  if (stores >= 0) {
+    blocks[stores] = ending[1];
+    changed = true;
+  }
   const last = blocks.findIndex((block) => lastLines.includes(text(block)));
   if (last >= 0) {
     blocks[last] = ending[2];
