@@ -1,16 +1,16 @@
 ---
-import { getEmDashEntry, getSeoMeta } from 'emdash';
+import { getEmDashEntry } from 'emdash';
 import { PortableText } from 'emdash/ui';
+import { pageSeo, photoUrl } from '../../lib/site';
 import Base from '../../layouts/Base.astro';
 import PostByline from '../../components/PostByline.astro';
 import { cacheContentPage } from '../../lib/cache';
 cacheContentPage(Astro);
 const { entry: post } = await getEmDashEntry('posts', Astro.params.slug!);
 if (!post) return Astro.rewrite('/404');
-const seo = getSeoMeta(post, { defaultTitle: post.data.title, defaultDescription: post.data.excerpt });
 const photo = post.data.photo?.src ? post.data.photo : undefined;
 ---
-<Base title={seo.title} description={seo.description || post.data.excerpt} content={{ collection: 'posts', id: post.data.id, slug: post.id }}>
+<Base {...pageSeo(post, { title: post.data.title, description: post.data.excerpt, image: photoUrl(post.data.photo) })} content={{ collection: 'posts', id: post.data.id, slug: post.id }}>
   <section class="page-heading story-heading wrap">
     <p class="eyebrow"><a href="/blog">Blog</a></p>
     <h1 {...post.edit.title}>{post.data.title}</h1>

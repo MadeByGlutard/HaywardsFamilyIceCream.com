@@ -3,24 +3,21 @@
 import MenuGroups from './MenuGroups.astro';
 import MenuNote from './MenuNote.astro';
 import Base from '../layouts/Base.astro';
-import { menuCategories, type MenuName } from '../lib/catalog';
+import { menuCategories, splitEvenly, type MenuName } from '../lib/catalog';
 import Photo from './Photo.astro';
-import { getLocation, photoUrl, telephone, type SitePage } from '../lib/site';
-interface Props { menu: MenuName; page: SitePage; /** Category slugs per column, in reading order. A category staff add goes in the last one. */ columns: string[][] }
+import { getLocation, photoUrl, telephone, type SitePage, pageSeo } from '../lib/site';
+interface Props { menu: MenuName; page: SitePage; /** How many columns on a wide screen. */ columns: number }
 const { menu, page, columns } = Astro.props;
 const photo = page.data.photo;
 const [all, { data: place }] = await Promise.all([menuCategories(menu), getLocation()]);
 const categories = all.filter((category) => category.items.length > 0);
-const placed = columns.flat();
-const inColumn = (slugs: string[], last: boolean) => [
-  ...slugs.flatMap((slug) => categories.filter((category) => category.slug === slug)),
-  ...(last ? categories.filter((category) => !placed.includes(category.slug)) : []),
-];
+// The menu's own order (Menus in the admin), split into columns of about equal length.
+const columnsOf = splitEvenly(categories, columns, (category) => category.items.length + 2);
 ---
-<Base title={page.data.title} description={page.data.summary || page.data.excerpt} image={photoUrl(photo)}>
+<Base {...pageSeo(page, { title: page.data.title, description: page.data.summary || page.data.excerpt, image: photoUrl(photo) })} content={{ collection: 'site_pages', id: page.data.id, slug: page.id }}>
   <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1><MenuNote lead={page.data.excerpt} edit={page.edit.excerpt} /></section>
   <div class={`menu-groups wrap${photo ? ' has-photo' : ''}`}>
-    {columns.map((slugs, i) => <div class="menu-col"><MenuGroups categories={inColumn(slugs, i === columns.length - 1)} /></div>)}
+    {columnsOf.map((column) => <div class="menu-col"><MenuGroups categories={column} /></div>)}
     {photo && <figure class="menu-photo"><Photo image={photo} sizes="(max-width: 1000px) 100vw, 400px" /></figure>}
     {categories.length === 0 && <p>Please <a href={telephone(place.phone)}>call the stand</a> for today’s menu.</p>}
   </div>

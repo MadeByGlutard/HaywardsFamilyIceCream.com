@@ -3,13 +3,13 @@ import { getEmDashCollection } from 'emdash';
 import Base from '../../layouts/Base.astro';
 import PostByline from '../../components/PostByline.astro';
 import { cacheContentPage } from '../../lib/cache';
-import { getPage } from '../../lib/site';
+import { getPage, pageSeo } from '../../lib/site';
 cacheContentPage(Astro);
 const [page, { entries }] = await Promise.all([getPage('blog'), getEmDashCollection('posts', { limit: 100 })]);
 if (!page) return Astro.rewrite('/404');
 const posts = [...entries].sort((a, b) => (b.data.publishedAt?.getTime() ?? 0) - (a.data.publishedAt?.getTime() ?? 0));
 ---
-<Base title={page.data.title} description={page.data.excerpt} content={{ collection: 'site_pages', id: page.data.id, slug: 'blog' }}>
+<Base {...pageSeo(page, { title: page.data.title, description: page.data.excerpt })} content={{ collection: 'site_pages', id: page.data.id, slug: 'blog' }}>
   <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1>{page.data.excerpt && <p {...page.edit.excerpt}>{page.data.excerpt}</p>}</section>
   <section class="post-list wrap">
     {posts.length === 0 && <p>Nothing here yet.</p>}

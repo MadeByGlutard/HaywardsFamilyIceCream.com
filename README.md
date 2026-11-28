@@ -216,7 +216,7 @@ Anything staff can manage in the admin lives there, not in this repository:
   "hide from search engines" in a page's SEO panel. `robots.txt` points to it.
 - **Page text** is in each page's fields, not the templates: the Summary (the homepage's menu
   columns and the search-engine description; `{flavors}` is the number of ice cream flavors), the
-  band at the bottom (headline, button, link), the Jobs page's "Want to work here?" (its Text:
+  band at the bottom (headline, button, and the page it links to, picked from Pages), the Jobs page's "Want to work here?" (its Text:
   heading and first paragraph above the buttons, the rest below), and the Trees page's
   Introduction (before the season) and Text after the season. A band that links to an
   unpublished page, and the Trees page outside the season, use the Hours & directions page's band.
@@ -228,6 +228,13 @@ Anything staff can manage in the admin lives there, not in this repository:
   before it). Crops follow each photo's focal point. `public/images` and `seed/photos.json` are
   only the starting set: the content upgrade copies them into the library once.
 - **History's sources** are its Sources field.
+- **Search engines:** each page's title, description, share image and "hide from search engines"
+  come from its SEO panel, then its own text. Pages without either use Settings: the site tagline
+  and the default share image. The business details for search engines (address, phone) come
+  from Store info.
+- **Trees & wreaths in the menu** (and its list of trees) shows in the schedule periods ticked
+  "Show Trees & wreaths in the menu": the tree lot and the Thanksgiving closure before it.
+- **Food and Sundaes columns** follow the order in Menus, split into columns of about equal length.
 - **Menus** drop a page while it's unpublished.
 
 ### Databases already set up

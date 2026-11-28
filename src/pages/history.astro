@@ -1,17 +1,15 @@
 ---
-import { getSeoMeta } from 'emdash';
 import { PortableText } from 'emdash/ui';
 import Base from '../layouts/Base.astro';
 import Photo from '../components/Photo.astro';
-import { getPage, photoUrl } from '../lib/site';
+import { getPage, photoUrl, pageSeo } from '../lib/site';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
 const story=await getPage('history');
 if(!story)return Astro.rewrite('/404');
-const seo=getSeoMeta(story,{defaultTitle:'History',defaultDescription:story.data.excerpt});
 const photo=story.data.photo;
 ---
-<Base title={seo.title} description={seo.description || story.data.excerpt} content={{collection: 'site_pages',id:story.data.id,slug:'history'}} image={photoUrl(photo)}>
+<Base {...pageSeo(story, { title: 'History', description: story.data.excerpt, image: photoUrl(photo) })} content={{collection: 'site_pages',id:story.data.id,slug:'history'}}>
   <section class="page-heading story-heading wrap"><p class="eyebrow">Our history</p><h1 {...story.headlineEdit}>{story.headline.replace(/Elm Street/g, 'Elm\u00a0Street')}</h1><p {...story.edit.excerpt}>{story.data.excerpt}</p></section>
   {photo && <figure class="story-banner wrap" {...story.edit.photo}><Photo image={photo} sizes="(max-width: 1000px) 100vw, 1000px" priority />{photo.caption && <figcaption>{photo.caption}</figcaption>}</figure>}
   <article class="story-body wrap"><div class="story-prose" {...story.edit.content}><PortableText value={story.data.content || []} /></div></article>

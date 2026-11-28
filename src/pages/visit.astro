@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import {getLocation,getPage,photoUrl,telephone} from '../lib/site';
+import {getLocation,getPage,photoUrl,telephone, pageSeo } from '../lib/site';
 import {getScheduleContext} from '../lib/schedule';
 import {withSentences} from '../lib/text';
 import { cacheContentPage } from '../lib/cache';
@@ -14,7 +14,7 @@ const statusEdit=status.edit;
 // Google's keyless embed: a pin on the stand, Google Maps a tap away. Loads only when scrolled to.
 const mapUrl=`https://www.google.com/maps?q=${encodeURIComponent(`Hayward’s Family Ice Cream, ${place.address}, ${place.locality}`)}&z=15&output=embed`;
 ---
-<Base title="Hours & directions" description={`${status.line}. Hayward’s Family Ice Cream, ${place.address}, ${place.locality}. ${place.phone}.`.replace(/\s+/g, ' ')} image={photoUrl(page.data.photo)}>
+<Base {...pageSeo(page, { title: 'Hours & directions', description: `${status.line}. Hayward’s Family Ice Cream, ${place.address}, ${place.locality}. ${place.phone}.`.replace(/\s+/g, ' '), image: photoUrl(page.data.photo) })} content={{ collection: 'site_pages', id: page.data.id, slug: 'visit' }}>
   <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1>{page.data.excerpt && <p {...page.edit.excerpt}>{page.data.excerpt}</p>}</section>
   <div class="visit-layout wrap">
     <section class="visit-hours"><p class="eyebrow">Hours</p><h2 {...statusEdit} set:html={withSentences(status.line)} />{schedule.treesOpen && /\bfrom \d/i.test(status.line) && <p><a class="text-link" href={telephone(place.phone)}>Call for closing time</a></p>}</section>

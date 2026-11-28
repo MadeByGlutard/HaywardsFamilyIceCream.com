@@ -2,7 +2,7 @@
 import { PortableText } from 'emdash/ui';
 import EndBand from '../components/EndBand.astro';
 import Base from '../layouts/Base.astro';
-import { endBand, getLocation, getPage, photoList, photoUrl, telephone } from '../lib/site';
+import { endBand, getLocation, getPage, photoList, photoUrl, telephone, pageSeo } from '../lib/site';
 import { getScheduleContext } from '../lib/schedule';
 import Photo from '../components/Photo.astro';
 import { sentence } from '../lib/status';
@@ -37,7 +37,7 @@ const gallery = photoList(page.data.photos);
 // While the lot is open the page ends on its own band; otherwise on Hours & directions'.
 const band = await endBand(schedule.treesOpen ? page : undefined);
 ---
-<Base title={title} description={page.data.summary || page.data.excerpt} content={{ collection: 'site_pages', id: page.data.id, slug: 'trees' }} image={photoUrl(lead)} strip={!schedule.treesOpen}>
+<Base {...pageSeo(page, { title: title, description: page.data.summary || page.data.excerpt, image: photoUrl(lead) })} content={{ collection: 'site_pages', id: page.data.id, slug: 'trees' }} strip={!schedule.treesOpen}>
   <section class="page-heading wrap">
     {answer
       ? <><p class="eyebrow" {...page.headlineEdit}>{title.replace(/\.$/, '')}</p><h1>{answer}</h1></>

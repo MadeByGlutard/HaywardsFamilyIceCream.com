@@ -6,4 +6,4 @@ cacheContentPage(Astro);
 const page = await getPage('food');
 if (!page) return Astro.rewrite('/404');
 ---
-<MenuList menu="food" page={page} columns={[['hot-dogs', 'melts'], ['rolls-wraps-and-subs', 'mac-chili-and-sides'], ['drinks']]} />
+<MenuList menu="food" page={page} columns={3} />

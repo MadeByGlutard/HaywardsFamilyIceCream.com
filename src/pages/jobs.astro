@@ -2,7 +2,7 @@
 import { getEmDashCollection } from 'emdash';
 import { PortableText } from 'emdash/ui';
 import Base from '../layouts/Base.astro';
-import { getLocation, getPage, photoUrl, telephone } from '../lib/site';
+import { getLocation, getPage, photoUrl, telephone, pageSeo } from '../lib/site';
 import Photo from '../components/Photo.astro';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
@@ -17,7 +17,7 @@ const split = blocks.findIndex((block) => block.style === 'normal') + 1;
 const intro = blocks.slice(0, split);
 const rules = blocks.slice(split);
 ---
-<Base title={page.data.title} description={page.data.summary || page.data.excerpt || undefined} content={{ collection: 'site_pages', id: page.data.id, slug: 'jobs' }} image={photoUrl(photo)}>
+<Base {...pageSeo(page, { title: page.data.title, description: page.data.summary || page.data.excerpt, image: photoUrl(photo) })} content={{ collection: 'site_pages', id: page.data.id, slug: 'jobs' }}>
   <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1>{page.data.excerpt && <p {...page.edit.excerpt}>{page.data.excerpt}</p>}</section>
   {jobs.length > 0 && <section class="job-list wrap" aria-label="Positions">
     {jobs.map((job) => <article>

@@ -22,9 +22,9 @@ export interface ScheduleContext {
   /** The next tree lot, if one is scheduled after today. */
   nextTrees?: PeriodEntry;
   photoSet: 'stand' | 'trees';
-  /** Trees & wreaths in the navigation: while the lot is open, for six weeks before, and for five days after (to say it has closed). */
+  /** Trees & wreaths in the navigation: the period's "Show Trees & wreaths in the menu". */
   treesNav: boolean;
-  /** Show the product list: while the lot is open and in the month before. */
+  /** Show the list of trees: while the lot is open, and in any period that shows Trees & wreaths in the menu. */
   treesListed: boolean;
   /** The most recent tree lot, if it ended in the last two months. */
   endedTrees?: PeriodEntry;
@@ -88,7 +88,6 @@ async function build(Astro: AstroGlobal): Promise<ScheduleContext> {
     const end = lastDay(period, periods);
     return isTrees(period.data) && !!end && end < today && daysBetween(end, today) <= 60;
   }).at(-1);
-  const untilTrees = nextTrees ? daysBetween(today, nextTrees.start) : Infinity;
   // Closed just before the tree lot (Thanksgiving): its photos already.
   const treesNext = closed && !!nextTrees && periods[periods.indexOf(active) + 1] === nextTrees;
   return {
@@ -100,8 +99,8 @@ async function build(Astro: AstroGlobal): Promise<ScheduleContext> {
     closed,
     treesOpen,
     nextTrees,
-    treesNav: treesOpen || untilTrees <= 45 || (!!endedTrees && daysBetween(lastDay(endedTrees, periods)!, today) <= 5),
-    treesListed: treesOpen || untilTrees <= 30,
+    treesNav: !!active.data.trees_in_menu,
+    treesListed: treesOpen || !!active.data.trees_in_menu,
     endedTrees,
     photoSet: treesOpen || treesNext ? 'trees' : 'stand',
     preview: preview.period || preview.today ? `${preview.period ?? ''}${preview.today ? ` @ ${preview.today}` : ''}`.trim() : undefined,

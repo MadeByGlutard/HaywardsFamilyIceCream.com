@@ -12,10 +12,15 @@ import '@fontsource-variable/dm-sans';
 import '@fontsource-variable/newsreader/opsz-italic.css';
 import '@phosphor-icons/web/regular';
 import '../styles/theme.css';
-interface Props { title: string; strip?: boolean; description?: string; content?: { collection: string; id: string; slug?: string | null }; image?: string; }
-const { strip: showStripProp = true, title, description = 'Homemade ice cream at 383 Elm Street in Milford, New Hampshire. Explore the flavors, read our story, and plan your visit.', content, image = '/images/milford-stand.jpg' } = Astro.props;
+interface Props { title: string; strip?: boolean; description?: string; content?: { collection: string; id: string; slug?: string | null }; image?: string; /** From the SEO panel: "noindex, nofollow" hides the page from search engines. */ robots?: string; }
+const { strip: showStripProp = true, title, content, robots } = Astro.props;
 const [settings, menu, location, { entries: sitePages }] = await Promise.all([getSiteSettings(), getMenu('primary'), getLocation(), getEmDashCollection('site_pages', { limit: 100 })]);
 const place = location.data;
+// A page without its own description or share image uses the site's tagline and default share image (Settings).
+const description = Astro.props.description || settings.tagline || undefined;
+const image = Astro.props.image || (settings.seo?.defaultOgImage as any)?.url || undefined;
+// "Milford, NH 03055" in Store info, split for search engines.
+const [, town = place.locality, region, postalCode] = place.locality.match(/^(.+?),\s*([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$/) ?? [];
 const schedule = await getScheduleContext(Astro);
 const status = schedule.status;
 const preview = schedule.preview;
@@ -26,12 +31,12 @@ const siteTitle = settings.title || 'Hayward’s Family Ice Cream';
 const fullTitle = `${title} | ${siteTitle} · Milford, NH`;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const canonical = new URL(path, Astro.site).href;
-const page = createPublicPageContext({ Astro, kind: content ? 'content' : 'custom', pageType: 'website', title: fullTitle, description, canonical, image: new URL(image, Astro.site).href, content, siteName: siteTitle });
-const structured = { '@context':'https://schema.org', '@type':'IceCreamShop', name:siteTitle, url:Astro.site?.href, telephone:telephone(place.phone).slice(4), image:new URL('/images/milford-stand.jpg',Astro.site).href, address:{'@type':'PostalAddress',streetAddress:place.address,addressLocality:'Milford',addressRegion:'NH',postalCode:'03055',addressCountry:'US'}, sameAs:[place.facebook, place.instagram].filter(Boolean) };
+const page = createPublicPageContext({ Astro, kind: content ? 'content' : 'custom', pageType: 'website', title: fullTitle, description, canonical, image: image ? new URL(image, Astro.site).href : undefined, content, siteName: siteTitle, ...(robots ? { seo: { robots } } : {}) });
+const structured = { '@context':'https://schema.org', '@type':'IceCreamShop', name:siteTitle, url:Astro.site?.href, telephone:telephone(place.phone).slice(4), ...(image ? { image: new URL(image, Astro.site).href } : {}), address:{'@type':'PostalAddress',streetAddress:place.address,addressLocality:town,...(region ? { addressRegion: region } : {}),...(postalCode ? { postalCode } : {}),addressCountry:'US'}, sameAs:[place.facebook, place.instagram].filter(Boolean) };
 
 // Main navigation in Menus links to entries in Pages. Every one is in the footer; the top menu
 // (and the phone Menu) has only the pages ticked "Show in the top menu". Trees & wreaths shows
-// while the tree lot is open, for six weeks before, and for a few days after.
+// in the periods ticked "Show Trees & wreaths in the menu".
 const promoted = new Set(sitePages.filter((entry) => entry.data.top_menu).map((entry) => entry.id));
 const navItems = (menu?.items ?? [])
   .map((item) => ({ label: item.label, url: item.url === '/home' ? '/' : item.url, top: promoted.has(item.url.replace(/^\//, '').split('/')[0]) }))

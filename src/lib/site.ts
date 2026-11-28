@@ -1,4 +1,4 @@
-import { getEmDashCollection, getEmDashEntry, getSiteSettings } from 'emdash';
+import { getEmDashCollection, getEmDashEntry, getSeoMeta, getSiteSettings } from 'emdash';
 
 /** Social links are saved in Settings as a username; a full address works too. */
 const profile = (site: string, value: string | undefined) => {
@@ -33,20 +33,36 @@ export const telephone = (value: string) => `tel:+1${value.replace(/\D/g, '')}`;
 
 /**
  * The band a page ends on, from its "Band at the bottom" fields. A page without one, or whose band
- * links to an unpublished page, ends on the Hours & directions page's band instead.
+ * points at an unpublished page, ends on the Hours & directions page's band instead.
  */
 export async function endBand(page?: SitePage) {
   const { entries } = await getEmDashCollection('site_pages', { limit: 100 });
-  const published = new Set(entries.map((entry: any) => entry.id));
-  const usable = (entry: any) => {
-    const { band_headline: headline, band_button: label, band_link: url } = entry?.data ?? {};
-    if (!headline || !label || !url) return false;
-    const slug = url.match(/^\/([^/?#]*)/)?.[1];
-    return slug === undefined || slug === '' || published.has(slug);
+  // Published pages by their id, which is what the band's page picker stores.
+  const byId = new Map(entries.map((entry: any) => [entry.data.id, entry.id as string]));
+  const link = (entry: any) => {
+    const target = entry?.data?.band_page;
+    const id = typeof target === 'string' ? target : target?.id;
+    const slug = id && byId.get(id);
+    return slug === undefined ? undefined : slug === 'home' ? '/' : `/${slug}`;
   };
+  const usable = (entry: any) => !!(entry?.data?.band_headline && entry.data.band_button && link(entry));
   const visit = entries.find((entry: any) => entry.id === 'visit');
   const chosen: any = usable(page) ? page : usable(visit) ? visit : undefined;
-  return chosen && { headline: chosen.data.band_headline as string, label: chosen.data.band_button as string, url: chosen.data.band_link as string, edit: chosen.edit.band_headline };
+  return chosen && { headline: chosen.data.band_headline as string, label: chosen.data.band_button as string, url: link(chosen)!, edit: chosen.edit.band_headline };
+}
+
+/**
+ * Title, description, share image and "hide from search engines" from a page's SEO panel, with the
+ * page's own text where the panel is empty.
+ */
+export function pageSeo(entry: any, fallback: { title: string; description?: string | null; image?: string }) {
+  const meta = entry ? getSeoMeta(entry, { defaultTitle: fallback.title, defaultDescription: fallback.description ?? undefined }) : undefined;
+  return {
+    title: meta?.title || fallback.title,
+    description: meta?.description ?? fallback.description ?? undefined,
+    image: meta?.ogImage ?? fallback.image,
+    robots: meta?.robots ?? undefined,
+  };
 }
 
 /** A summary with its "{flavors}" placeholder (the number of ice cream flavors) filled in. */

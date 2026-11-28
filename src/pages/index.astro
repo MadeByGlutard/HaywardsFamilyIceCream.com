@@ -1,7 +1,7 @@
 ---
 import EndBand from '../components/EndBand.astro';
 import Base from '../layouts/Base.astro';
-import { endBand, fillSummary, getLocation, getPage, photoList, photoUrl } from '../lib/site';
+import { endBand, fillSummary, getLocation, getPage, photoList, photoUrl, pageSeo } from '../lib/site';
 import { menuCategories } from '../lib/catalog';
 import { getScheduleContext } from '../lib/schedule';
 import Photo from '../components/Photo.astro';
@@ -34,7 +34,7 @@ const treesDate = !closed && !schedule.treesOpen && schedule.treesNav && schedul
   : undefined;
 const primaryExternal = !!primary && /^https?:/.test(primary.url);
 ---
-<Base title="Homemade ice cream" description={page?.data.summary || undefined} content={page && { collection: 'site_pages', id: page.data.id, slug: 'home' }} image={photoUrl(photos[0])}>
+<Base {...pageSeo(page, { title: 'Homemade ice cream', description: page?.data.summary, image: photoUrl(photos[0]) })} content={page && { collection: 'site_pages', id: page.data.id, slug: 'home' }}>
   <section class="home-intro wrap">{!schedule.status.strip && page?.data.excerpt && <p class="eyebrow" {...page.edit.excerpt}>{page.data.excerpt}</p>}<h1 {...active.edit.hero_headline}>{headline.split('\n').map((line) => <><span class="line" set:html={withPlaceholders(line)} />{' '}</>)}</h1><p class="intro-deck" {...active.edit.hero_deck} set:html={withPlaceholders(deck)} />
     {primary && <div class="actions"><a class="button" href={primary.url}>{primary.label} <i class={`ph ${primaryExternal ? 'ph-arrow-up-right' : 'ph-arrow-right'}`} aria-hidden="true"></i></a></div>}</section>
   {treesDate && <section class="trees-line wrap"><h2><a href="/trees">Trees arrive {treesDate} <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2></section>}

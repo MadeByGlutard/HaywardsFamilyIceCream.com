@@ -27,7 +27,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 26;
+export const CONTENT_VERSION = 28;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -136,6 +136,9 @@ async function addMissing(db: any, options: OptionsRepository, origin?: string) 
   await footerOnlyPages(db);
   await copyFromTemplates(db);
   await importPhotos(db, origin);
+  await treesInMenu(db);
+  await bandPages(db, registry);
+  await siteDefaults(db);
   // EmDash's stock Categories and Tags, which are for blog posts.
   await sql`DELETE FROM _emdash_taxonomy_defs WHERE id IN ('taxdef_category', 'taxdef_tag')
     AND name NOT IN (SELECT name FROM taxonomies)`.execute(db);
@@ -288,7 +291,7 @@ async function footerOnlyPages(db: any) {
  * and the jobs page's "Want to work here?". Fields staff already filled in are left alone.
  */
 async function copyFromTemplates(db: any) {
-  const fields = ['excerpt', 'summary', 'band_headline', 'band_button', 'band_link', 'after_season'] as const;
+  const fields = ['excerpt', 'summary', 'band_headline', 'band_button', 'after_season'] as const;
   for (const page of (seed.content as any).site_pages ?? []) {
     for (const field of fields) {
       const value = page.data[field];
@@ -393,4 +396,51 @@ function jpegSize(bytes: Uint8Array) {
     i += 2 + length;
   }
   return undefined;
+}
+
+/**
+ * Trees & wreaths used to join the menu 45 days before the lot opened. Now each period says so
+ * itself: the tree lot, and the closed period just before it (Thanksgiving), start ticked.
+ */
+async function treesInMenu(db: any) {
+  const { rows } = await sql<{ id: string; kind: string; start_date: string | null; trees_in_menu: number | null }>`
+    SELECT id, kind, start_date, trees_in_menu FROM ec_schedule WHERE deleted_at IS NULL AND start_date IS NOT NULL ORDER BY start_date`.execute(db);
+  if (rows.some((row) => row.trees_in_menu !== null)) return;
+  for (const [i, row] of rows.entries()) {
+    const next = rows[i + 1];
+    const show = row.kind === 'Trees & wreaths' || (row.kind === 'Closed' && next?.kind === 'Trees & wreaths');
+    await sql`UPDATE ec_schedule SET trees_in_menu = ${show ? 1 : 0} WHERE id = ${row.id}`.execute(db);
+  }
+}
+
+/** The band's link was typed as an address; it's now a page picked from Pages, so it can't go stale. */
+async function bandPages(db: any, registry: SchemaRegistry) {
+  if (!(await registry.getField('site_pages', 'band_link'))) return;
+  const { rows } = await sql<{ id: string; slug: string; band_link: string | null; band_page: string | null }>`
+    SELECT id, slug, band_link, band_page FROM ec_site_pages`.execute(db);
+  for (const row of rows) {
+    if (!row.band_link || row.band_page) continue;
+    const slug = row.band_link.replace(/^\/|[?#].*$/g, '').split('/')[0] || 'home';
+    const target = rows.find((page) => page.slug === slug);
+    if (target) await sql`UPDATE ec_site_pages SET band_page = ${target.id} WHERE id = ${row.id}`.execute(db);
+  }
+  await registry.deleteField('site_pages', 'band_link');
+}
+
+/**
+ * Site-wide defaults in Settings: the tagline is the description of a page that has none, and the
+ * stand's photo is the share image of a page without its own.
+ */
+async function siteDefaults(db: any) {
+  const { rows } = await sql<{ name: string; value: string }>`SELECT name, value FROM options WHERE name IN ('site:tagline', 'emdash:site_tagline', 'site:seo')`.execute(db);
+  const has = (name: string) => rows.some((row) => row.name === name && row.value && row.value !== 'null' && row.value !== '""');
+  const seo = rows.find((row) => row.name === 'site:seo');
+  const ogSet = !!seo && /defaultOgImage/.test(seo.value);
+  const update: Record<string, unknown> = {};
+  if (!has('site:tagline') && !has('emdash:site_tagline') && (seed as any).settings?.tagline) update.tagline = (seed as any).settings.tagline;
+  if (!ogSet) {
+    const { rows: stand } = await sql<{ id: string }>`SELECT id FROM media WHERE filename = 'milford-stand.jpg' ORDER BY created_at LIMIT 1`.execute(db);
+    if (stand[0]) update.seo = { ...(seo ? JSON.parse(seo.value) : {}), defaultOgImage: { mediaId: stand[0].id, alt: 'The white Hayward’s stand on Elm Street in Milford' } };
+  }
+  if (Object.keys(update).length) await setSiteSettings(update as any, db);
 }

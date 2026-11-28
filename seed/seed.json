@@ -9,7 +9,7 @@
   "settings": {
     "title": "Hayward's Family Ice Cream",
     "timezone": "America/New_York",
-    "tagline": "Homemade ice cream in Milford, New Hampshire.",
+    "tagline": "Homemade ice cream at 383 Elm Street in Milford, New Hampshire. Explore the flavors, read our story, and plan your visit.",
     "social": {
       "facebook": "Haywardsofmilford",
       "instagram": "haywards_icecream"
@@ -89,6 +89,11 @@
           "options": {
             "rows": 2
           }
+        },
+        {
+          "slug": "trees_in_menu",
+          "label": "Show Trees & wreaths in the menu",
+          "type": "boolean"
         },
         {
           "slug": "photos",
@@ -428,9 +433,12 @@
           "type": "string"
         },
         {
-          "slug": "band_link",
-          "label": "Band at the bottom: link",
-          "type": "string"
+          "slug": "band_page",
+          "label": "Band at the bottom: page it links to",
+          "type": "reference",
+          "validation": {
+            "targetCollection": "site_pages"
+          }
         },
         {
           "slug": "after_season",
@@ -1886,7 +1894,8 @@
           "start_date": "2026-01-10T00:00:00-05:00",
           "status_text": "Open daily, 11am to 8pm",
           "hero_headline": "A Milford tradition.\nOne scoop at a time.",
-          "hero_deck": "Good ice cream. Good company. Right here on Elm Street."
+          "hero_deck": "Good ice cream. Good company. Right here on Elm Street.",
+          "trees_in_menu": false
         }
       },
       {
@@ -1900,7 +1909,8 @@
           "status_text": "Reopening Friday, Nov 27th at 11am",
           "banner_text": "We’re closed through Thanksgiving. Open again Friday, Nov 27 at 11am.",
           "hero_headline": "See you Friday\nwith the trees.",
-          "hero_deck": "Christmas trees, wreaths and kissing balls, plus ice cream at the window."
+          "hero_deck": "Christmas trees, wreaths and kissing balls, plus ice cream at the window.",
+          "trees_in_menu": true
         }
       },
       {
@@ -1914,7 +1924,8 @@
           "status_text": "Open daily from 11am",
           "banner_text": "Christmas trees, wreaths and kissing balls are on the lot.",
           "hero_headline": "Trees and wreaths\nare on the lot.",
-          "hero_deck": "Balsam and Fraser firs, wreaths and kissing balls. Food and ice cream at the window."
+          "hero_deck": "Balsam and Fraser firs, wreaths and kissing balls. Food and ice cream at the window.",
+          "trees_in_menu": true
         }
       },
       {
@@ -1928,7 +1939,8 @@
           "status_text": "Closed for a winter break",
           "banner_text": "We’re on winter break. We’ll post our reopening day on Facebook and Instagram.",
           "hero_headline": "See you soon,\nMilford.",
-          "hero_deck": "Thank you for another year on Elm Street."
+          "hero_deck": "Thank you for another year on Elm Street.",
+          "trees_in_menu": false
         }
       },
       {
@@ -1940,7 +1952,8 @@
           "kind": "Open",
           "status_text": "Open daily, 11am to 9pm",
           "hero_headline": "A Milford tradition.\nOne scoop at a time.",
-          "hero_deck": "Good ice cream. Good company. Right here on Elm Street."
+          "hero_deck": "Good ice cream. Good company. Right here on Elm Street.",
+          "trees_in_menu": false
         }
       }
     ],
@@ -2593,7 +2606,7 @@
           "top_menu": true,
           "band_headline": "Find us on Elm Street.",
           "band_button": "Hours & directions",
-          "band_link": "/visit"
+          "band_page": "$ref:page-visit"
         }
       },
       {
@@ -2625,7 +2638,7 @@
           "after_season": "The lot is closed for the year. Thank you, Milford. Trees and wreaths usually arrive Thanksgiving weekend.",
           "band_headline": "Come pick out your tree.",
           "band_button": "Hours & directions",
-          "band_link": "/visit"
+          "band_page": "$ref:page-visit"
         }
       },
       {
@@ -2755,7 +2768,7 @@
           "summary": "Homemade ice cream at 383 Elm Street in Milford, New Hampshire. Explore the flavors, read our story, and plan your visit.",
           "band_headline": "It started with\na milk cart.",
           "band_button": "Read our history",
-          "band_link": "/history"
+          "band_page": "$ref:page-history"
         }
       },
       {
