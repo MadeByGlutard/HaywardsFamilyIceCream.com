@@ -1,14 +1,15 @@
 ---
 import EndBand from '../components/EndBand.astro';
 import Base from '../layouts/Base.astro';
-import { getLocation, getPage } from '../lib/site';
+import { endBand, fillSummary, getLocation, getPage } from '../lib/site';
 import { menuCategories } from '../lib/catalog';
 import { getScheduleContext } from '../lib/schedule';
 import { photoSets } from '../lib/photos';
 import { withPlaceholders } from '../lib/text';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
-const [page, categories, location, history] = await Promise.all([getPage('home'), menuCategories('flavors'), getLocation(), getPage('history')]);
+const [page, categories, location, ...columns] = await Promise.all([getPage('home'), menuCategories('flavors'), getLocation(), getPage('flavors'), getPage('sundaes'), getPage('food')]);
+const band = await endBand(page);
 const iceCream = categories.find((category) => category.slug === 'ice-cream')?.flavors ?? [];
 const place = location.data;
 const schedule = await getScheduleContext(Astro);
@@ -30,19 +31,15 @@ const treesDate = !closed && !schedule.treesOpen && schedule.treesNav && schedul
   : undefined;
 const primaryExternal = !!primary && /^https?:/.test(primary.url);
 ---
-<Base title="Homemade ice cream" content={page && { collection: 'site_pages', id: page.data.id, slug: 'home' }} image={photos.home[0].src}>
-  <section class="home-intro wrap">{!schedule.status.strip && <p class="eyebrow">Homemade ice cream · Family owned</p>}<h1 {...active.edit.hero_headline}>{headline.split('\n').map((line) => <><span class="line" set:html={withPlaceholders(line)} />{' '}</>)}</h1><p class="intro-deck" {...active.edit.hero_deck} set:html={withPlaceholders(deck)} />
+<Base title="Homemade ice cream" description={page?.data.summary || undefined} content={page && { collection: 'site_pages', id: page.data.id, slug: 'home' }} image={photos.home[0].src}>
+  <section class="home-intro wrap">{!schedule.status.strip && page?.data.excerpt && <p class="eyebrow" {...page.edit.excerpt}>{page.data.excerpt}</p>}<h1 {...active.edit.hero_headline}>{headline.split('\n').map((line) => <><span class="line" set:html={withPlaceholders(line)} />{' '}</>)}</h1><p class="intro-deck" {...active.edit.hero_deck} set:html={withPlaceholders(deck)} />
     {primary && <div class="actions"><a class="button" href={primary.url}>{primary.label} <i class={`ph ${primaryExternal ? 'ph-arrow-up-right' : 'ph-arrow-right'}`} aria-hidden="true"></i></a></div>}</section>
   {treesDate && <section class="trees-line wrap"><h2><a href="/trees">Trees arrive {treesDate} <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2></section>}
   <section class="news-columns wrap" aria-label="The menu">
-    <article><h2><a href="/flavors">Flavors <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2><p>{iceCream.length} ice creams, plus frozen yogurt, sherbet, sorbet, vegan and no sugar added.</p></article>
-    <article><h2><a href="/sundaes">Sundaes &amp; frappes <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2><p>Frappes, floats and ice cream sodas. Sundaes, banana boats and twisters. Pints and quarts to take home.</p></article>
-    <article><h2><a href="/food">Food &amp; drinks <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2><p>Hot dogs and grilled cheese. Rolls, wraps and subs with lobster, chicken or tuna. Mac and cheese, chili and drinks.</p></article>
+    {columns.map((column) => column && <article><h2><a href={`/${column.id}`}>{column.data.title} <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2><p {...column.edit.summary}>{fillSummary(column.data.summary, { flavors: iceCream.length })}</p></article>)}
   </section>
   <div class={`photo-spread wrap photo-set-${schedule.photoSet}`}>
     {photos.home.map((photo, i) => <div class="crop"><img src={photo.src} alt={photo.alt} srcset={photo.srcset} sizes={i === 0 ? '(max-width: 740px) 100vw, 820px' : '(max-width: 740px) 1px, 620px'} width={photo.width} height={photo.height} style={photo.position ? `object-position: ${photo.position}` : undefined} loading={i === 0 ? undefined : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} /></div>)}
   </div>
-  {history
-    ? <EndBand headline={'It started with\na milk cart.'} label="Read our history" url="/history" />
-    : <EndBand headline="Find us on Elm Street." label="Hours & directions" url="/visit" />}
+  {band && <EndBand {...band} />}
 </Base>

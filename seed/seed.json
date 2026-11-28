@@ -285,6 +285,26 @@
           "label": "Town, state and ZIP",
           "type": "string",
           "required": true
+        },
+        {
+          "slug": "allergy_note",
+          "label": "Allergy note (menu pages)",
+          "type": "string"
+        },
+        {
+          "slug": "empty_note",
+          "label": "When a flavor list is empty",
+          "type": "string"
+        },
+        {
+          "slug": "not_found_headline",
+          "label": "Page not found: headline",
+          "type": "string"
+        },
+        {
+          "slug": "not_found_text",
+          "label": "Page not found: text",
+          "type": "string"
         }
       ]
     },
@@ -371,6 +391,40 @@
           "slug": "top_menu",
           "label": "Show in the top menu",
           "type": "boolean"
+        },
+        {
+          "slug": "summary",
+          "label": "Summary (home page and search engines)",
+          "type": "text",
+          "options": {
+            "rows": 2
+          }
+        },
+        {
+          "slug": "band_headline",
+          "label": "Band at the bottom: headline",
+          "type": "text",
+          "options": {
+            "rows": 2
+          }
+        },
+        {
+          "slug": "band_button",
+          "label": "Band at the bottom: button",
+          "type": "string"
+        },
+        {
+          "slug": "band_link",
+          "label": "Band at the bottom: link",
+          "type": "string"
+        },
+        {
+          "slug": "after_season",
+          "label": "Text after the season",
+          "type": "text",
+          "options": {
+            "rows": 2
+          }
         },
         {
           "slug": "content",
@@ -1861,7 +1915,11 @@
           "phone": "603-672-8383",
           "email": "haywardsofmilford@gmail.com",
           "address": "383 Elm Street",
-          "locality": "Milford, NH 03055"
+          "locality": "Milford, NH 03055",
+          "allergy_note": "Food allergies? Please talk with our team before ordering.",
+          "empty_note": "Changes often. Ask at the window.",
+          "not_found_headline": "This scoop got away.",
+          "not_found_text": "The page you’re looking for isn’t here."
         }
       }
     ],
@@ -2094,7 +2152,10 @@
         "data": {
           "title": "Hours & directions",
           "excerpt": "Look for the white stand with the curved roof and the red Hayward’s sign.",
-          "top_menu": true
+          "top_menu": true,
+          "band_headline": "Find us on Elm Street.",
+          "band_button": "Hours & directions",
+          "band_link": "/visit"
         }
       },
       {
@@ -2104,7 +2165,7 @@
         "data": {
           "title": "Trees & wreaths",
           "headline": "Christmas trees & wreaths",
-          "excerpt": "Balsam and Fraser firs, 24‑inch wreaths and kissing balls.",
+          "excerpt": "Trees and wreaths are at the stand each year from Thanksgiving weekend until just before Christmas.",
           "content": [
             {
               "_type": "block",
@@ -2121,7 +2182,12 @@
               ]
             }
           ],
-          "top_menu": true
+          "top_menu": true,
+          "summary": "Christmas trees, 24-inch wreaths and kissing balls at Hayward’s on Elm Street in Milford, from Thanksgiving weekend until just before Christmas.",
+          "after_season": "The lot is closed for the year. Thank you, Milford. Trees and wreaths usually arrive Thanksgiving weekend.",
+          "band_headline": "Come pick out your tree.",
+          "band_button": "Hours & directions",
+          "band_link": "/visit"
         }
       },
       {
@@ -2131,7 +2197,8 @@
         "data": {
           "title": "Food & drinks",
           "excerpt": "Not everything is on every day.",
-          "top_menu": true
+          "top_menu": true,
+          "summary": "Hot dogs and grilled cheese. Rolls, wraps and subs with lobster, chicken or tuna. Mac and cheese, chili and drinks."
         }
       },
       {
@@ -2141,7 +2208,8 @@
         "data": {
           "title": "Sundaes & frappes",
           "excerpt": "Not everything is on every day.",
-          "top_menu": true
+          "top_menu": true,
+          "summary": "Frappes, floats and ice cream sodas. Sundaes, banana boats and twisters. Pints and quarts to take home."
         }
       },
       {
@@ -2151,7 +2219,8 @@
         "data": {
           "title": "Flavors",
           "excerpt": "Flavors come and go.",
-          "top_menu": true
+          "top_menu": true,
+          "summary": "{flavors} ice creams, plus frozen yogurt, sherbet, sorbet, vegan and no sugar added."
         }
       },
       {
@@ -2162,6 +2231,34 @@
           "title": "Join our team",
           "excerpt": "Work for a family-owned stand on Elm Street: scoop ice cream, run the kitchen, or help out at the tree lot.",
           "content": [
+            {
+              "_type": "block",
+              "_key": "ja",
+              "style": "h2",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "jas",
+                  "text": "Want to work here?",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "jb",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "jbs",
+                  "text": "Call or email us, and tell us which job and when you can work.",
+                  "marks": []
+                }
+              ]
+            },
             {
               "_type": "block",
               "_key": "y0",
@@ -2205,7 +2302,8 @@
               ]
             }
           ],
-          "top_menu": false
+          "top_menu": false,
+          "summary": "Jobs at Hayward’s Family Ice Cream on 383 Elm Street in Milford, New Hampshire."
         }
       },
       {
@@ -2214,7 +2312,12 @@
         "status": "published",
         "data": {
           "title": "Home",
-          "top_menu": true
+          "top_menu": true,
+          "excerpt": "Homemade ice cream · Family owned",
+          "summary": "Homemade ice cream at 383 Elm Street in Milford, New Hampshire. Explore the flavors, read our story, and plan your visit.",
+          "band_headline": "It started with\na milk cart.",
+          "band_button": "Read our history",
+          "band_link": "/history"
         }
       },
       {

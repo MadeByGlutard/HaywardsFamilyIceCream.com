@@ -214,8 +214,15 @@ Anything staff can manage in the admin lives there, not in this repository:
   adds one when a page's slug changes.
 - **The sitemap** is EmDash's own (`/sitemap.xml`): published pages and posts, minus any marked
   "hide from search engines" in a page's SEO panel. `robots.txt` points to it.
-- **Menus** drop a page while it's unpublished, and the homepage ends on "Find us on Elm Street"
-  instead of the History band while History is unpublished.
+- **Page text** is in each page's fields, not the templates: the Summary (the homepage's menu
+  columns and the search-engine description; `{flavors}` is the number of ice cream flavors), the
+  band at the bottom (headline, button, link), the Jobs page's "Want to work here?" (its Text:
+  heading and first paragraph above the buttons, the rest below), and the Trees page's
+  Introduction (before the season) and Text after the season. A band that links to an
+  unpublished page, and the Trees page outside the season, use the Hours & directions page's band.
+- **Site-wide notes** are in Store info: the allergy note on the menu pages (its opening question
+  is bold), the line for an empty flavor list, and the page-not-found headline and text.
+- **Menus** drop a page while it's unpublished.
 
 ### Databases already set up
 

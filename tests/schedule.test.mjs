@@ -64,7 +64,8 @@ test('seed content invents no closing times, prices or dates', () => {
 });
 
 test('the forms stay short, with no prices', () => {
-	const most = { schedule: 7, catalog_flavors: 6, catalog_items: 3, catalog_categories: 3, store: 4, jobs: 3, site_pages: 5, posts: 5 };
+	// Store info and Pages also hold the text that used to be written into the templates (Nov 2026).
+	const most = { schedule: 7, catalog_flavors: 6, catalog_items: 3, catalog_categories: 3, store: 8, jobs: 3, site_pages: 10, posts: 5 };
 	assert.deepEqual(seed.collections.map((c) => c.slug), Object.keys(most));
 	for (const c of seed.collections) {
 		assert.ok(c.fields.length <= most[c.slug], `${c.slug} has ${c.fields.length} fields`);

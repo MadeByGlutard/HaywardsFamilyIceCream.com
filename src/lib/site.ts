@@ -1,4 +1,4 @@
-import { getEmDashEntry, getSiteSettings } from 'emdash';
+import { getEmDashCollection, getEmDashEntry, getSiteSettings } from 'emdash';
 
 /** Social links are saved in Settings as a username; a full address works too. */
 const profile = (site: string, value: string | undefined) => {
@@ -30,3 +30,25 @@ export async function getPage(slug: string) {
 }
 export type SitePage = NonNullable<Awaited<ReturnType<typeof getPage>>>;
 export const telephone = (value: string) => `tel:+1${value.replace(/\D/g, '')}`;
+
+/**
+ * The band a page ends on, from its "Band at the bottom" fields. A page without one, or whose band
+ * links to an unpublished page, ends on the Hours & directions page's band instead.
+ */
+export async function endBand(page?: SitePage) {
+  const { entries } = await getEmDashCollection('site_pages', { limit: 100 });
+  const published = new Set(entries.map((entry: any) => entry.id));
+  const usable = (entry: any) => {
+    const { band_headline: headline, band_button: label, band_link: url } = entry?.data ?? {};
+    if (!headline || !label || !url) return false;
+    const slug = url.match(/^\/([^/?#]*)/)?.[1];
+    return slug === undefined || slug === '' || published.has(slug);
+  };
+  const visit = entries.find((entry: any) => entry.id === 'visit');
+  const chosen: any = usable(page) ? page : usable(visit) ? visit : undefined;
+  return chosen && { headline: chosen.data.band_headline as string, label: chosen.data.band_button as string, url: chosen.data.band_link as string, edit: chosen.edit.band_headline };
+}
+
+/** A summary with its "{flavors}" placeholder (the number of ice cream flavors) filled in. */
+export const fillSummary = (text: string | undefined, counts: { flavors?: number } = {}) =>
+  (text ?? '').replace(/\{flavors\}/g, String(counts.flavors ?? ''));

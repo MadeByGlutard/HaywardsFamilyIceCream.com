@@ -4,7 +4,7 @@ import Base from '../layouts/Base.astro';
 import { photos } from '../lib/photos';
 import { getScheduleContext } from '../lib/schedule';
 import { menuCategories } from '../lib/catalog';
-import { getLocation, getPage, telephone } from '../lib/site';
+import { fillSummary, getLocation, getPage, telephone } from '../lib/site';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
 const [page, categories, location] = await Promise.all([getPage('flavors'), menuCategories('flavors'), getLocation()]);
@@ -19,7 +19,7 @@ const [main, ...rest] = categories.filter((category) => category !== sizes && ca
 const scoops = sizes?.items.filter((item) => !item.data.options) ?? [];
 const others = sizes?.items.filter((item) => item.data.options) ?? [];
 ---
-<Base title="Ice cream flavors" description="Hayward’s Milford ice cream flavors, frozen yogurt, sherbet, sorbet, vegan and no-sugar-added options, with sizes and cones.">
+<Base title="Ice cream flavors" description={fillSummary(page.data.summary, { flavors: main?.flavors.length }) || page.data.excerpt}>
   <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1><MenuNote lead={page.data.excerpt} edit={page.edit.excerpt} /></section>
   {!!sizes?.items.length && <div class="size-lines wrap">
     <p><strong>Sizes</strong> {scoops.map((item, i) => <>{i > 0 && ', '}<span {...item.edit.name}>{i > 0 ? item.data.name.toLowerCase() : item.data.name}</span></>)}.{others.map((item) => <>{' '}<span {...item.edit.name}>{item.data.name}</span>: <span {...item.edit.options}>{item.data.options!.toLowerCase()}</span>.</>)}</p>
@@ -41,7 +41,7 @@ const others = sizes?.items.filter((item) => item.data.options) ?? [];
         <div class="section-rule"><h2 {...category.edit.name}>{category.name}</h2></div>
         {category.flavors.length > 0
           ? <ul class="flavor-list" role="list">{category.flavors.map((flavor) => <li><span class="row-name" {...flavor.edit.name}>{flavor.data.name}</span>{flavor.data.description && <p {...flavor.edit.description}>{flavor.data.description}</p>}</li>)}</ul>
-          : <p>Changes often. Ask at the window.</p>}
+          : <p {...location.edit.empty_note}>{place.empty_note}</p>}
       </section>)}
       <figure class="menu-photo"><img src={photos.twoCups.src} alt={photos.twoCups.alt} srcset={photos.twoCups.srcset} sizes="(max-width: 740px) 100vw, 400px" width={photos.twoCups.width} height={photos.twoCups.height} style={`object-position: ${photos.twoCups.position}`} loading="lazy" /></figure>
     </div>

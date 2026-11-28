@@ -7,4 +7,4 @@ cacheContentPage(Astro);
 const page = await getPage('sundaes');
 if (!page) return Astro.rewrite('/404');
 ---
-<MenuList menu="sundaes" page={page} description="Sundaes, frappes, floats, twisters and take-home ice cream at Hayward’s in Milford, New Hampshire." photo={photos.toppedCups} columns={[['sundaes', 'shakes-and-floats'], ['twisters-and-treats', 'take-home']]} />
+<MenuList menu="sundaes" page={page} photo={photos.toppedCups} columns={[['sundaes', 'shakes-and-floats'], ['twisters-and-treats', 'take-home']]} />

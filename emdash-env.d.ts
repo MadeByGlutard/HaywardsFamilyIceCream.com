@@ -91,6 +91,10 @@ export interface Store {
   email?: string;
   address: string;
   locality: string;
+  allergy_note?: string;
+  empty_note?: string;
+  not_found_headline?: string;
+  not_found_text?: string;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -107,6 +111,11 @@ export interface SitePage {
   headline?: string;
   excerpt?: string;
   top_menu?: boolean;
+  summary?: string;
+  band_headline?: string;
+  band_button?: string;
+  band_link?: string;
+  after_season?: string;
   content?: PortableTextBlock[];
   createdAt: Date;
   updatedAt: Date;

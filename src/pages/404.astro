@@ -1,4 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getLocation } from '../lib/site';
+const { data: place, edit } = await getLocation();
 ---
-<Base title="Page not found"><section class="page-heading wrap error-page"><p class="eyebrow">404 · A wrong turn</p><h1>This scoop got away.</h1><p>The page you’re looking for isn’t here.</p><a class="button" href="/">Back to the home page <i class="ph ph-arrow-right" aria-hidden="true"></i></a></section></Base>
+<Base title="Page not found"><section class="page-heading wrap error-page"><p class="eyebrow">404 · A wrong turn</p><h1 {...edit.not_found_headline}>{place.not_found_headline}</h1><p {...edit.not_found_text}>{place.not_found_text}</p><a class="button" href="/">Back to the home page <i class="ph ph-arrow-right" aria-hidden="true"></i></a></section></Base>

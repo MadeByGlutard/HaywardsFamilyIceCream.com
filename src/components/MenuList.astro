@@ -6,8 +6,8 @@ import Base from '../layouts/Base.astro';
 import { menuCategories, type MenuName } from '../lib/catalog';
 import type { Photo } from '../lib/photos';
 import { getLocation, telephone, type SitePage } from '../lib/site';
-interface Props { menu: MenuName; page: SitePage; description: string; photo?: Photo; /** Category slugs per column, in reading order. A category staff add goes in the last one. */ columns: string[][] }
-const { menu, page, description, photo, columns } = Astro.props;
+interface Props { menu: MenuName; page: SitePage; photo?: Photo; /** Category slugs per column, in reading order. A category staff add goes in the last one. */ columns: string[][] }
+const { menu, page, photo, columns } = Astro.props;
 const [all, { data: place }] = await Promise.all([menuCategories(menu), getLocation()]);
 const categories = all.filter((category) => category.items.length > 0);
 const placed = columns.flat();
@@ -16,7 +16,7 @@ const inColumn = (slugs: string[], last: boolean) => [
   ...(last ? categories.filter((category) => !placed.includes(category.slug)) : []),
 ];
 ---
-<Base title={page.data.title} description={description}>
+<Base title={page.data.title} description={page.data.summary || page.data.excerpt}>
   <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1><MenuNote lead={page.data.excerpt} edit={page.edit.excerpt} /></section>
   <div class={`menu-groups wrap${photo ? ' has-photo' : ''}`}>
     {columns.map((slugs, i) => <div class="menu-col"><MenuGroups categories={inColumn(slugs, i === columns.length - 1)} /></div>)}

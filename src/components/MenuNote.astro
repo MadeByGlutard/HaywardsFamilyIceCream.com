@@ -1,6 +1,11 @@
 ---
-/** The one note under every menu heading: what's on changes, and who to ask about allergies. */
+/** The one note under every menu heading: what's on changes, and the allergy note from Store info. */
+import { getLocation } from '../lib/site';
 interface Props { lead?: string; edit?: Record<string, string> }
 const { lead, edit } = Astro.props;
+const location = await getLocation();
+const note: string = location.data.allergy_note ?? '';
+// "Food allergies? Please talk…": the question up front is bold.
+const [, question, rest] = note.match(/^([^?]*\?)(.*)$/s) ?? [, '', note];
 ---
-<p>{lead && <span {...edit}>{lead}</span>} <strong>Food allergies?</strong> Please talk with our team before ordering.</p>
+<p>{lead && <span {...edit}>{lead}</span>} {note && <span {...location.edit.allergy_note}>{question && <strong>{question}</strong>}{rest}</span>}</p>

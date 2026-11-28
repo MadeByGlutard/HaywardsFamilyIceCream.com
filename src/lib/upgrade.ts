@@ -25,7 +25,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 24;
+export const CONTENT_VERSION = 25;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -132,6 +132,7 @@ async function addMissing(db: any, options: OptionsRepository) {
   await splitFirstPost(db);
   await historyEnding(db);
   await footerOnlyPages(db);
+  await copyFromTemplates(db);
   // EmDash's stock Categories and Tags, which are for blog posts.
   await sql`DELETE FROM _emdash_taxonomy_defs WHERE id IN ('taxdef_category', 'taxdef_tag')
     AND name NOT IN (SELECT name FROM taxonomies)`.execute(db);
@@ -276,4 +277,33 @@ async function footerOnlyPages(db: any) {
     await sql`INSERT INTO _emdash_menu_items (id, menu_id, parent_id, sort_order, type, reference_collection, reference_id, label, created_at, locale, translation_group)
       VALUES (${id}, ${menu}, NULL, ${order}, 'collection', 'site_pages', ${rows[0].id}, ${label}, ${new Date().toISOString()}, 'en', ${id})`.execute(db);
   }
+}
+
+/**
+ * Text that used to be written into the page templates (Nov 2026) moves to fields staff can edit:
+ * pages' summaries, end bands and the trees page's off-season text, the store's site-wide notes,
+ * and the jobs page's "Want to work here?". Fields staff already filled in are left alone.
+ */
+async function copyFromTemplates(db: any) {
+  const fields = ['excerpt', 'summary', 'band_headline', 'band_button', 'band_link', 'after_season'] as const;
+  for (const page of (seed.content as any).site_pages ?? []) {
+    for (const field of fields) {
+      const value = page.data[field];
+      if (typeof value !== 'string') continue;
+      await sql`UPDATE ec_site_pages SET ${sql.ref(field)} = ${value} WHERE slug = ${page.slug} AND (${sql.ref(field)} IS NULL OR ${sql.ref(field)} = '')`.execute(db);
+    }
+  }
+  // The trees page's old introduction was shown nowhere; the before-the-season text takes its place.
+  const trees = (seed.content as any).site_pages.find((page: any) => page.slug === 'trees');
+  await sql`UPDATE ec_site_pages SET excerpt = ${trees.data.excerpt} WHERE slug = 'trees' AND excerpt = 'Balsam and Fraser firs, 24‑inch wreaths and kissing balls.'`.execute(db);
+  const store = (seed.content as any).store[0].data;
+  for (const field of ['allergy_note', 'empty_note', 'not_found_headline', 'not_found_text']) {
+    await sql`UPDATE ec_store SET ${sql.ref(field)} = ${store[field]} WHERE ${sql.ref(field)} IS NULL OR ${sql.ref(field)} = ''`.execute(db);
+  }
+  const jobs = (seed.content as any).site_pages.find((page: any) => page.slug === 'jobs');
+  const intro = jobs.data.content.slice(0, 2);
+  const { rows } = await sql<{ content: string | null }>`SELECT content FROM ec_site_pages WHERE slug = 'jobs'`.execute(db);
+  if (!rows[0] || rows[0].content?.includes('Want to work here?')) return;
+  const content = [...intro, ...JSON.parse(rows[0].content || '[]')];
+  await sql`UPDATE ec_site_pages SET content = ${JSON.stringify(content)} WHERE slug = 'jobs'`.execute(db);
 }
