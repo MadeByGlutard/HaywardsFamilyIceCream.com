@@ -8,7 +8,7 @@ import { photoSets } from '../lib/photos';
 import { withPlaceholders } from '../lib/text';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
-const [page, categories, location] = await Promise.all([getPage('home'), menuCategories('flavors'), getLocation()]);
+const [page, categories, location, history] = await Promise.all([getPage('home'), menuCategories('flavors'), getLocation(), getPage('history')]);
 const iceCream = categories.find((category) => category.slug === 'ice-cream')?.flavors ?? [];
 const place = location.data;
 const schedule = await getScheduleContext(Astro);
@@ -42,5 +42,7 @@ const primaryExternal = !!primary && /^https?:/.test(primary.url);
   <div class={`photo-spread wrap photo-set-${schedule.photoSet}`}>
     {photos.home.map((photo, i) => <div class="crop"><img src={photo.src} alt={photo.alt} srcset={photo.srcset} sizes={i === 0 ? '(max-width: 740px) 100vw, 820px' : '(max-width: 740px) 1px, 620px'} width={photo.width} height={photo.height} style={photo.position ? `object-position: ${photo.position}` : undefined} loading={i === 0 ? undefined : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} /></div>)}
   </div>
-  <EndBand headline={'It started with\na milk cart.'} label="Read our history" url="/history" />
+  {history
+    ? <EndBand headline={'It started with\na milk cart.'} label="Read our history" url="/history" />
+    : <EndBand headline="Find us on Elm Street." label="Hours & directions" url="/visit" />}
 </Base>

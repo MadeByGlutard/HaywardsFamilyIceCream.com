@@ -5,7 +5,8 @@
  * seed would never reach production or a preview copied from it. This runs EmDash's
  * own seed code once per CONTENT_VERSION. It adds:
  *   - new collections, and new fields on existing ones;
- *   - the starting entries of collections the database did not have before.
+ *   - the starting entries of collections the database did not have before;
+ *   - the seed's redirects that the database does not have yet (staff's own are kept).
  * The port's flavors and categories become linked records, its banner goes to the current
  * schedule period and its social links to Settings. Replaced collections are then hidden from the
  * admin but kept, so going back loses nothing.
@@ -24,7 +25,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 23;
+export const CONTENT_VERSION = 24;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -105,6 +106,12 @@ async function addMissing(db: any, options: OptionsRepository) {
     for (const field of collection.fields)
       if (!(await registry.getField(collection.slug, field.slug))) await registry.createField(collection.slug, { ...field, required: false } as any);
   }
+  // Pages and posts gained SEO settings, which also put them in EmDash's sitemap.
+  for (const collection of file.collections ?? [])
+    if (had.has(collection.slug) && collection.supports?.includes('seo')) {
+      const current = await registry.getCollection(collection.slug);
+      if (!current?.supports?.includes('seo')) await registry.updateCollection(collection.slug, { supports: [...(current?.supports ?? []), 'seo'], hasSeo: true });
+    }
   // A field added later lands last; Pages keep the seed's order, with the text (any length) last.
   await registry.reorderFields('site_pages', (file.collections ?? []).find((c) => c.slug === 'site_pages')!.fields.map((f) => f.slug));
   // EmDash replaces the items of a menu it finds in the seed; staff's menus stay theirs.

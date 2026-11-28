@@ -205,6 +205,18 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages: all of 
 `content/flavors.json` and `content/settings/settings.yaml` are the original data from
 `main`. They are kept only so `tests/migration.test.mjs` can prove the seed matches them.
 
+### Managed in EmDash, not in code
+
+Anything staff can manage in the admin lives there, not in this repository:
+
+- **Redirects** are under Redirects in the admin. The seed starts them with `/home` → `/` (the
+  Home page's own address) and Gatsby's sitemap addresses (`/sitemap-index.xml`, `/sitemap-0.xml`)
+  → `/sitemap.xml`. EmDash also adds one when a page's slug changes.
+- **The sitemap** is EmDash's own (`/sitemap.xml`): published pages and posts, minus any marked
+  "hide from search engines" in a page's SEO panel. `robots.txt` points to it.
+- **Menus** drop a page while it's unpublished, and the homepage ends on "Find us on Elm Street"
+  instead of the History band while History is unpublished.
+
 ### Databases already set up
 
 EmDash applies the seed during setup only, so `src/lib/upgrade.ts` adds what a database is
@@ -281,6 +293,8 @@ the domains to the Pages project.
    - Publish a banner change in the admin and see it at once (purge on publish).
    - `/login` works with a password; `/admin` asks for it.
    - The cron trigger runs (Worker logs, every minute).
+   - In Google Search Console, submit `https://haywardsfamilyicecream.com/sitemap.xml` (Gatsby's
+     `/sitemap-index.xml` now redirects there).
 7. **Afterwards:** rotate the Google Maps key that `main` committed, and delete the port's
    hidden collections once going back is off the table (Databases already set up).
 

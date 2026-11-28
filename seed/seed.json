@@ -337,7 +337,8 @@
       "icon": "file",
       "supports": [
         "drafts",
-        "revisions"
+        "revisions",
+        "seo"
       ],
       "routable": true,
       "hasSeo": false,
@@ -387,7 +388,8 @@
       "icon": "newspaper",
       "supports": [
         "drafts",
-        "revisions"
+        "revisions",
+        "seo"
       ],
       "routable": true,
       "hasSeo": false,
@@ -2703,6 +2705,23 @@
           "label": "Extras"
         }
       ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "type": 301
+    },
+    {
+      "source": "/sitemap-index.xml",
+      "destination": "/sitemap.xml",
+      "type": 301
+    },
+    {
+      "source": "/sitemap-0.xml",
+      "destination": "/sitemap.xml",
+      "type": 301
     }
   ],
   "relations": [
