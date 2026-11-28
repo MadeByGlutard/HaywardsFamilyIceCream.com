@@ -209,9 +209,9 @@ EmDash's own Menus hold the navigation (`primary`, which links to Pages: all of 
 
 Anything staff can manage in the admin lives there, not in this repository:
 
-- **Redirects** are under Redirects in the admin. The seed starts them with `/home` → `/` (the
-  Home page's own address) and Gatsby's sitemap addresses (`/sitemap-index.xml`, `/sitemap-0.xml`)
-  → `/sitemap.xml`. EmDash also adds one when a page's slug changes.
+- **Redirects** are under Redirects in the admin. The seed starts them with `/home` → `/`: EmDash
+  gives the Home page the address `/home`, which its View link and the sitemap use. EmDash also
+  adds one when a page's slug changes.
 - **The sitemap** is EmDash's own (`/sitemap.xml`): published pages and posts, minus any marked
   "hide from search engines" in a page's SEO panel. `robots.txt` points to it.
 - **Menus** drop a page while it's unpublished, and the homepage ends on "Find us on Elm Street"
@@ -293,8 +293,8 @@ the domains to the Pages project.
    - Publish a banner change in the admin and see it at once (purge on publish).
    - `/login` works with a password; `/admin` asks for it.
    - The cron trigger runs (Worker logs, every minute).
-   - In Google Search Console, submit `https://haywardsfamilyicecream.com/sitemap.xml` (Gatsby's
-     `/sitemap-index.xml` now redirects there).
+   - In Google Search Console, submit `https://haywardsfamilyicecream.com/sitemap.xml` in place of
+     Gatsby's `/sitemap-index.xml`.
 7. **Afterwards:** rotate the Google Maps key that `main` committed, and delete the port's
    hidden collections once going back is off the table (Databases already set up).
 

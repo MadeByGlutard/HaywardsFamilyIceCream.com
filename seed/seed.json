@@ -2712,16 +2712,6 @@
       "source": "/home",
       "destination": "/",
       "type": 301
-    },
-    {
-      "source": "/sitemap-index.xml",
-      "destination": "/sitemap.xml",
-      "type": 301
-    },
-    {
-      "source": "/sitemap-0.xml",
-      "destination": "/sitemap.xml",
-      "type": 301
     }
   ],
   "relations": [
