@@ -27,7 +27,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 28;
+export const CONTENT_VERSION = 29;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -139,6 +139,7 @@ async function addMissing(db: any, options: OptionsRepository, origin?: string) 
   await treesInMenu(db);
   await bandPages(db, registry);
   await siteDefaults(db);
+  await periodMenus(db, registry);
   // EmDash's stock Categories and Tags, which are for blog posts.
   await sql`DELETE FROM _emdash_taxonomy_defs WHERE id IN ('taxdef_category', 'taxdef_tag')
     AND name NOT IN (SELECT name FROM taxonomies)`.execute(db);
@@ -425,6 +426,28 @@ async function bandPages(db: any, registry: SchemaRegistry) {
     if (target) await sql`UPDATE ec_site_pages SET band_page = ${target.id} WHERE id = ${row.id}`.execute(db);
   }
   await registry.deleteField('site_pages', 'band_link');
+}
+
+/**
+ * Each period picks its food menu (the tree lot starts on Winter), and the Flavors page's one-line
+ * categories are ticked instead of being picked out by address. Runs once, while nothing is set.
+ */
+async function periodMenus(db: any, registry: SchemaRegistry) {
+  // The seed can't point a new menu at categories that already exist, so the winter menu arrives
+  // with empty links: copy them from the summer menu, item by item.
+  await sql`UPDATE _emdash_menu_items AS w SET
+      type = 'collection', reference_collection = 'catalog_categories',
+      reference_id = (SELECT s.reference_id FROM _emdash_menu_items s JOIN _emdash_menus m ON m.id = s.menu_id
+        WHERE m.name = 'food' AND s.label = w.label AND s.reference_id IS NOT NULL LIMIT 1)
+    WHERE w.menu_id IN (SELECT id FROM _emdash_menus WHERE name = 'food-winter') AND w.reference_id IS NULL`.execute(db);
+  if (await registry.getField('schedule', 'food_menu')) {
+    const { rows } = await sql<{ n: number }>`SELECT COUNT(*) AS n FROM ec_schedule WHERE food_menu IS NOT NULL`.execute(db);
+    if (!Number(rows[0]?.n)) await sql`UPDATE ec_schedule SET food_menu = CASE WHEN kind = 'Trees & wreaths' THEN 'Winter' ELSE 'Summer' END`.execute(db);
+  }
+  if (await registry.getField('catalog_categories', 'one_line')) {
+    const { rows } = await sql<{ n: number }>`SELECT COUNT(*) AS n FROM ec_catalog_categories WHERE one_line IS NOT NULL`.execute(db);
+    if (!Number(rows[0]?.n)) await sql`UPDATE ec_catalog_categories SET one_line = CASE WHEN slug = 'sizes' THEN 1 ELSE 0 END`.execute(db);
+  }
 }
 
 /**

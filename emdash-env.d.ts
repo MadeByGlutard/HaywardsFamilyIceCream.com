@@ -18,6 +18,7 @@ export interface Schedule {
   banner_text?: string;
   photos?: { "image"?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; caption?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; focalX?: number; focalY?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } } | null }[];
   trees_in_menu?: boolean;
+  food_menu?: "Summer" | "Winter";
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -62,6 +63,7 @@ export interface CatalogCategory {
   slug: string | null;
   status: string;
   name: string;
+  one_line?: boolean;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;

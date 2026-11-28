@@ -10,7 +10,8 @@ import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
 const [page, categories, location, ...columns] = await Promise.all([getPage('home'), menuCategories('flavors'), getLocation(), getPage('flavors'), getPage('sundaes'), getPage('food')]);
 const band = await endBand(page);
-const iceCream = categories.find((category) => category.slug === 'ice-cream')?.flavors ?? [];
+// The Flavors menu's first category of flavors (ice cream) gives the count in its summary.
+const iceCream = categories.find((category) => category.flavors.length)?.flavors ?? [];
 const place = location.data;
 const schedule = await getScheduleContext(Astro);
 const active = schedule.active;

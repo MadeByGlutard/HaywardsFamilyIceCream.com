@@ -3,17 +3,19 @@ import { categoryLinks } from './catalog-links';
 import { byName, sharedOptions } from './catalog-text';
 
 /** EmDash menus of categories, beside the site's navigation (`primary`). */
-export type MenuName = 'flavors' | 'sundaes' | 'food' | 'trees';
+export type MenuName = 'flavors' | 'sundaes' | 'food' | 'food-winter' | 'trees';
 
 /** One menu's categories, in order, each with its flavors and menu items. */
 export async function menuCategories(name: MenuName) {
-  const [menu, { entries: categories }, { entries: flavors }, { entries: items }, links] = await Promise.all([
+  const [found, { entries: categories }, { entries: flavors }, { entries: items }, links] = await Promise.all([
     getMenu(name),
     getEmDashCollection('catalog_categories', { limit: 100 }),
     getEmDashCollection('catalog_flavors', { limit: 500 }),
     getEmDashCollection('catalog_items', { limit: 500 }),
     categoryLinks(),
   ]);
+  // The winter food menu stands in for the summer one only once someone has filled it in.
+  const menu = !found?.items.length && name === 'food-winter' ? await getMenu('food') : found;
   // A menu item links to its category, so the address ends in the category's slug.
   const slugs = (menu?.items ?? []).map((item) => item.url.replace(/\/+$/, '').split('/').at(-1));
   return slugs
@@ -24,6 +26,8 @@ export async function menuCategories(name: MenuName) {
       return {
         slug: category.id,
         name: category.data.name,
+        /** Ticked “Show as one line at the top of the page” (sizes). */
+        oneLine: !!category.data.one_line,
         edit: category.edit,
         flavors: byName(flavors.filter((flavor) => order.has(flavor.data.id))),
         items: own,

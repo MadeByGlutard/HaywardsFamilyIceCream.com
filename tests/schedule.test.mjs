@@ -33,7 +33,7 @@ test('a period is complete: nothing else supplies its hours or headline', () => 
 	const fields = seed.collections.find((c) => c.slug === 'schedule').fields;
 	const required = fields.filter((f) => f.required).map((f) => f.slug);
 	// Optional: the banner, the Trees & wreaths menu tick, and photos (without them the home page shows the Home page's own).
-	assert.deepEqual(fields.filter((f) => !f.required).map((f) => f.slug), ['banner_text', 'trees_in_menu', 'photos']);
+	assert.deepEqual(fields.filter((f) => !f.required).map((f) => f.slug), ['banner_text', 'trees_in_menu', 'food_menu', 'photos']);
 	for (const p of seed.content.schedule) for (const slug of required) assert.ok(p.data[slug] || (p.status === 'draft' && slug === 'start_date'), `${p.slug}.${slug}`);
 	assert.ok(!seed.collections.find((c) => c.slug === 'store').fields.some((f) => /hours|banner/.test(f.slug)));
 	assert.ok(!seed.content.site_pages.find((p) => p.slug === 'home').data.headline);
@@ -66,7 +66,7 @@ test('seed content invents no closing times, prices or dates', () => {
 
 test('the forms stay short, with no prices', () => {
 	// Store info, Pages and periods also hold the text and photos that used to be in the templates (Nov 2026).
-	const most = { schedule: 9, catalog_flavors: 6, catalog_items: 3, catalog_categories: 3, store: 8, jobs: 3, site_pages: 13, posts: 5 };
+	const most = { schedule: 10, catalog_flavors: 6, catalog_items: 3, catalog_categories: 4, store: 8, jobs: 3, site_pages: 13, posts: 5 };
 	assert.deepEqual(seed.collections.map((c) => c.slug), Object.keys(most));
 	for (const c of seed.collections) {
 		assert.ok(c.fields.length <= most[c.slug], `${c.slug} has ${c.fields.length} fields`);
@@ -83,11 +83,15 @@ test('every flavor and menu item is in a category, and categories are on a menu'
 	const ids = new Set(seed.content.catalog_categories.map((c) => `$ref:${c.id}`));
 	for (const entry of [...seed.content.catalog_flavors, ...seed.content.catalog_items]) assert.ok(ids.has(entry.data.category), entry.slug);
 	for (const collection of ['catalog_flavors', 'catalog_items']) assert.ok(seed.collections.find((c) => c.slug === collection).fields.find((f) => f.slug === 'category').required);
-	const onMenus = seed.menus.filter((menu) => menu.name !== 'primary').flatMap((menu) => menu.items.map((item) => item.ref));
+	// The winter food menu starts as a copy of the summer one.
+	const refs = (name) => seed.menus.find((menu) => menu.name === name).items.map((item) => item.ref);
+	assert.deepEqual(refs('food-winter'), refs('food'));
+	const onMenus = seed.menus.filter((menu) => !['primary', 'food-winter'].includes(menu.name)).flatMap((menu) => menu.items.map((item) => item.ref));
 	assert.deepEqual([...onMenus].sort(), seed.content.catalog_categories.map((c) => c.id).sort(), 'each category is on one menu');
-	for (const page of ['food', 'sundaes']) {
+	// No page picks out a category by its address; settings in EmDash decide.
+	for (const page of ['index', 'flavors', 'food', 'sundaes']) {
 		const source = await readFile(new URL(`../src/pages/${page}.astro`, import.meta.url), 'utf8');
-		for (const [, slug] of source.match(/columns=\{(.*)\}/)[1].matchAll(/'([^']+)'/g)) assert.ok(seed.content.catalog_categories.some((c) => c.slug === slug), slug);
+		assert.ok(!/slug === '/.test(source), page);
 	}
 	const squareIds = JSON.parse(await readFile(new URL('../seed/square-ids.json', import.meta.url), 'utf8'));
 	assert.equal(Object.keys(squareIds).length, 51);

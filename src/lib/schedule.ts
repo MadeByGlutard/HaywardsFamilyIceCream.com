@@ -26,6 +26,8 @@ export interface ScheduleContext {
   treesNav: boolean;
   /** Show the list of trees: while the lot is open, and in any period that shows Trees & wreaths in the menu. */
   treesListed: boolean;
+  /** The food menu the period picked: Summer is `food`, Winter is `food-winter` (both under Menus). */
+  foodMenu: 'food' | 'food-winter';
   /** The most recent tree lot, if it ended in the last two months. */
   endedTrees?: PeriodEntry;
   /** Set when a design-review preview (`?period=` / `?today=`) is in effect. */
@@ -102,6 +104,7 @@ async function build(Astro: AstroGlobal): Promise<ScheduleContext> {
     treesNav: !!active.data.trees_in_menu,
     treesListed: treesOpen || !!active.data.trees_in_menu,
     endedTrees,
+    foodMenu: active.data.food_menu === 'Winter' ? 'food-winter' : 'food',
     photoSet: treesOpen || treesNext ? 'trees' : 'stand',
     preview: preview.period || preview.today ? `${preview.period ?? ''}${preview.today ? ` @ ${preview.today}` : ''}`.trim() : undefined,
   };

@@ -1,9 +1,10 @@
 ---
 import MenuList from '../components/MenuList.astro';
 import { getPage } from '../lib/site';
+import { getScheduleContext } from '../lib/schedule';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
-const page = await getPage('food');
+const [page, { foodMenu }] = await Promise.all([getPage('food'), getScheduleContext(Astro)]);
 if (!page) return Astro.rewrite('/404');
 ---
-<MenuList menu="food" page={page} columns={3} />
+<MenuList menu={foodMenu} page={page} columns={3} />

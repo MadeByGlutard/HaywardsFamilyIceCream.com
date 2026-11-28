@@ -236,6 +236,13 @@ Anything staff can manage in the admin lives there, not in this repository:
   "Show Trees & wreaths in the menu": the tree lot and the Thanksgiving closure before it.
 - **Food and Sundaes columns** follow the order in Menus, split into columns of about equal length.
 - **Menus** drop a page while it's unpublished.
+- **The food menu** is picked by each schedule period's Food menu: Summer shows the "Food & drinks"
+  menu and Winter shows "Food & drinks in winter" (the tree lot starts on Winter). The winter menu
+  starts as a copy of the summer one; until it has anything in it, Winter shows the summer menu.
+- **The Flavors page** lays out its categories from settings, not their names: a category ticked
+  "Show as one line at the top of the page" (Sizes) runs as a sentence under the heading; other
+  categories of menu items (cones, toppings) sit under the first flavor category; the remaining
+  flavor categories go down the side. The homepage's flavor count is the first flavor category's.
 
 ### Databases already set up
 

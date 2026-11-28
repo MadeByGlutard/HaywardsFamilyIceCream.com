@@ -11,18 +11,22 @@ const [page, categories, location] = await Promise.all([getPage('flavors'), menu
 if (!page) return Astro.rewrite('/404');
 const place = location.data;
 const { closed } = await getScheduleContext(Astro);
-// Sizes and cones are menu items; every other category here is flavors, the first in the wide column.
-const sizes = categories.find((category) => category.slug === 'sizes');
-const cones = categories.find((category) => category.slug === 'cones-and-toppings');
-const [main, ...rest] = categories.filter((category) => category !== sizes && category !== cones);
-// Scoop sizes read as one line; anything with its own sizes (soft serve) follows.
-const scoops = sizes?.items.filter((item) => !item.data.options) ?? [];
-const others = sizes?.items.filter((item) => item.data.options) ?? [];
+// Categories ticked "one line" (sizes) run as sentences under the heading. Other categories of menu
+// items (cones, toppings) sit under the first flavor category, in the wide column; the rest of the
+// flavor categories go down the side.
+const lines = categories.filter((category) => category.oneLine && category.items.length);
+const extras = categories.filter((category) => !category.oneLine && category.items.length && !category.flavors.length);
+const [main, ...rest] = categories.filter((category) => !category.oneLine && !extras.includes(category));
 ---
 <Base {...pageSeo(page, { title: 'Ice cream flavors', description: fillSummary(page.data.summary, { flavors: main?.flavors.length }) || page.data.excerpt, image: photoUrl(page.data.photo) })} content={{ collection: 'site_pages', id: page.data.id, slug: 'flavors' }}>
   <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1><MenuNote lead={page.data.excerpt} edit={page.edit.excerpt} /></section>
-  {!!sizes?.items.length && <div class="size-lines wrap">
-    <p><strong>Sizes</strong> {scoops.map((item, i) => <>{i > 0 && ', '}<span {...item.edit.name}>{i > 0 ? item.data.name.toLowerCase() : item.data.name}</span></>)}.{others.map((item) => <>{' '}<span {...item.edit.name}>{item.data.name}</span>: <span {...item.edit.options}>{item.data.options!.toLowerCase()}</span>.</>)}</p>
+  {lines.length > 0 && <div class="size-lines wrap">
+    {lines.map((category) => {
+      // Plain items read as one list; anything with its own options (soft serve) follows.
+      const plain = category.items.filter((item) => !item.data.options);
+      const own = category.items.filter((item) => item.data.options);
+      return <p><strong {...category.edit.name}>{category.name}</strong> {plain.map((item, i) => <>{i > 0 && ', '}<span {...item.edit.name}>{i > 0 ? item.data.name.toLowerCase() : item.data.name}</span></>)}{plain.length > 0 && '.'}{own.map((item) => <>{' '}<span {...item.edit.name}>{item.data.name}</span>: <span {...item.edit.options}>{item.data.options!.toLowerCase()}</span>.</>)}</p>;
+    })}
     <p class="size-links">{!closed && <a href={telephone(place.phone)}>Ask about sizes: {place.phone}</a>}<a href="/sundaes">Frappes and sundaes</a></p>
   </div>}
   <div class="menu-layout wrap">
@@ -31,7 +35,7 @@ const others = sizes?.items.filter((item) => item.data.options) ?? [];
         <div class="section-rule"><h2 {...main.edit.name}>{main.name}</h2></div>
         <ul class="flavor-list" role="list">{main.flavors.map((flavor) => <li><span class="row-name" {...flavor.edit.name}>{flavor.data.name}</span>{flavor.data.description && <p {...flavor.edit.description}>{flavor.data.description}</p>}</li>)}</ul>
       </section>}
-      <div class="flavor-extra">{cones?.items.map((item) => <section>
+      <div class="flavor-extra">{extras.flatMap((category) => category.items).map((item) => <section>
         <div class="section-rule"><h2 {...item.edit.name}>{item.data.name}</h2></div>
         <p {...item.edit.options}>{item.data.options}</p>
       </section>)}</div>
