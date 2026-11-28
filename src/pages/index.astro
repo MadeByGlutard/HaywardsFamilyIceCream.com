@@ -1,10 +1,10 @@
 ---
 import EndBand from '../components/EndBand.astro';
 import Base from '../layouts/Base.astro';
-import { endBand, fillSummary, getLocation, getPage } from '../lib/site';
+import { endBand, fillSummary, getLocation, getPage, photoList, photoUrl } from '../lib/site';
 import { menuCategories } from '../lib/catalog';
 import { getScheduleContext } from '../lib/schedule';
-import { photoSets } from '../lib/photos';
+import Photo from '../components/Photo.astro';
 import { withPlaceholders } from '../lib/text';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
@@ -15,7 +15,10 @@ const place = location.data;
 const schedule = await getScheduleContext(Astro);
 const active = schedule.active;
 const { hero_headline: headline, hero_deck: deck } = active.data;
-const photos = photoSets[schedule.photoSet];
+// The period's home page photos (the tree lot's also while closed just before it), else the Home page's.
+const periodPhotos = photoList(active.data.photos).length ? photoList(active.data.photos)
+  : schedule.photoSet === 'trees' ? photoList(schedule.nextTrees?.data.photos) : [];
+const photos = periodPhotos.length ? periodPhotos : photoList(page?.data.photos);
 const closed = schedule.closed;
 // Closed with the tree lot coming next (e.g. Thanksgiving): point the hero at /trees, not the ice cream menu.
 const treesNext = closed && !!schedule.nextTrees;
@@ -31,7 +34,7 @@ const treesDate = !closed && !schedule.treesOpen && schedule.treesNav && schedul
   : undefined;
 const primaryExternal = !!primary && /^https?:/.test(primary.url);
 ---
-<Base title="Homemade ice cream" description={page?.data.summary || undefined} content={page && { collection: 'site_pages', id: page.data.id, slug: 'home' }} image={photos.home[0].src}>
+<Base title="Homemade ice cream" description={page?.data.summary || undefined} content={page && { collection: 'site_pages', id: page.data.id, slug: 'home' }} image={photoUrl(photos[0])}>
   <section class="home-intro wrap">{!schedule.status.strip && page?.data.excerpt && <p class="eyebrow" {...page.edit.excerpt}>{page.data.excerpt}</p>}<h1 {...active.edit.hero_headline}>{headline.split('\n').map((line) => <><span class="line" set:html={withPlaceholders(line)} />{' '}</>)}</h1><p class="intro-deck" {...active.edit.hero_deck} set:html={withPlaceholders(deck)} />
     {primary && <div class="actions"><a class="button" href={primary.url}>{primary.label} <i class={`ph ${primaryExternal ? 'ph-arrow-up-right' : 'ph-arrow-right'}`} aria-hidden="true"></i></a></div>}</section>
   {treesDate && <section class="trees-line wrap"><h2><a href="/trees">Trees arrive {treesDate} <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2></section>}
@@ -39,7 +42,7 @@ const primaryExternal = !!primary && /^https?:/.test(primary.url);
     {columns.map((column) => column && <article><h2><a href={`/${column.id}`}>{column.data.title} <i class="ph ph-arrow-right" aria-hidden="true"></i></a></h2><p {...column.edit.summary}>{fillSummary(column.data.summary, { flavors: iceCream.length })}</p></article>)}
   </section>
   <div class={`photo-spread wrap photo-set-${schedule.photoSet}`}>
-    {photos.home.map((photo, i) => <div class="crop"><img src={photo.src} alt={photo.alt} srcset={photo.srcset} sizes={i === 0 ? '(max-width: 740px) 100vw, 820px' : '(max-width: 740px) 1px, 620px'} width={photo.width} height={photo.height} style={photo.position ? `object-position: ${photo.position}` : undefined} loading={i === 0 ? undefined : 'lazy'} fetchpriority={i === 0 ? 'high' : undefined} /></div>)}
+    {photos.map((photo, i) => <div class="crop"><Photo image={photo} sizes={i === 0 ? '(max-width: 740px) 100vw, 820px' : '(max-width: 740px) 1px, 620px'} priority={i === 0} /></div>)}
   </div>
   {band && <EndBand {...band} />}
 </Base>

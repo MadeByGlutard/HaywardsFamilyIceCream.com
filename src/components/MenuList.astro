@@ -4,10 +4,11 @@ import MenuGroups from './MenuGroups.astro';
 import MenuNote from './MenuNote.astro';
 import Base from '../layouts/Base.astro';
 import { menuCategories, type MenuName } from '../lib/catalog';
-import type { Photo } from '../lib/photos';
-import { getLocation, telephone, type SitePage } from '../lib/site';
-interface Props { menu: MenuName; page: SitePage; photo?: Photo; /** Category slugs per column, in reading order. A category staff add goes in the last one. */ columns: string[][] }
-const { menu, page, photo, columns } = Astro.props;
+import Photo from './Photo.astro';
+import { getLocation, photoUrl, telephone, type SitePage } from '../lib/site';
+interface Props { menu: MenuName; page: SitePage; /** Category slugs per column, in reading order. A category staff add goes in the last one. */ columns: string[][] }
+const { menu, page, columns } = Astro.props;
+const photo = page.data.photo;
 const [all, { data: place }] = await Promise.all([menuCategories(menu), getLocation()]);
 const categories = all.filter((category) => category.items.length > 0);
 const placed = columns.flat();
@@ -16,11 +17,11 @@ const inColumn = (slugs: string[], last: boolean) => [
   ...(last ? categories.filter((category) => !placed.includes(category.slug)) : []),
 ];
 ---
-<Base title={page.data.title} description={page.data.summary || page.data.excerpt}>
+<Base title={page.data.title} description={page.data.summary || page.data.excerpt} image={photoUrl(photo)}>
   <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1><MenuNote lead={page.data.excerpt} edit={page.edit.excerpt} /></section>
   <div class={`menu-groups wrap${photo ? ' has-photo' : ''}`}>
     {columns.map((slugs, i) => <div class="menu-col"><MenuGroups categories={inColumn(slugs, i === columns.length - 1)} /></div>)}
-    {photo && <figure class="menu-photo"><img src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} srcset={photo.srcset} sizes="(max-width: 1000px) 100vw, 400px" style={photo.position ? `object-position: ${photo.position}` : undefined} loading="lazy" /></figure>}
+    {photo && <figure class="menu-photo"><Photo image={photo} sizes="(max-width: 1000px) 100vw, 400px" /></figure>}
     {categories.length === 0 && <p>Please <a href={telephone(place.phone)}>call the stand</a> for today’s menu.</p>}
   </div>
 </Base>

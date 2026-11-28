@@ -1,10 +1,9 @@
 ---
 import MenuList from '../components/MenuList.astro';
-import { photos } from '../lib/photos';
 import { getPage } from '../lib/site';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
 const page = await getPage('sundaes');
 if (!page) return Astro.rewrite('/404');
 ---
-<MenuList menu="sundaes" page={page} photo={photos.toppedCups} columns={[['sundaes', 'shakes-and-floats'], ['twisters-and-treats', 'take-home']]} />
+<MenuList menu="sundaes" page={page} columns={[['sundaes', 'shakes-and-floats'], ['twisters-and-treats', 'take-home']]} />

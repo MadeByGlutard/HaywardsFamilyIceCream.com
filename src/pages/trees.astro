@@ -2,9 +2,9 @@
 import { PortableText } from 'emdash/ui';
 import EndBand from '../components/EndBand.astro';
 import Base from '../layouts/Base.astro';
-import { endBand, getLocation, getPage, telephone } from '../lib/site';
+import { endBand, getLocation, getPage, photoList, photoUrl, telephone } from '../lib/site';
 import { getScheduleContext } from '../lib/schedule';
-import { photos } from '../lib/photos';
+import Photo from '../components/Photo.astro';
 import { sentence } from '../lib/status';
 import MenuGroups from '../components/MenuGroups.astro';
 import { menuCategories } from '../lib/catalog';
@@ -31,20 +31,13 @@ const answer = schedule.treesOpen ? 'Trees are on the lot' : opens && schedule.t
 const lot = schedule.treesOpen ? schedule.status.line : schedule.nextTrees?.data.status_text?.trim();
 const hoursLine = lot && sentence(lot);
 const askClosing = schedule.treesOpen && !!lot && /\bfrom \d/i.test(lot);
-const lead = photos.treesOnRacks;
+const lead = page.data.photo;
+// The photos speak for themselves: alt text, no captions.
+const gallery = photoList(page.data.photos);
 // While the lot is open the page ends on its own band; otherwise on Hours & directions'.
 const band = await endBand(schedule.treesOpen ? page : undefined);
-// The photos speak for themselves: alt text, no captions.
-const gallery = [
-  photos.porch,
-  photos.wreathsDusk,
-  photos.treesNetted,
-  photos.bows,
-  photos.pinecone,
-  photos.snowmen,
-];
 ---
-<Base title={title} description={page.data.summary || page.data.excerpt} content={{ collection: 'site_pages', id: page.data.id, slug: 'trees' }} image={lead.src} strip={!schedule.treesOpen}>
+<Base title={title} description={page.data.summary || page.data.excerpt} content={{ collection: 'site_pages', id: page.data.id, slug: 'trees' }} image={photoUrl(lead)} strip={!schedule.treesOpen}>
   <section class="page-heading wrap">
     {answer
       ? <><p class="eyebrow" {...page.headlineEdit}>{title.replace(/\.$/, '')}</p><h1>{answer}</h1></>
@@ -60,16 +53,16 @@ const gallery = [
 
   {schedule.treesListed && categories.length > 0 && (
     <div class="trees-layout wrap">
-      <figure class="trees-lead"><div class="crop"><img src={lead.src} alt={lead.alt} srcset={lead.srcset} sizes="(max-width: 1000px) 100vw, 400px" width={lead.width} height={lead.height} style={`object-position: ${lead.position}`} fetchpriority="high" /></div></figure>
+      {lead && <figure class="trees-lead"><div class="crop"><Photo image={lead} sizes="(max-width: 1000px) 100vw, 400px" priority /></div></figure>}
       <div class="trees-list">
         <MenuGroups categories={categories} />
       </div>
     </div>
   )}
 
-  <section class="photo-row wrap" aria-label="Photos from the tree lot">
-    {gallery.map((photo) => <figure><div class="crop"><img src={photo.src} alt={photo.alt} srcset={photo.srcset} sizes="(max-width: 740px) 50vw, 400px" width={photo.width} height={photo.height} style={photo.position ? `object-position: ${photo.position}` : undefined} loading="lazy" /></div></figure>)}
-  </section>
+  {gallery.length > 0 && <section class="photo-row wrap" aria-label="Photos from the tree lot">
+    {gallery.map((photo) => <figure><div class="crop"><Photo image={photo} sizes="(max-width: 740px) 50vw, 400px" /></div></figure>)}
+  </section>}
 
   {band && <EndBand {...band} />}
 </Base>

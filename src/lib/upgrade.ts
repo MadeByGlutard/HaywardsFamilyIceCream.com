@@ -11,7 +11,9 @@
  * schedule period and its social links to Settings. Replaced collections are then hidden from the
  * admin but kept, so going back loses nothing.
  */
-import { SchemaRegistry, setSiteSettings, ulid } from 'emdash';
+import { MediaRepository, SchemaRegistry, computeContentHash, generatePlaceholder, setSiteSettings, ulid } from 'emdash';
+import { env } from 'cloudflare:workers';
+import photos from '../../seed/photos.json';
 import { applySeed, type SeedFile } from 'emdash/seed';
 import { OptionsRepository } from 'emdash/api/route-utils';
 import { getDb } from 'emdash/runtime';
@@ -25,7 +27,7 @@ const PORT = ['settings', 'categories', 'flavors'];
 const REPLACED = [...PORT, 'pages', 'visit', 'periods', 'products', 'menu_items', 'servings', 'menu_lists'];
 
 /** Raise when seed.json gains a collection or field, or renames a label (see renameUnedited). */
-export const CONTENT_VERSION = 25;
+export const CONTENT_VERSION = 26;
 const VERSION = 'haywards:content_version';
 const LOCK = 'haywards:content_upgrade_lock';
 // On D1 an upgrade takes about two minutes, one query at a time.
@@ -41,9 +43,9 @@ let done: Promise<void> | undefined;
  * Once per Worker isolate. A failure rejects, so the middleware can hold pages back instead of
  * serving them from a half-upgraded database, and is retried on the next request.
  */
-export function ensureContentModel(): Promise<void> {
+export function ensureContentModel(origin?: string): Promise<void> {
   // getDb, not locals.emdash.db: EmDash leaves the database off signed-out requests.
-  done ??= getDb().then(upgrade).catch((error) => {
+  done ??= getDb().then((db) => upgrade(db, origin)).catch((error) => {
     done = undefined;
     console.error('[content-upgrade] failed:', error);
     throw error;
@@ -51,7 +53,7 @@ export function ensureContentModel(): Promise<void> {
   return done;
 }
 
-async function upgrade(db: any) {
+async function upgrade(db: any, origin?: string) {
   const options = new OptionsRepository(db);
   const complete = await options.get('emdash:setup_complete');
   if (complete !== true && complete !== 'true') {
@@ -79,7 +81,7 @@ async function upgrade(db: any) {
   }
 
   try {
-    await addMissing(db, options);
+    await addMissing(db, options, origin);
     await options.set(VERSION, CONTENT_VERSION);
     await options.delete(ADDING);
   } finally {
@@ -87,7 +89,7 @@ async function upgrade(db: any) {
   }
 }
 
-async function addMissing(db: any, options: OptionsRepository) {
+async function addMissing(db: any, options: OptionsRepository, origin?: string) {
   const file = structuredClone(seed) as unknown as SeedFile;
   const { rows: existing } = await sql<{ slug: string }>`SELECT slug FROM _emdash_collections`.execute(db);
   const had = new Set(existing.map((row) => row.slug));
@@ -133,6 +135,7 @@ async function addMissing(db: any, options: OptionsRepository) {
   await historyEnding(db);
   await footerOnlyPages(db);
   await copyFromTemplates(db);
+  await importPhotos(db, origin);
   // EmDash's stock Categories and Tags, which are for blog posts.
   await sql`DELETE FROM _emdash_taxonomy_defs WHERE id IN ('taxdef_category', 'taxdef_tag')
     AND name NOT IN (SELECT name FROM taxonomies)`.execute(db);
@@ -293,6 +296,9 @@ async function copyFromTemplates(db: any) {
       await sql`UPDATE ec_site_pages SET ${sql.ref(field)} = ${value} WHERE slug = ${page.slug} AND (${sql.ref(field)} IS NULL OR ${sql.ref(field)} = '')`.execute(db);
     }
   }
+  // History's sources list, which used to be part of its template.
+  const history = (seed.content as any).site_pages.find((page: any) => page.slug === 'history');
+  await sql`UPDATE ec_site_pages SET sources = ${JSON.stringify(history.data.sources)} WHERE slug = 'history' AND (sources IS NULL OR sources = '' OR sources = '[]')`.execute(db);
   // The trees page's old introduction was shown nowhere; the before-the-season text takes its place.
   const trees = (seed.content as any).site_pages.find((page: any) => page.slug === 'trees');
   await sql`UPDATE ec_site_pages SET excerpt = ${trees.data.excerpt} WHERE slug = 'trees' AND excerpt = 'Balsam and Fraser firs, 24‑inch wreaths and kissing balls.'`.execute(db);
@@ -306,4 +312,85 @@ async function copyFromTemplates(db: any) {
   if (!rows[0] || rows[0].content?.includes('Want to work here?')) return;
   const content = [...intro, ...JSON.parse(rows[0].content || '[]')];
   await sql`UPDATE ec_site_pages SET content = ${JSON.stringify(content)} WHERE slug = 'jobs'`.execute(db);
+}
+
+type Photo = { file: string; alt: string; caption?: string; focalX: number; focalY: number };
+
+/**
+ * The site's photos used to ship with the code (public/images). Each one goes into the Media
+ * library once, and into the fields seed/photos.json names while those are still empty, so staff
+ * can swap them in the admin. History's two photos inside its text move to the library too.
+ */
+async function importPhotos(db: any, origin?: string) {
+  const media = new MediaRepository(db);
+  const ids = new Map<string, any>();
+  const item = async (file: string) => {
+    if (ids.has(file)) return ids.get(file);
+    const { rows } = await sql<any>`SELECT id, width, height, blurhash, dominant_color, storage_key, filename, mime_type FROM media WHERE filename = ${file} ORDER BY created_at LIMIT 1`.execute(db);
+    if (rows[0]) return ids.set(file, rows[0]).get(file);
+    const path = `/images/${file}`;
+    // The Worker's own static files; `astro dev` has no assets binding, so it asks its own server.
+    const assets = (env as any).ASSETS;
+    let response = assets ? await assets.fetch(new Request(`https://assets.local${path}`)).catch(() => undefined) : undefined;
+    if (!response?.ok && origin) response = await fetch(new URL(path, origin));
+    if (!response) throw new Error(`couldn't read ${path}`);
+    if (!response.ok) throw new Error(`couldn't read ${path} (${response.status})`);
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    const storageKey = `${ulid()}.jpg`;
+    await (env as any).MEDIA.put(storageKey, bytes, { httpMetadata: { contentType: 'image/jpeg' } });
+    const lqip: any = (await generatePlaceholder(bytes, 'image/jpeg')) ?? {};
+    const size = jpegSize(bytes);
+    const created = await media.create({
+      filename: file, mimeType: 'image/jpeg', size: bytes.byteLength, storageKey, contentHash: await computeContentHash(bytes),
+      width: size?.width, height: size?.height, blurhash: lqip.blurhash, dominantColor: lqip.dominantColor, status: 'ready',
+    } as any);
+    return ids.set(file, { id: created.id, width: size?.width, height: size?.height, blurhash: lqip.blurhash, dominant_color: lqip.dominantColor, storage_key: storageKey, filename: file, mime_type: 'image/jpeg' }).get(file);
+  };
+  const value = async (photo: Photo) => {
+    const row = await item(photo.file);
+    // The same shape the admin saves when someone picks a photo.
+    return {
+      provider: 'local', id: row.id, filename: row.filename, mimeType: row.mime_type, width: row.width, height: row.height,
+      blurhash: row.blurhash ?? undefined, dominantColor: row.dominant_color ?? undefined, meta: { storageKey: row.storage_key },
+      alt: photo.alt, ...(photo.caption ? { caption: photo.caption } : {}), focalX: photo.focalX, focalY: photo.focalY,
+    };
+  };
+  const fill = async (table: string, slug: string, fields: Record<string, Photo | Photo[]>) => {
+    for (const [field, photo] of Object.entries(fields)) {
+      const { rows } = await sql<any>`SELECT ${sql.ref(field)} AS v FROM ${sql.table(table)} WHERE slug = ${slug}`.execute(db);
+      if (!rows[0] || (rows[0].v && rows[0].v !== '[]' && rows[0].v !== 'null')) continue;
+      const json = Array.isArray(photo) ? await Promise.all(photo.map(async (p) => ({ image: await value(p) }))) : await value(photo);
+      await sql`UPDATE ${sql.table(table)} SET ${sql.ref(field)} = ${JSON.stringify(json)} WHERE slug = ${slug}`.execute(db);
+    }
+  };
+  for (const [slug, fields] of Object.entries((photos as any).site_pages)) await fill('ec_site_pages', slug, fields as any);
+  for (const [slug, fields] of Object.entries((photos as any).schedule)) await fill('ec_schedule', slug, fields as any);
+
+  // History's photos inside its text pointed at /images files; they become library items.
+  const { rows } = await sql<{ content: string | null }>`SELECT content FROM ec_site_pages WHERE slug = 'history'`.execute(db);
+  if (!rows[0]?.content) return;
+  const blocks = JSON.parse(rows[0].content);
+  let changed = false;
+  for (const block of blocks) {
+    const url: string | undefined = block._type === 'image' ? block.asset?.url : undefined;
+    if (!url?.startsWith('/images/')) continue;
+    const row = await item(url.slice('/images/'.length));
+    block.asset = { _type: 'reference', _ref: row.id, provider: 'local', url: `/_emdash/api/media/file/${row.storage_key}`, meta: { storageKey: row.storage_key } };
+    Object.assign(block, { width: row.width, height: row.height, blurhash: row.blurhash ?? undefined, dominantColor: row.dominant_color ?? undefined });
+    changed = true;
+  }
+  if (changed) await sql`UPDATE ec_site_pages SET content = ${JSON.stringify(blocks)} WHERE slug = 'history'`.execute(db);
+}
+
+/** Width and height from a JPEG's start-of-frame marker. */
+function jpegSize(bytes: Uint8Array) {
+  for (let i = 2; i < bytes.length - 9; ) {
+    if (bytes[i] !== 0xff) return undefined;
+    const marker = bytes[i + 1];
+    const length = (bytes[i + 2] << 8) | bytes[i + 3];
+    if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker))
+      return { height: (bytes[i + 5] << 8) | bytes[i + 6], width: (bytes[i + 7] << 8) | bytes[i + 8] };
+    i += 2 + length;
+  }
+  return undefined;
 }

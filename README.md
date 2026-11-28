@@ -222,6 +222,12 @@ Anything staff can manage in the admin lives there, not in this repository:
   unpublished page, and the Trees page outside the season, use the Hours & directions page's band.
 - **Site-wide notes** are in Store info: the allergy note on the menu pages (its opening question
   is bold), the line for an empty flavor list, and the page-not-found headline and text.
+- **Photos** are in the Media library and each page's Photo and Photos fields (Home's Photos, the
+  Trees gallery, a menu page's photo, History's postcard and its caption). A schedule period's Home
+  page photos replace the Home page's while it's on (the tree lot's also show while closed just
+  before it). Crops follow each photo's focal point. `public/images` and `seed/photos.json` are
+  only the starting set: the content upgrade copies them into the library once.
+- **History's sources** are its Sources field.
 - **Menus** drop a page while it's unpublished.
 
 ### Databases already set up

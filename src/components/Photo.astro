@@ -1,0 +1,10 @@
+---
+/**
+ * A photo from the Media library (a page's Photo or Photos field). EmDash picks the sizes, crops
+ * around the photo's focal point and shows its colour until it loads.
+ */
+import { Image } from 'emdash/ui';
+interface Props { image: any; sizes: string; priority?: boolean }
+const { image, sizes, priority = false } = Astro.props;
+---
+{image && <Image image={image} sizes={sizes} priority={priority} />}

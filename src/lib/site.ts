@@ -52,3 +52,10 @@ export async function endBand(page?: SitePage) {
 /** A summary with its "{flavors}" placeholder (the number of ice cream flavors) filled in. */
 export const fillSummary = (text: string | undefined, counts: { flavors?: number } = {}) =>
   (text ?? '').replace(/\{flavors\}/g, String(counts.flavors ?? ''));
+
+/** A Media library photo's address, for share images. */
+export const photoUrl = (image: any): string | undefined =>
+  image?.meta?.storageKey ? `/_emdash/api/media/file/${image.meta.storageKey}` : image?.src;
+
+/** The photos in a Photos field. */
+export const photoList = (rows: any): any[] => (Array.isArray(rows) ? rows.map((row) => row?.image).filter(Boolean) : []);

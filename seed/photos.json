@@ -1,0 +1,126 @@
+{
+  "_about": "Starting photos. The content upgrade (src/lib/upgrade.ts) copies each file from public/images into the Media library once and puts it in these fields while they are empty. After that, photos are managed in the admin.",
+  "site_pages": {
+    "home": {
+      "photos": [
+        {
+          "file": "sundae.jpg",
+          "alt": "A Hayward’s sundae with sprinkles and a cherry in front of the Milford stand",
+          "focalX": 0.5,
+          "focalY": 0.82
+        },
+        {
+          "file": "scoops-caramel.jpg",
+          "alt": "Pale scoops with caramel-colored ribbons in a blue Hayward’s cup",
+          "focalX": 0.74,
+          "focalY": 0.5
+        }
+      ]
+    },
+    "flavors": {
+      "photo": {
+        "file": "two-cups.jpg",
+        "alt": "Two blue Hayward’s cups, one with red-streaked white ice cream and one with bright blue",
+        "focalX": 0.6,
+        "focalY": 0.4
+      }
+    },
+    "sundaes": {
+      "photo": {
+        "file": "two-scoops.jpg",
+        "alt": "Two cups of ice cream on an outdoor table at Hayward’s, one piled with caramel pieces and one green",
+        "focalX": 0.18,
+        "focalY": 0.5
+      }
+    },
+    "jobs": {
+      "photo": {
+        "file": "milford-stand.jpg",
+        "alt": "The white Hayward’s stand on Elm Street in Milford, with its curved roof and red sign",
+        "focalX": 0.5,
+        "focalY": 0.43
+      }
+    },
+    "visit": {
+      "photo": {
+        "file": "milford-stand.jpg",
+        "alt": "The entrance and serving windows at Hayward’s Milford",
+        "focalX": 0.49,
+        "focalY": 0.5
+      }
+    },
+    "trees": {
+      "photo": {
+        "file": "trees-on-racks.jpg",
+        "alt": "Fresh-cut Christmas trees leaning on wooden racks in front of the stand’s grey roof",
+        "focalX": 0.55,
+        "focalY": 0.5
+      },
+      "photos": [
+        {
+          "file": "trees-porch.jpg",
+          "alt": "Looking down the stand’s covered porch: a greenery snowman in a black top hat up close, and wreaths with red ribbons along the railing, with snow on the ground beyond",
+          "focalX": 0.5,
+          "focalY": 0.28
+        },
+        {
+          "file": "trees-wreaths-dusk.jpg",
+          "alt": "Wreaths with red, white and silver bows set out on benches in front of the stand at dusk, a street lamp lit behind",
+          "focalX": 0.45,
+          "focalY": 0.5
+        },
+        {
+          "file": "trees-netted.jpg",
+          "alt": "Netted Christmas trees stacked high beside the stand, cut trunks facing out",
+          "focalX": 0.5,
+          "focalY": 0.55
+        },
+        {
+          "file": "trees-bows.jpg",
+          "alt": "Freshly tied bows piled on a steel workbench: blue snowflakes, candy stripes, gold, holly, and red ribbon printed “Merry Christmas”",
+          "focalX": 0.5,
+          "focalY": 0.45
+        },
+        {
+          "file": "trees-pinecone.jpg",
+          "alt": "Close-up of a pinecone with white-tipped scales among pine needles",
+          "focalX": 0.42,
+          "focalY": 0.5
+        },
+        {
+          "file": "trees-snowmen.jpg",
+          "alt": "Three snowmen made of evergreen boughs, with black top hats, button eyes, pinecone noses and plaid scarves, hanging in front of green lattice",
+          "focalX": 0.5,
+          "focalY": 0.22
+        }
+      ]
+    },
+    "history": {
+      "photo": {
+        "file": "postcard-milford-stand.jpg",
+        "alt": "Color postcard of a long white ice cream stand with a red hipped roof and a Hayward Farms sign, titled “One of our ice cream stands on Route 101, Milford, New Hampshire”",
+        "caption": "The old Milford stand on an undated postcard. Boston Public Library, Tichnor Brothers Collection.",
+        "focalX": 0.5,
+        "focalY": 0.5
+      }
+    }
+  },
+  "schedule": {
+    "trees-2026": {
+      "photos": [
+        {
+          "file": "trees-stand-dusk.jpg",
+          "alt": "The Hayward’s stand at dusk, its curved roof edged in white lights, with wreaths and red bows across the front and red-draped tables outside",
+          "focalX": 0.5,
+          "focalY": 0.22
+        },
+        {
+          "file": "trees-single.jpg",
+          "alt": "A full Christmas tree standing on its own by a white picket fence under a clear blue sky",
+          "focalX": 0.5,
+          "focalY": 0.3
+        }
+      ]
+    }
+  }
+}

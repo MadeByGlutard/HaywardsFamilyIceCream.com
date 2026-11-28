@@ -35,7 +35,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	if (to) return redirect(to + url.search);
 	if (!isPrerendered) {
 		try {
-			await ensureContentModel();
+			await ensureContentModel(url.origin);
 		} catch {
 			// Don't serve pages from a half-upgraded database; staff routes stay reachable.
 			if (!url.pathname.startsWith("/_emdash/")) return updating();

@@ -36,6 +36,6 @@ From the family's shared iCloud album "Haywards Tree Season" (2015–2022, Milfo
 | `public/images/trees-bows.jpg` (1536 × 1800) [#208, Nov 2020] | `/trees` photo row |
 | `public/images/trees-pinecone.jpg` (1800 × 1200) [#211, Jan 2021] | `/trees` photo row. The white tips look painted, not snow; taken after the season, place unknown, so nothing claims it is at the stand. |
 
-Photo sets, alt text and captions are defined in `src/lib/photos.ts`.
+Photos, alt text and captions are managed in the admin (Media library and each page's Photo and Photos fields). The starting set is `seed/photos.json`; see README, "Managed in EmDash, not in code".
 
 Flavors in the scoop photos are not identified anywhere, so captions and alt text describe what is visible. Each photo has an 800px copy (`-800.jpg`) for phones.

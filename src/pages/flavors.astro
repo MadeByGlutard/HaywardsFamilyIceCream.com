@@ -1,10 +1,10 @@
 ---
 import MenuNote from '../components/MenuNote.astro';
 import Base from '../layouts/Base.astro';
-import { photos } from '../lib/photos';
+import Photo from '../components/Photo.astro';
 import { getScheduleContext } from '../lib/schedule';
 import { menuCategories } from '../lib/catalog';
-import { fillSummary, getLocation, getPage, telephone } from '../lib/site';
+import { fillSummary, getLocation, getPage, photoUrl, telephone } from '../lib/site';
 import { cacheContentPage } from '../lib/cache';
 cacheContentPage(Astro);
 const [page, categories, location] = await Promise.all([getPage('flavors'), menuCategories('flavors'), getLocation()]);
@@ -19,7 +19,7 @@ const [main, ...rest] = categories.filter((category) => category !== sizes && ca
 const scoops = sizes?.items.filter((item) => !item.data.options) ?? [];
 const others = sizes?.items.filter((item) => item.data.options) ?? [];
 ---
-<Base title="Ice cream flavors" description={fillSummary(page.data.summary, { flavors: main?.flavors.length }) || page.data.excerpt}>
+<Base title="Ice cream flavors" description={fillSummary(page.data.summary, { flavors: main?.flavors.length }) || page.data.excerpt} image={photoUrl(page.data.photo)}>
   <section class="page-heading wrap"><h1 {...page.headlineEdit}>{page.headline}</h1><MenuNote lead={page.data.excerpt} edit={page.edit.excerpt} /></section>
   {!!sizes?.items.length && <div class="size-lines wrap">
     <p><strong>Sizes</strong> {scoops.map((item, i) => <>{i > 0 && ', '}<span {...item.edit.name}>{i > 0 ? item.data.name.toLowerCase() : item.data.name}</span></>)}.{others.map((item) => <>{' '}<span {...item.edit.name}>{item.data.name}</span>: <span {...item.edit.options}>{item.data.options!.toLowerCase()}</span>.</>)}</p>
@@ -43,7 +43,7 @@ const others = sizes?.items.filter((item) => item.data.options) ?? [];
           ? <ul class="flavor-list" role="list">{category.flavors.map((flavor) => <li><span class="row-name" {...flavor.edit.name}>{flavor.data.name}</span>{flavor.data.description && <p {...flavor.edit.description}>{flavor.data.description}</p>}</li>)}</ul>
           : <p {...location.edit.empty_note}>{place.empty_note}</p>}
       </section>)}
-      <figure class="menu-photo"><img src={photos.twoCups.src} alt={photos.twoCups.alt} srcset={photos.twoCups.srcset} sizes="(max-width: 740px) 100vw, 400px" width={photos.twoCups.width} height={photos.twoCups.height} style={`object-position: ${photos.twoCups.position}`} loading="lazy" /></figure>
+      {page.data.photo && <figure class="menu-photo"><Photo image={page.data.photo} sizes="(max-width: 740px) 100vw, 400px" /></figure>}
     </div>
   </div>
 </Base>

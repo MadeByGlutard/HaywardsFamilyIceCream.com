@@ -89,6 +89,20 @@
           "options": {
             "rows": 2
           }
+        },
+        {
+          "slug": "photos",
+          "label": "Home page photos",
+          "type": "repeater",
+          "validation": {
+            "subFields": [
+              {
+                "slug": "image",
+                "label": "Photo",
+                "type": "image"
+              }
+            ]
+          }
         }
       ]
     },
@@ -429,6 +443,30 @@
         {
           "slug": "content",
           "label": "Text",
+          "type": "portableText"
+        },
+        {
+          "slug": "photo",
+          "label": "Photo",
+          "type": "image"
+        },
+        {
+          "slug": "photos",
+          "label": "Photos",
+          "type": "repeater",
+          "validation": {
+            "subFields": [
+              {
+                "slug": "image",
+                "label": "Photo",
+                "type": "image"
+              }
+            ]
+          }
+        },
+        {
+          "slug": "sources",
+          "label": "Sources",
           "type": "portableText"
         }
       ],
@@ -2142,7 +2180,407 @@
               ]
             }
           ],
-          "top_menu": true
+          "top_menu": true,
+          "sources": [
+            {
+              "_type": "block",
+              "_key": "s0",
+              "style": "normal",
+              "markDefs": [],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s0a",
+                  "text": "Sources don’t all agree. We use 1939 for the Milford stand because the 1962 obituary and the local history both give it and the town’s records fit; 1940 is when the family’s Nashua stand opened. If you have a photo or a correction, please get in touch.",
+                  "marks": []
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s1",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l1",
+                  "href": "https://milfordhistory.online/haywards-milford-nh"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s1a",
+                  "text": "Matt Bowling, “Hayward’s Ice Cream,” Milford History Online: the milk cart, the Smith Farm, the 1939 opening and the fires",
+                  "marks": [
+                    "l1"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s2",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l2",
+                  "href": "https://archive.org/details/sim_guernsey-breeders-journal_1962-04-07_109_7"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s2a",
+                  "text": "Guernsey Breeders’ Journal, April 7, 1962: Stanley Hayward’s obituary, which dates the stand to 1939",
+                  "marks": [
+                    "l2"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s3",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l3",
+                  "href": "https://archive.org/details/annualreportofto1943milf"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s3a",
+                  "text": "Town of Milford annual report: tax inventory of April 1942",
+                  "marks": [
+                    "l3"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s4",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l4",
+                  "href": "https://ark.digitalcommonwealth.org/ark:/50959/pz50h301m"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s4a",
+                  "text": "Tichnor Brothers postcard 86441, Boston Public Library: “the original Hayward Farms Stand”",
+                  "marks": [
+                    "l4"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s5",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l5",
+                  "href": "https://ark.digitalcommonwealth.org/ark:/50959/pz50h2977"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s5a",
+                  "text": "Tichnor Brothers postcard 78043, Boston Public Library: the stand with the frozen foods sign",
+                  "marks": [
+                    "l5"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s6",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l6",
+                  "href": "https://haywardsicecream.com/history-of-haywards"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s6a",
+                  "text": "Hayward’s Ice Cream, Nashua: its opening on June 15, 1940",
+                  "marks": [
+                    "l6"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s7",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l7",
+                  "href": "https://www.visitingnewengland.com/haywards-homemade-ice-cream.html"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s7a",
+                  "text": "Eric Hurwitz, “Carry on Hayward Son,” Visiting New England, 2018: the Nashua stand’s founders and their grandson Chris Ordway",
+                  "marks": [
+                    "l7"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s8",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l8",
+                  "href": "https://www.cabinet.com/obituaries/cabinet-obituaries/2026/08/20/trudy-hayward-legrice/"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s8a",
+                  "text": "The Cabinet, 2026: obituary of Trudy (Hayward) LeGrice, daughter of Charles P. and Fredericka Hayward (it spells her “Frederika”)",
+                  "marks": [
+                    "l8"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s9",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l9",
+                  "href": "https://www.cabinet.com/opinion/cabinet-editorials/2019/06/20/thumbing-the-files-18/"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s9a",
+                  "text": "The Cabinet, “Thumbing the Files,” 2019: the 1948 frozen food store",
+                  "marks": [
+                    "l9"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s10",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l10",
+                  "href": "https://milfordhistory.com/wp-content/uploads/Milford%20High%20School%20Yearbook%201948%20(searchable).pdf#page=50"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s10a",
+                  "text": "Milford High School yearbook, 1948, page 50 of the PDF: Hayward Farms advertisement",
+                  "marks": [
+                    "l10"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s11",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l11",
+                  "href": "https://milfordhistory.com/wp-content/uploads/Milford%20High%20School%20Yearbook%201949%20(searchable).pdf#page=31"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s11a",
+                  "text": "Milford High School yearbook, 1949, page 31 of the PDF: the seniors in riddles",
+                  "marks": [
+                    "l11"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s12",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l12",
+                  "href": "https://archive.org/details/annualreportofto1965milf"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s12a",
+                  "text": "Town of Milford annual report, 1965: Christmas ice cream for the schools",
+                  "marks": [
+                    "l12"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s13",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l13",
+                  "href": "https://gis.vgsi.com/milfordnh/Parcel.aspx?pid=4979"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s13a",
+                  "text": "Town of Milford assessing record for 383 Elm Street: built 2001",
+                  "marks": [
+                    "l13"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s14",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l14",
+                  "href": "https://web.archive.org/web/20090614160912/http://www.haywardsicecream.com/Milford.htm"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s14a",
+                  "text": "Hayward’s website, 2009: the Milford stand on former Hayward Farms land",
+                  "marks": [
+                    "l14"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s15",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l15",
+                  "href": "https://web.archive.org/web/20080423023621/http://www.haywardsicecream-nh.com/MakingIceCream.htm"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s15a",
+                  "text": "Hayward’s website, 2008: making ice cream again",
+                  "marks": [
+                    "l15"
+                  ]
+                }
+              ]
+            },
+            {
+              "_type": "block",
+              "_key": "s16",
+              "style": "normal",
+              "listItem": "number",
+              "level": 1,
+              "markDefs": [
+                {
+                  "_type": "link",
+                  "_key": "l16",
+                  "href": "https://www.collaborativenh.org/granite-solutions-coronavirus-1/2022/6/22/these-seacoast-stops-are-on-nh-ice-cream-trail-states-greatest-summer-adventure"
+                }
+              ],
+              "children": [
+                {
+                  "_type": "span",
+                  "_key": "s16a",
+                  "text": "Granite State News Collaborative, 2022: the Ice Cream Trail",
+                  "marks": [
+                    "l16"
+                  ]
+                }
+              ]
+            }
+          ]
         }
       },
       {

@@ -32,7 +32,8 @@ test('there is always a period, and each runs until the next one starts', () => 
 test('a period is complete: nothing else supplies its hours or headline', () => {
 	const fields = seed.collections.find((c) => c.slug === 'schedule').fields;
 	const required = fields.filter((f) => f.required).map((f) => f.slug);
-	assert.deepEqual(fields.filter((f) => !f.required).map((f) => f.slug), ['banner_text']);
+	// Photos are optional: without them the home page shows the Home page's own.
+	assert.deepEqual(fields.filter((f) => !f.required).map((f) => f.slug), ['banner_text', 'photos']);
 	for (const p of seed.content.schedule) for (const slug of required) assert.ok(p.data[slug] || (p.status === 'draft' && slug === 'start_date'), `${p.slug}.${slug}`);
 	assert.ok(!seed.collections.find((c) => c.slug === 'store').fields.some((f) => /hours|banner/.test(f.slug)));
 	assert.ok(!seed.content.site_pages.find((p) => p.slug === 'home').data.headline);
@@ -64,8 +65,8 @@ test('seed content invents no closing times, prices or dates', () => {
 });
 
 test('the forms stay short, with no prices', () => {
-	// Store info and Pages also hold the text that used to be written into the templates (Nov 2026).
-	const most = { schedule: 7, catalog_flavors: 6, catalog_items: 3, catalog_categories: 3, store: 8, jobs: 3, site_pages: 10, posts: 5 };
+	// Store info, Pages and periods also hold the text and photos that used to be in the templates (Nov 2026).
+	const most = { schedule: 8, catalog_flavors: 6, catalog_items: 3, catalog_categories: 3, store: 8, jobs: 3, site_pages: 13, posts: 5 };
 	assert.deepEqual(seed.collections.map((c) => c.slug), Object.keys(most));
 	for (const c of seed.collections) {
 		assert.ok(c.fields.length <= most[c.slug], `${c.slug} has ${c.fields.length} fields`);
