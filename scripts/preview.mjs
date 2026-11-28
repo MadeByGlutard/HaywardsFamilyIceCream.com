@@ -20,6 +20,7 @@
 // PREVIEW_ACCESS_CLIENT_SECRET (optional; without them the first visitor runs it).
 
 import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 
 const PREFIX = "haywardsfamilyicecream-com";
 const PRODUCTION_D1_ID = "406e55ec-a241-4bad-a648-15dc41f01810";
@@ -272,26 +273,33 @@ async function findNamespace() {
 
 // ---------------------------------------------------------------- commands
 
-// Load the new preview once, so the content upgrade happens now and not for a visitor.
-async function upgradeContent() {
+// Load the new preview until its database reaches this commit's CONTENT_VERSION, so the content
+// upgrade happens now and not for a visitor. Right after a deploy, the old version can still answer.
+const CONTENT_VERSION = Number(readFileSync(new URL("../src/lib/upgrade.ts", import.meta.url), "utf8").match(/CONTENT_VERSION = (\d+)/)[1]);
+const contentVersion = async (databaseId) =>
+	Number((await rows(databaseId, "SELECT value FROM options WHERE name = 'haywards:content_version'"))[0]?.value ?? 0);
+
+async function upgradeContent(databaseId) {
 	const id = process.env.PREVIEW_ACCESS_CLIENT_ID;
 	const secret = process.env.PREVIEW_ACCESS_CLIENT_SECRET;
 	if (!id || !secret) return log("No Access service token; the first visitor will run the content upgrade");
 	// The workers.dev address, not the custom domain: the zone's Bot Fight Mode answers requests
 	// from CI servers with a 403 before Access sees them, and workers.dev isn't in the zone.
 	const { result } = await api(`/accounts/${account}/workers/subdomain`);
-	// A query string nobody else uses, so the Workers cache can't answer with the last deploy's page.
-	const url = `https://${slug}-${PREFIX}.${result.subdomain}.workers.dev/?upgrade=${Date.now()}`;
 	const started = Date.now();
-	for (let attempt = 1; attempt <= 6; attempt++) {
+	for (let attempt = 1; attempt <= 12; attempt++) {
+		// A query string nobody else uses, so the Workers cache can't answer with the last deploy's page.
+		const url = `https://${slug}-${PREFIX}.${result.subdomain}.workers.dev/?upgrade=${Date.now()}`;
 		try {
 			const response = await fetch(url, {
 				headers: { "CF-Access-Client-Id": id, "CF-Access-Client-Secret": secret },
 				redirect: "manual",
 				signal: AbortSignal.timeout(600_000),
 			});
-			if (response.ok) return log(`Content is up to date (${((Date.now() - started) / 1000).toFixed(1)}s, ${url})`);
-			log(`${url} answered ${response.status}; trying again`);
+			const version = await contentVersion(databaseId);
+			if (response.ok && version >= CONTENT_VERSION)
+				return log(`Content is up to date, version ${version} (${((Date.now() - started) / 1000).toFixed(1)}s, ${url})`);
+			log(`${url} answered ${response.status}, content version ${version} of ${CONTENT_VERSION}; trying again`);
 		} catch (error) {
 			log(`${url}: ${error.message}; trying again`);
 		}
@@ -343,7 +351,7 @@ if (command === "deploy") {
 	cf(["previews", "deploy", "--preview-name", branch], {
 		env: { PREVIEW_D1_NAME: name, PREVIEW_D1_ID: database.uuid, PREVIEW_R2_BUCKET: name, PREVIEW_KV_ID: sessions.id },
 	});
-	await upgradeContent();
+	await upgradeContent(database.uuid);
 } else {
 	log(`Deleting the ${branch} preview`);
 	// Keep going if the Worker Preview is already gone, so its storage still gets removed.
