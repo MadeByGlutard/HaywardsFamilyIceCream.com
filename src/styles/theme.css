@@ -1732,8 +1732,9 @@ main:has(> .end-band:last-child) + .footer {
 		aspect-ratio: 3 / 2;
 	}
 
+	/* Two columns all the way down: Find us and Hours & contact line up under the page links. */
 	.footer {
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5em), 1fr));
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 16px var(--gutter);
 		margin-top: var(--s4);
 	}
@@ -1757,10 +1758,6 @@ main:has(> .end-band:last-child) + .footer {
 	.footer-col a,
 	.footer-fine a {
 		min-height: 44px;
-	}
-
-	.footer-fine span {
-		flex-basis: 100%;
 	}
 }
 
